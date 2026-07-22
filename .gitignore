@@ -53,3 +53,8 @@ jspm_packages/
 
 # Aider AI Chat
 .aider*
+
+# Local Docker dev stack (vendored frappe_docker checkout + generated files + secrets)
+.build/
+docker/custom.env
+docker/*.log

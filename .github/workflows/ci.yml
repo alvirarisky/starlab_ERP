@@ -1,0 +1,106 @@
+name: CI
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Server tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    services:
+      redis-cache:
+        image: redis:alpine
+        ports:
+          - 13000:6379
+      redis-queue:
+        image: redis:alpine
+        ports:
+          - 11000:6379
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=5s
+          --health-timeout=2s
+          --health-retries=6
+
+    env:
+      BENCH_DIR: /home/runner/frappe-bench
+
+    steps:
+      - name: Clone app
+        uses: actions/checkout@v4
+        with:
+          path: apps/starlab_lab_ops
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('apps/starlab_lab_ops/pyproject.toml') }}
+
+      - name: Install wkhtmltopdf
+        run: |
+          wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+          sudo apt-get install -y ./wkhtmltox_0.12.6.1-3.jammy_amd64.deb
+
+      - name: Install Bench CLI
+        run: pip install frappe-bench
+
+      - name: Init bench
+        run: |
+          bench init "$BENCH_DIR" \
+            --skip-redis-config-generation \
+            --skip-assets \
+            --python "$(which python)" \
+            --frappe-branch version-16
+
+      - name: Point bench at CI services
+        working-directory: ${{ env.BENCH_DIR }}
+        run: |
+          bench set-mariadb-host 127.0.0.1
+          bench set-redis-cache-host redis://localhost:13000
+          bench set-redis-queue-host redis://localhost:11000
+          bench set-redis-socketio-host redis://localhost:11000
+          bench set-config -g db_type mariadb
+
+      - name: Get ERPNext and this app
+        working-directory: ${{ env.BENCH_DIR }}
+        run: |
+          bench get-app erpnext --branch version-16
+          bench get-app starlab_lab_ops "${{ github.workspace }}/apps/starlab_lab_ops"
+
+      - name: New site
+        working-directory: ${{ env.BENCH_DIR }}
+        run: |
+          bench new-site test_site \
+            --mariadb-root-password root \
+            --admin-password admin \
+            --install-app erpnext \
+            --install-app starlab_lab_ops
+
+      - name: Run tests
+        working-directory: ${{ env.BENCH_DIR }}
+        run: bench --site test_site run-tests --app starlab_lab_ops
