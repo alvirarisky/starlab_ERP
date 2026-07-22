@@ -25,16 +25,18 @@ jobs:
         ports:
           - 11000:6379
       mariadb:
-        image: mariadb:11.4
+        image: mariadb:11.8
         env:
-          MARIADB_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
+          MARIADB_AUTO_UPGRADE: 1
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-start-period=5s
           --health-interval=5s
-          --health-timeout=2s
-          --health-retries=6
+          --health-timeout=5s
+          --health-retries=10
 
     env:
       BENCH_DIR: /home/runner/frappe-bench
@@ -85,6 +87,11 @@ jobs:
           bench set-redis-queue-host redis://localhost:11000
           bench set-redis-socketio-host redis://localhost:11000
           bench set-config -g db_type mariadb
+
+      - name: Set MariaDB server charset defaults
+        run: |
+          mysql --host=127.0.0.1 --user=root --password=root \
+            -e "SET GLOBAL character_set_server = 'utf8mb4'; SET GLOBAL collation_server = 'utf8mb4_unicode_ci';"
 
       - name: Get ERPNext and this app
         working-directory: ${{ env.BENCH_DIR }}
