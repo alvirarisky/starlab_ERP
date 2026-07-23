@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:sample_id",
+ "creation": "2026-07-23 16:29:08.592817",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sample_id",
+  "work_order",
+  "matriks",
+  "tanggal_terima",
+  "status",
+  "retensi",
+  "tanggal_musnah",
+  "catatan_kondisi"
+ ],
+ "fields": [
+  {
+   "fieldname": "sample_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "ID Sample",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Work Order",
+   "options": "Work Order Pengujian",
+   "reqd": 1
+  },
+  {
+   "fieldname": "matriks",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Matriks",
+   "options": "Udara Ambien\nUdara Emisi\nAir Permukaan\nAir Bersih\nAir Limbah\nTanah\nSedimen\nKebisingan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tanggal_terima",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Tanggal Terima",
+   "reqd": 1
+  },
+  {
+   "default": "Diterima",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Diterima\nSedang Diuji\nDivalidasi\nDiarsipkan\nDimusnahkan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "retensi",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Retensi",
+   "options": "Tahan\nBisa Dibuang",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tanggal_musnah",
+   "fieldtype": "Date",
+   "label": "Tanggal Musnah"
+  },
+  {
+   "fieldname": "catatan_kondisi",
+   "fieldtype": "Small Text",
+   "label": "Catatan Kondisi"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 16:29:08.592817",
+ "modified_by": "Administrator",
+ "module": "Starlab Lab Ops",
+ "name": "Sample",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
