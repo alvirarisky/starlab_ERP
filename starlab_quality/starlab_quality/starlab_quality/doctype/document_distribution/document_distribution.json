@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-07-23 16:30:40.691883",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "divisi",
+  "tanggal_distribusi",
+  "acknowledged",
+  "acknowledged_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "divisi",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Divisi",
+   "options": "Direksi\nMM\nMT\nLaboratorium\nAdministrasi\nFinance\nMarketing",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tanggal_distribusi",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Tanggal Distribusi",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "acknowledged",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Acknowledged"
+  },
+  {
+   "fieldname": "acknowledged_on",
+   "fieldtype": "Datetime",
+   "label": "Acknowledged Pada"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-23 16:30:40.691883",
+ "modified_by": "Administrator",
+ "module": "Starlab Quality",
+ "name": "Document Distribution",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

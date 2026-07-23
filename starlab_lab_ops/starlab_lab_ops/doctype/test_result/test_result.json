@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-07-23 16:29:35.146785",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sample",
+  "work_order",
+  "parameter",
+  "analis",
+  "hasil_uji",
+  "satuan",
+  "qc_detail",
+  "status",
+  "validated_by",
+  "validated_on",
+  "locked",
+  "catatan_validasi"
+ ],
+ "fields": [
+  {
+   "fieldname": "sample",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Sample",
+   "options": "Sample",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "sample.work_order",
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Work Order",
+   "options": "Work Order Pengujian",
+   "reqd": 1
+  },
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Parameter",
+   "options": "Test Parameter",
+   "reqd": 1
+  },
+  {
+   "fieldname": "analis",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Analis",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hasil_uji",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Hasil Uji",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "parameter.satuan",
+   "fieldname": "satuan",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Satuan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "qc_detail",
+   "fieldtype": "Table",
+   "label": "Detail QC",
+   "options": "QC Detail"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nDiajukan Validasi\nDivalidasi\nDitolak",
+   "reqd": 1
+  },
+  {
+   "fieldname": "validated_by",
+   "fieldtype": "Link",
+   "label": "Divalidasi Oleh",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "validated_on",
+   "fieldtype": "Datetime",
+   "label": "Divalidasi Pada"
+  },
+  {
+   "default": "0",
+   "fieldname": "locked",
+   "fieldtype": "Check",
+   "label": "Terkunci"
+  },
+  {
+   "fieldname": "catatan_validasi",
+   "fieldtype": "Small Text",
+   "label": "Catatan Validasi"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 16:29:35.146785",
+ "modified_by": "Administrator",
+ "module": "Starlab Lab Ops",
+ "name": "Test Result",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

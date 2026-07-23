@@ -1,0 +1,99 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:parameter_name",
+ "creation": "2026-07-23 16:09:23.535381",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter_name",
+  "matriks",
+  "regulasi_acuan",
+  "satuan",
+  "harga_satuan_default",
+  "status",
+  "metode_uji"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Nama Parameter",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "matriks",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Matriks",
+   "options": "Udara Ambien\nUdara Emisi\nAir Permukaan\nAir Bersih\nAir Limbah\nTanah\nSedimen\nKebisingan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "regulasi_acuan",
+   "fieldtype": "Data",
+   "label": "Regulasi Acuan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "satuan",
+   "fieldtype": "Data",
+   "label": "Satuan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "harga_satuan_default",
+   "fieldtype": "Currency",
+   "label": "Harga Satuan Default"
+  },
+  {
+   "default": "Aktif",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Aktif\nNonaktif",
+   "reqd": 1
+  },
+  {
+   "fieldname": "metode_uji",
+   "fieldtype": "Link",
+   "label": "Metode Uji",
+   "options": "Document Master"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 16:27:53.302106",
+ "modified_by": "Administrator",
+ "module": "Starlab Lab Ops",
+ "name": "Test Parameter",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
