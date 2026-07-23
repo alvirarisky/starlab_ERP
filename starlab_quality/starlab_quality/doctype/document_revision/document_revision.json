@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-07-23 16:27:36.371779",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "revisi_ke",
+  "tanggal_revisi",
+  "diubah_oleh",
+  "ringkasan_perubahan",
+  "file_versi_lama"
+ ],
+ "fields": [
+  {
+   "fieldname": "revisi_ke",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Revisi Ke"
+  },
+  {
+   "fieldname": "tanggal_revisi",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Tanggal Revisi"
+  },
+  {
+   "fieldname": "diubah_oleh",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Diubah Oleh",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "ringkasan_perubahan",
+   "fieldtype": "Small Text",
+   "label": "Ringkasan Perubahan"
+  },
+  {
+   "fieldname": "file_versi_lama",
+   "fieldtype": "Attach",
+   "label": "File Versi Lama"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-23 16:27:36.371779",
+ "modified_by": "Administrator",
+ "module": "Starlab Quality",
+ "name": "Document Revision",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

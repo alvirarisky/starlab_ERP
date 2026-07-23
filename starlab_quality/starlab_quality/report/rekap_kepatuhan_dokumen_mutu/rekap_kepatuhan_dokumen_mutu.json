@@ -1,0 +1,32 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [],
+ "creation": "2026-07-23 16:51:31.404468",
+ "disable_prepared_report_automation": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "doctype_to_sync": [],
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": null,
+ "modified": "2026-07-23 16:51:31.404468",
+ "modified_by": "Administrator",
+ "module": "Starlab Quality",
+ "name": "Rekap Kepatuhan Dokumen Mutu",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "\nSELECT\n\tm.document_no as \"No Dokumen:Data:120\",\n\tm.document_name as \"Nama Dokumen:Data:200\",\n\tm.document_level as \"Level::180\",\n\tm.status as \"Status Dokumen::100\",\n\td.divisi as \"Divisi::110\",\n\td.tanggal_distribusi as \"Tanggal Distribusi:Date:120\",\n\td.acknowledged as \"Acknowledged:Check:90\"\nFROM `tabDocument Master` m\nINNER JOIN `tabDocument Distribution` d ON d.parent = m.name\nWHERE\n\t(%(document_level)s = '' OR m.document_level = %(document_level)s)\n\tAND (%(status)s = '' OR m.status = %(status)s)\n\tAND (%(divisi)s = '' OR d.divisi = %(divisi)s)\nORDER BY m.document_no, d.divisi\n",
+ "ref_doctype": "Document Master",
+ "report_name": "Rekap Kepatuhan Dokumen Mutu",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
+ "snapshot_report": 0,
+ "timeout": 0
+}

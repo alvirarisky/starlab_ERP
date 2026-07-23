@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:document_no",
+ "creation": "2026-07-23 16:27:36.515013",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "document_no",
+  "document_name",
+  "document_level",
+  "edisi_revisi",
+  "tanggal_efektif",
+  "owner_division",
+  "status",
+  "file_dokumen",
+  "distribusi",
+  "revisi_history"
+ ],
+ "fields": [
+  {
+   "fieldname": "document_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Nomor Dokumen",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "document_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Nama Dokumen",
+   "reqd": 1
+  },
+  {
+   "fieldname": "document_level",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Level Dokumen",
+   "options": "PM - Panduan Mutu\nPO - Prosedur Operasional\nIKM - Instruksi Kerja Metode\nDP - Dokumen Pendukung",
+   "reqd": 1
+  },
+  {
+   "fieldname": "edisi_revisi",
+   "fieldtype": "Data",
+   "label": "Edisi/Revisi",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tanggal_efektif",
+   "fieldtype": "Date",
+   "label": "Tanggal Efektif",
+   "reqd": 1
+  },
+  {
+   "fieldname": "owner_division",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Divisi Pemilik",
+   "options": "Direksi\nMM\nMT\nLaboratorium\nAdministrasi\nFinance\nMarketing",
+   "reqd": 1
+  },
+  {
+   "default": "Aktif",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Aktif\nDalam Revisi\nUsang",
+   "reqd": 1
+  },
+  {
+   "fieldname": "file_dokumen",
+   "fieldtype": "Attach",
+   "label": "File Dokumen",
+   "reqd": 1
+  },
+  {
+   "fieldname": "distribusi",
+   "fieldtype": "Table",
+   "label": "Distribusi",
+   "options": "Document Distribution",
+   "reqd": 1
+  },
+  {
+   "fieldname": "revisi_history",
+   "fieldtype": "Table",
+   "label": "Riwayat Revisi",
+   "options": "Document Revision",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-23 16:27:36.515013",
+ "modified_by": "Administrator",
+ "module": "Starlab Quality",
+ "name": "Document Master",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
