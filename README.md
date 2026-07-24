@@ -31,3 +31,8 @@ Pre-commit is configured to use the following tools for checking and formatting 
 ### License
 
 mit
+
+
+Desain crm figma 
+https://www.figma.com/design/1ngh6dEXgrWvRv66rs506H/Untitled?node-id=78-897&t=i0KKjDwhMQ0r4LSw-1
+
