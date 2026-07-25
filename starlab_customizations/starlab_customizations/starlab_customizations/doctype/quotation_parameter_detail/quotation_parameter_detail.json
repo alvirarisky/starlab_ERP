@@ -1,0 +1,88 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-07-26 00:06:25.689679",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter",
+  "matriks",
+  "regulasi_acuan",
+  "frekuensi",
+  "qty_per_titik",
+  "harga_satuan",
+  "harga_total"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Parameter Uji",
+   "options": "Test Parameter",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "parameter.matriks",
+   "fieldname": "matriks",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Matriks",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "parameter.regulasi_acuan",
+   "fieldname": "regulasi_acuan",
+   "fieldtype": "Data",
+   "label": "Regulasi Acuan",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "frekuensi",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Frekuensi",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "qty_per_titik",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty per Titik",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "parameter.harga_satuan_default",
+   "fieldname": "harga_satuan",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Harga Satuan"
+  },
+  {
+   "fieldname": "harga_total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Harga Total",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-26 00:06:25.689679",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Quotation Parameter Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

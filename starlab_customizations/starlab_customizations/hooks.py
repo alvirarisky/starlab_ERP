@@ -138,13 +138,47 @@ app_license = "mit"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Quotation": {
+		"validate": "starlab_customizations.quotation_hooks.validate",
+	},
+}
+
+# Fixtures
+# --------
+# Config records (not doctype/report source) that need to ship as part of
+# this app's code so a fresh install recreates the Quotation approval flow.
+
+fixtures = [
+	{
+		"dt": "Role",
+		"filters": [
+			["name", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi", "Laboratorium"]]
+		],
+	},
+	{
+		"dt": "Workflow State",
+		"filters": [
+			["name", "in", [
+				"Draft", "Menunggu Approval MT", "Menunggu Approval MM", "Menunggu Approval Finance",
+				"Menunggu Approval Marketing", "Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
+			]]
+		],
+	},
+	{
+		"dt": "Workflow Action Master",
+		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
+	},
+	{"dt": "Workflow", "filters": [["document_type", "=", "Quotation"]]},
+	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation"]]]},
+	{
+		"dt": "Custom DocPerm",
+		"filters": [
+			["parent", "in", ["Quotation", "Customer"]],
+			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
+		],
+	},
+]
 
 # Scheduled Tasks
 # ---------------
