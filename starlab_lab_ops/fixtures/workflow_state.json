@@ -16,5 +16,50 @@
   "name": "Completed",
   "style": "",
   "workflow_state_name": "Completed"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 02:42:00.438645",
+  "name": "Diterima",
+  "style": "",
+  "workflow_state_name": "Diterima"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 02:42:00.605304",
+  "name": "Sedang Diuji",
+  "style": "",
+  "workflow_state_name": "Sedang Diuji"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 02:42:00.613084",
+  "name": "Divalidasi",
+  "style": "",
+  "workflow_state_name": "Divalidasi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 02:42:00.617281",
+  "name": "Diarsipkan",
+  "style": "",
+  "workflow_state_name": "Diarsipkan"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 02:42:00.621637",
+  "name": "Dimusnahkan",
+  "style": "",
+  "workflow_state_name": "Dimusnahkan"
  }
 ]

@@ -19,5 +19,26 @@
   "modified": "2026-07-26 01:44:49.825025",
   "name": "Buka Kembali",
   "workflow_action_name": "Buka Kembali"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 02:42:00.667412",
+  "name": "Mulai Uji",
+  "workflow_action_name": "Mulai Uji"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 02:42:00.693572",
+  "name": "Arsipkan",
+  "workflow_action_name": "Arsipkan"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 02:42:00.698223",
+  "name": "Musnahkan",
+  "workflow_action_name": "Musnahkan"
  }
 ]
