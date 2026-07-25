@@ -1,0 +1,83 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "ok-sign",
+  "modified": "2026-07-22 10:18:50.212477",
+  "name": "Approved",
+  "style": "Success",
+  "workflow_state_name": "Approved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "remove",
+  "modified": "2026-07-22 10:18:50.214608",
+  "name": "Rejected",
+  "style": "Danger",
+  "workflow_state_name": "Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.370412",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.649129",
+  "name": "Menunggu Approval MT",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval MT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.655603",
+  "name": "Menunggu Approval MM",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval MM"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.661053",
+  "name": "Menunggu Approval Finance",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval Finance"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.665232",
+  "name": "Menunggu Approval Marketing",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval Marketing"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.669947",
+  "name": "Menunggu Approval Direksi",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval Direksi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 00:08:47.677855",
+  "name": "Cancelled",
+  "style": "",
+  "workflow_state_name": "Cancelled"
+ }
+]
