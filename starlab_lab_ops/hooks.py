@@ -153,13 +153,40 @@ required_apps = ["erpnext"]
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Work Order Pengujian": {
+		"validate": "starlab_lab_ops.wo_hooks.validate_work_order",
+		"on_update": "starlab_lab_ops.wo_hooks.on_update_work_order",
+	},
+	"Sample": {
+		"validate": "starlab_lab_ops.wo_hooks.validate_sample",
+	},
+}
+
+# Fixtures
+# --------
+# Config records (not doctype source) that need to ship as part of this
+# app's code so a fresh install recreates the Work Order Pengujian workflow.
+
+fixtures = [
+	{
+		"dt": "Workflow State",
+		"filters": [["name", "in", ["In Progress", "Completed"]]],
+	},
+	{
+		"dt": "Workflow Action Master",
+		"filters": [["name", "in", ["Mulai Pengujian", "Selesaikan", "Buka Kembali"]]],
+	},
+	{"dt": "Workflow", "filters": [["document_type", "=", "Work Order Pengujian"]]},
+	{"dt": "Custom Field", "filters": [["dt", "=", "Work Order Pengujian"]]},
+	{
+		"dt": "Custom DocPerm",
+		"filters": [
+			["parent", "=", "Work Order Pengujian"],
+			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance"]],
+		],
+	},
+]
 
 # Scheduled Tasks
 # ---------------
