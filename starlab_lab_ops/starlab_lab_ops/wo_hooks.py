@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import getdate, nowdate
 
 
 def validate_work_order(doc, method=None):
@@ -25,9 +26,33 @@ def on_update_work_order(doc, method=None):
 
 
 def validate_sample(doc, method=None):
+	before = doc.get_doc_before_save()
+	previous_status = before.status if before else None
+
+	# Guard for the "Musnahkan" transition -- kept here rather than as a
+	# Workflow Transition "condition" because that sandbox evaluates
+	# tanggal_musnah inconsistently (sometimes a date object, sometimes a
+	# string depending on the call site), which throws a TypeError.
+	if previous_status == "Diarsipkan" and doc.status == "Dimusnahkan":
+		if doc.retensi != "Bisa Dibuang":
+			frappe.throw(frappe._("Sample hanya bisa dimusnahkan kalau retensi = Bisa Dibuang"))
+		if not doc.tanggal_musnah or getdate(doc.tanggal_musnah) > getdate(nowdate()):
+			frappe.throw(frappe._("Tanggal Pemusnahan belum terlewati"))
+
 	if doc.status != "Diterima" or not doc.work_order:
 		return
 
 	wo_status = frappe.db.get_value("Work Order Pengujian", doc.work_order, "status")
 	if wo_status == "Approved":
 		frappe.db.set_value("Work Order Pengujian", doc.work_order, "status", "In Progress")
+
+
+def on_update_test_result(doc, method=None):
+	if doc.status != "Divalidasi" or not doc.sample:
+		return
+
+	statuses = frappe.get_all("Test Result", filters={"sample": doc.sample}, pluck="status")
+	if statuses and all(s == "Divalidasi" for s in statuses):
+		sample_status = frappe.db.get_value("Sample", doc.sample, "status")
+		if sample_status == "Sedang Diuji":
+			frappe.db.set_value("Sample", doc.sample, "status", "Divalidasi")

@@ -161,6 +161,9 @@ doc_events = {
 	"Sample": {
 		"validate": "starlab_lab_ops.wo_hooks.validate_sample",
 	},
+	"Test Result": {
+		"on_update": "starlab_lab_ops.wo_hooks.on_update_test_result",
+	},
 }
 
 # Fixtures
@@ -171,22 +174,35 @@ doc_events = {
 fixtures = [
 	{
 		"dt": "Workflow State",
-		"filters": [["name", "in", ["In Progress", "Completed"]]],
+		"filters": [
+			["name", "in", [
+				"In Progress", "Completed", "Diterima", "Sedang Diuji", "Divalidasi", "Diarsipkan", "Dimusnahkan",
+			]]
+		],
 	},
 	{
 		"dt": "Workflow Action Master",
-		"filters": [["name", "in", ["Mulai Pengujian", "Selesaikan", "Buka Kembali"]]],
+		"filters": [
+			["name", "in", ["Mulai Pengujian", "Selesaikan", "Buka Kembali", "Mulai Uji", "Arsipkan", "Musnahkan"]]
+		],
 	},
-	{"dt": "Workflow", "filters": [["document_type", "=", "Work Order Pengujian"]]},
+	{"dt": "Workflow", "filters": [["document_type", "in", ["Work Order Pengujian", "Sample"]]]},
 	{"dt": "Custom Field", "filters": [["dt", "=", "Work Order Pengujian"]]},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "=", "Work Order Pengujian"],
+			["parent", "in", ["Work Order Pengujian", "Sample"]],
 			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance"]],
 		],
 	},
+	{"dt": "Number Card", "filters": [["name", "in", ["Sample Belum Diuji", "Sample Sedang Diuji"]]]},
 ]
+
+# Note: the "Starlab Lab Ops" Workspace itself is NOT a fixture here on purpose --
+# it's private to the dev/test user tester@starlab.local, so exporting it would
+# try to recreate a Workspace pointing at a user that may not exist on another
+# install. The 2 Number Cards above are the actual portable Sprint 4 deliverable;
+# which Workspace happens to display them is a per-environment convenience.
 
 # Scheduled Tasks
 # ---------------
