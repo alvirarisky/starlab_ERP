@@ -1,0 +1,23 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 01:44:49.797726",
+  "name": "Mulai Pengujian",
+  "workflow_action_name": "Mulai Pengujian"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 01:44:49.821600",
+  "name": "Selesaikan",
+  "workflow_action_name": "Selesaikan"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 01:44:49.825025",
+  "name": "Buka Kembali",
+  "workflow_action_name": "Buka Kembali"
+ }
+]
