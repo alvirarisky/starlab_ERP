@@ -6,5 +6,9 @@
   {
     "url": "https://github.com/alvirarisky/starlab_lab_ops.git",
     "branch": "app-starlab-lab-ops"
+  },
+  {
+    "url": "https://github.com/alvirarisky/starlab_lab_ops.git",
+    "branch": "app-starlab-customizations"
   }
 ]
