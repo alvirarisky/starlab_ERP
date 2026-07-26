@@ -101,6 +101,25 @@ jobs:
           mysql --host=127.0.0.1 --user=root --password=root \
             -e "SET GLOBAL character_set_server = 'utf8mb4'; SET GLOBAL collation_server = 'utf8mb4_unicode_ci';"
 
+      # bench get-app's local-path support only works against a path that is
+      # itself a git repo root (it internally runs `git clone <path>`, which
+      # fails with "does not appear to be a git repository" on a bare
+      # subfolder of a bigger repo -- confirmed by reproducing it directly).
+      # repo/starlab_quality and repo/starlab_lab_ops are just subfolders of
+      # the monorepo checkout, so give each one its own throwaway local .git
+      # first. This is the CI equivalent of the app-starlab-* subtree-split
+      # branches docker/apps.json builds from -- same underlying problem,
+      # solved on the fly here instead of via a pre-published branch, so CI
+      # always tests the current commit rather than a possibly-stale branch.
+      - name: Turn app subfolders into standalone git repos
+        run: |
+          for app in starlab_quality starlab_lab_ops; do
+            cd "${{ github.workspace }}/repo/$app"
+            git init -q
+            git add -A
+            git -c user.email=ci@localhost -c user.name=CI commit -q -m "CI snapshot"
+          done
+
       - name: Get ERPNext and this app
         working-directory: ${{ env.BENCH_DIR }}
         run: |
@@ -109,8 +128,15 @@ jobs:
           # (Test Parameter.metode_uji links to Document Master, owned by
           # starlab_quality) -- bench get-app needs its code present on disk
           # before installing starlab_lab_ops can cascade-install it.
-          bench get-app starlab_quality "${{ github.workspace }}/repo/starlab_quality"
-          bench get-app starlab_lab_ops "${{ github.workspace }}/repo/starlab_lab_ops"
+          #
+          # bench get-app takes exactly one meaningful positional argument (a
+          # git URL or local path); it derives the app's install name from
+          # that path's basename. A second positional is accepted only as a
+          # legacy no-op, so passing the app name first ("get-app NAME PATH")
+          # makes bench try to git-clone the literal string "NAME" as if it
+          # were a URL -- exactly the previous CI failure.
+          bench get-app "${{ github.workspace }}/repo/starlab_quality"
+          bench get-app "${{ github.workspace }}/repo/starlab_lab_ops"
 
       - name: New site
         working-directory: ${{ env.BENCH_DIR }}
