@@ -42,10 +42,18 @@ jobs:
       BENCH_DIR: /home/runner/frappe-bench
 
     steps:
-      - name: Clone app
+      # Checked out to a neutral path (not apps/starlab_lab_ops) because this
+      # repo is a monorepo -- starlab_lab_ops is a subfolder of it, not the
+      # repo root. Pointing bench get-app at the checkout root instead of the
+      # actual starlab_lab_ops/ subfolder (as this workflow used to) makes
+      # bench treat the whole monorepo as "the app", nesting its real package
+      # one level too deep and breaking every doctype/report import -- same
+      # bug the Docker build hit before docker/apps.json was switched to the
+      # app-starlab-* subtree-split branches.
+      - name: Clone repo
         uses: actions/checkout@v4
         with:
-          path: apps/starlab_lab_ops
+          path: repo
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -61,7 +69,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('apps/starlab_lab_ops/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('repo/starlab_lab_ops/pyproject.toml') }}
 
       - name: Install wkhtmltopdf
         run: |
@@ -97,7 +105,12 @@ jobs:
         working-directory: ${{ env.BENCH_DIR }}
         run: |
           bench get-app erpnext --branch version-16
-          bench get-app starlab_lab_ops "${{ github.workspace }}/apps/starlab_lab_ops"
+          # starlab_quality first: starlab_lab_ops declares it in required_apps
+          # (Test Parameter.metode_uji links to Document Master, owned by
+          # starlab_quality) -- bench get-app needs its code present on disk
+          # before installing starlab_lab_ops can cascade-install it.
+          bench get-app starlab_quality "${{ github.workspace }}/repo/starlab_quality"
+          bench get-app starlab_lab_ops "${{ github.workspace }}/repo/starlab_lab_ops"
 
       - name: New site
         working-directory: ${{ env.BENCH_DIR }}
@@ -106,6 +119,7 @@ jobs:
             --mariadb-root-password root \
             --admin-password admin \
             --install-app erpnext \
+            --install-app starlab_quality \
             --install-app starlab_lab_ops
 
       - name: Run tests
