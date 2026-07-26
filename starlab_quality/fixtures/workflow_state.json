@@ -1,0 +1,47 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 19:00:00.000000",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 19:00:00.000000",
+  "name": "Menunggu Approval MM",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval MM"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 19:00:00.000000",
+  "name": "Menunggu Approval Direksi",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval Direksi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "ok-sign",
+  "modified": "2026-07-26 19:00:00.000000",
+  "name": "Aktif",
+  "style": "Success",
+  "workflow_state_name": "Aktif"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 19:00:00.000000",
+  "name": "Dalam Revisi",
+  "style": "Warning",
+  "workflow_state_name": "Dalam Revisi"
+ }
+]
