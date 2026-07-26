@@ -45,7 +45,10 @@ required_apps = ["starlab_lab_ops"]
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Quotation": "public/js/quotation.js"}
+doctype_js = {
+	"Quotation": "public/js/quotation.js",
+	"LHU": "public/js/lhu.js",
+}
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -180,13 +183,14 @@ fixtures = [
 		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
 	},
 	{"dt": "Workflow", "filters": [["document_type", "in", ["Quotation", "Client Inquiry", "Petty Cash Entry"]]]},
-	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation", "Customer", "Print Settings"]]]},
+	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation", "Customer", "Print Settings", "Sales Invoice"]]]},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
 			["parent", "in", [
 				"Quotation", "Customer", "Client Inquiry", "Kaji Ulang Tender", "TNC Master Template",
-				"Petty Cash Entry",
+				"Petty Cash Entry", "Sales Invoice", "Bank Account", "Bank Transaction",
+				"Bank Reconciliation Tool", "Bank Statement Import",
 			]],
 			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
 		],
