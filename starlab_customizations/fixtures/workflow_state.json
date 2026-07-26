@@ -79,5 +79,32 @@
   "name": "Cancelled",
   "style": "",
   "workflow_state_name": "Cancelled"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 08:30:00.000000",
+  "name": "Diajukan Kaji Ulang",
+  "style": "",
+  "workflow_state_name": "Diajukan Kaji Ulang"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "ok-sign",
+  "modified": "2026-07-26 08:30:00.000000",
+  "name": "Disetujui MT",
+  "style": "Success",
+  "workflow_state_name": "Disetujui MT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "remove",
+  "modified": "2026-07-26 08:30:00.000000",
+  "name": "Ditolak MT",
+  "style": "Danger",
+  "workflow_state_name": "Ditolak MT"
  }
 ]
