@@ -148,6 +148,7 @@ after_migrate = "starlab_customizations.install.after_migrate"
 
 doc_events = {
 	"Quotation": {
+		"autoname": "starlab_customizations.quotation_hooks.autoname",
 		"validate": "starlab_customizations.quotation_hooks.validate",
 		"on_update": "starlab_customizations.quotation_hooks.on_update",
 	},

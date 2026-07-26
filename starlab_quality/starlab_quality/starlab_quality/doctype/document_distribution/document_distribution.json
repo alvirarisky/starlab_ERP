@@ -14,11 +14,12 @@
  ],
  "fields": [
   {
+   "description": "MK3 & Eksternal ditambahkan berdasarkan data Daftar Induk Dokumen dan Distribusi asli SAI (docs/dokumen asli/) -- keduanya belum punya Role/user sistem yang cocok (tidak ada role K3 di 7-role model TSD, dan Eksternal memang di luar organisasi), jadi acknowledgment untuk dua opsi ini tetap manual/di luar sistem, bukan lewat notifikasi otomatis seperti divisi lain.",
    "fieldname": "divisi",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Divisi",
-   "options": "Direksi\nMM\nMT\nLaboratorium\nAdministrasi\nFinance\nMarketing",
+   "options": "Direksi\nMM\nMT\nLaboratorium\nAdministrasi\nFinance\nMarketing\nMK3\nEksternal",
    "reqd": 1
   },
   {
@@ -45,7 +46,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-07-26 20:00:00.000000",
+ "modified": "2026-07-26 23:30:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Quality",
  "name": "Document Distribution",
