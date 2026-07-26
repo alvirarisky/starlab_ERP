@@ -1,14 +1,28 @@
 app_name = "starlab_integrations"
 app_title = "Starlab Integrations"
 app_publisher = "PT Starlab Analitik Indonesia"
-app_description = "Modul integrasi eksternal SAI"
+app_description = "Modul integrasi WhatsApp Gateway dan Client Portal SAI"
 app_email = "banyugong3@gmail.com"
 app_license = "mit"
+
+# Send non-GET requests for this app's endpoints as native `application/json`
+# bodies instead of form-encoded, per-key JSON-stringified values.
+use_json_request_body = True
 
 # Apps
 # ------------------
 
-# required_apps = []
+# LHU (dipakai halaman /status-klien) dimiliki starlab_lab_ops.
+required_apps = ["starlab_lab_ops"]
+
+# Portal
+# ------
+
+# TSD Bagian 9: Client Portal -- status LHU & Invoice untuk klien, muncul di
+# sidebar portal Customer di samping menu native ERPNext (Orders, Invoices).
+standard_portal_menu_items = [
+	{"title": "Status LHU & Invoice", "route": "/status-klien", "role": "Customer"},
+]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -17,7 +31,18 @@ app_license = "mit"
 # 		"logo": "/assets/starlab_integrations/logo.png",
 # 		"title": "Starlab Integrations",
 # 		"route": "/starlab_integrations",
-# 		"has_permission": "starlab_integrations.api.permission.has_app_permission"
+# 		"has_permission": "starlab_integrations.api.permission.has_app_permission",
+# 	}
+# ]
+
+# Companion apps that extend a host app (instead of taking their own apps-screen icon) can pin
+# their workspaces into the host app's workspace dock (rail) with this hook. Declaring it keeps
+# the app off the apps screen, so it takes precedence over any add_to_apps_screen above. Who can
+# see a pinned workspace is controlled by that workspace's own Roles table.
+# add_to_workspace_dock = [
+# 	{
+# 		"app": "erpnext",
+# 		"workspace": "My Workspace",
 # 	}
 # ]
 
@@ -213,6 +238,8 @@ app_license = "mit"
 # before_job = ["starlab_integrations.utils.before_job"]
 # after_job = ["starlab_integrations.utils.after_job"]
 
+# after_file_upload = ["starlab_integrations.utils.after_file_upload"]
+
 # User Data Protection
 # --------------------
 
@@ -245,7 +272,10 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
+
+# Require all whitelisted methods to have type annotations
+require_type_annotated_api_methods = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs

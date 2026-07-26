@@ -1,0 +1,77 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Status LHU & Invoice{% endblock %}
+
+{% block page_content %}
+<div class="container" style="max-width: 900px; margin-top: 2rem;">
+	<h2>Status LHU & Invoice</h2>
+
+	{% if no_access %}
+	<p>Akun Anda belum terhubung ke data Customer manapun. Silakan hubungi Administrasi PT Starlab Analitik Indonesia.</p>
+	{% else %}
+
+	<h4 style="margin-top: 2rem;">Laporan Hasil Uji (LHU)</h4>
+	{% if lhu_list %}
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>No. LHU</th>
+				<th>Work Order</th>
+				<th>Tanggal Terbit</th>
+				<th>Status</th>
+				<th>File</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for lhu in lhu_list %}
+			<tr>
+				<td>{{ lhu.name }}</td>
+				<td>{{ lhu.work_order }}</td>
+				<td>{{ lhu.tanggal_terbit }}</td>
+				<td>{{ lhu.status }}</td>
+				<td>
+					{% if lhu.file_lhu %}
+					<a href="{{ lhu.file_lhu }}" target="_blank">Unduh</a>
+					{% else %}-{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<p>Belum ada LHU yang diterbitkan.</p>
+	{% endif %}
+
+	<h4 style="margin-top: 2rem;">Invoice</h4>
+	{% if invoice_list %}
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>No. Invoice</th>
+				<th>Tanggal</th>
+				<th>Jatuh Tempo</th>
+				<th>Total</th>
+				<th>Outstanding</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for inv in invoice_list %}
+			<tr>
+				<td><a href="/invoices/{{ inv.name }}">{{ inv.name }}</a></td>
+				<td>{{ inv.posting_date }}</td>
+				<td>{{ inv.due_date }}</td>
+				<td>{{ frappe.format_value(inv.grand_total, {"fieldtype": "Currency"}) }}</td>
+				<td>{{ frappe.format_value(inv.outstanding_amount, {"fieldtype": "Currency"}) }}</td>
+				<td>{{ inv.status }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	<p>Belum ada Invoice.</p>
+	{% endif %}
+
+	{% endif %}
+</div>
+{% endblock %}

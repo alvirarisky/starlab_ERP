@@ -1,0 +1,77 @@
+{
+ "actions": [],
+ "creation": "2026-07-26 23:00:00.000000",
+ "description": "TSD Bagian 11: notifikasi diteruskan ke WhatsApp lewat gateway pihak ketiga (WhatsApp Business API/Twilio/Fonnte). Kredensial di sini SENGAJA dikosongkan sebagai default -- belum ada akun/API key asli milik SAI. send_whatsapp_message() di whatsapp.py mengecek `enabled` dan field-field ini sebelum mencoba mengirim; kalau belum diisi, notifikasi WhatsApp di-skip (dicatat, bukan error) supaya tidak menghalangi channel Email/Notification Log yang sudah jalan.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "provider",
+  "column_break_1",
+  "api_url",
+  "api_key",
+  "sender_number"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Aktifkan Notifikasi WhatsApp"
+  },
+  {
+   "depends_on": "eval:doc.enabled",
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "label": "Provider",
+   "options": "WhatsApp Business API\nTwilio\nFonnte\nCustom"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.enabled",
+   "description": "URL endpoint REST API provider WhatsApp yang dipakai (lihat dokumentasi provider terkait).",
+   "fieldname": "api_url",
+   "fieldtype": "Data",
+   "label": "API URL"
+  },
+  {
+   "depends_on": "eval:doc.enabled",
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key / Token"
+  },
+  {
+   "depends_on": "eval:doc.enabled",
+   "description": "Nomor WhatsApp pengirim resmi (format internasional, mis. 62812xxxxxxx).",
+   "fieldname": "sender_number",
+   "fieldtype": "Data",
+   "label": "Nomor Pengirim"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-07-26 23:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Integrations",
+ "name": "WhatsApp Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

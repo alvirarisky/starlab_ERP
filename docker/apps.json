@@ -14,5 +14,9 @@
   {
     "url": "https://github.com/alvirarisky/Starlab_ERP.git",
     "branch": "app-starlab-quality"
+  },
+  {
+    "url": "https://github.com/alvirarisky/starlab_ERP.git",
+    "branch": "app-starlab-integrations"
   }
 ]
