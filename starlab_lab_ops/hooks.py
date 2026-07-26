@@ -209,7 +209,16 @@ fixtures = [
 			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance", "Manajer Mutu"]],
 		],
 	},
-	{"dt": "Number Card", "filters": [["name", "in", ["Sample Belum Diuji", "Sample Sedang Diuji"]]]},
+	{
+		"dt": "Number Card",
+		"filters": [
+			["name", "in", [
+				"Sample Belum Diuji", "Sample Sedang Diuji", "WO Aktif", "WO Selesai",
+				"WO Draft Menunggu Approval", "Test Result Menunggu Validasi", "Test Result Ditolak",
+				"LHU Draft Menunggu Diterbitkan",
+			]]
+		],
+	},
 ]
 
 # Note: the "Starlab Lab Ops" Workspace itself is NOT a fixture here on purpose --
@@ -221,23 +230,14 @@ fixtures = [
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"starlab_lab_ops.tasks.all"
-# 	],
-# 	"daily": [
-# 		"starlab_lab_ops.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"starlab_lab_ops.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"starlab_lab_ops.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"starlab_lab_ops.tasks.monthly"
-# 	],
-# }
+# TSD Bagian 10 -- reminder deadline pengujian (H-2/terlewat) & retensi Sample.
+scheduler_events = {
+	"daily": [
+		"starlab_lab_ops.tasks.check_sample_deadline_mendekat",
+		"starlab_lab_ops.tasks.check_sample_deadline_terlewat",
+		"starlab_lab_ops.tasks.check_sample_retensi",
+	],
+}
 
 # Testing
 # -------

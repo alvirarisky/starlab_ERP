@@ -29,7 +29,29 @@ def validate_work_order(doc, method=None):
 		frappe.throw(frappe._("Alasan Buka Kembali wajib diisi"))
 
 
+def _notify_role(role, subject, message):
+	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+	if not users:
+		return
+	# frappe.sendmail raises OutgoingEmailError immediately when no default
+	# outgoing Email Account is configured -- must never block the workflow
+	# transition/scheduled job that triggered this notification.
+	try:
+		frappe.sendmail(recipients=users, subject=subject, message=message)
+	except Exception:
+		frappe.log_error(title="Gagal mengirim notifikasi email", message=frappe.get_traceback())
+
+
 def on_update_work_order(doc, method=None):
+	# TSD Bagian 10 "Approval Pending": Work Order baru dibuat = state Draft
+	# menunggu approval Manajer Teknis (transisi "Setujui" -> Approved).
+	if not doc.get_doc_before_save() and doc.status == "Draft":
+		_notify_role(
+			"Manajer Teknis",
+			frappe._("Work Order {0} menunggu approval Anda").format(doc.name),
+			frappe._("Work Order {0} baru dibuat dan menunggu approval Anda.").format(doc.name),
+		)
+
 	# Auto-complete runs as a direct DB write (not doc.status = ... + save)
 	# because Frappe's workflow engine gates any change to the workflow
 	# state field on the *saving user* having a matching Transition -- the
@@ -105,6 +127,30 @@ def _qc_rows_changed(doc, before):
 
 
 def on_update_test_result(doc, method=None):
+	before = doc.get_doc_before_save()
+
+	# TSD Bagian 10 "Approval Pending": notifikasi Manajer Teknis begitu Test
+	# Result diajukan untuk validasi.
+	if before and before.status != "Diajukan Validasi" and doc.status == "Diajukan Validasi":
+		_notify_role(
+			"Manajer Teknis",
+			frappe._("Test Result {0} menunggu validasi Anda").format(doc.name),
+			frappe._("Test Result {0} sudah diajukan dan menunggu validasi Anda.").format(doc.name),
+		)
+
+	# TSD Bagian 10 "Test Result Ditolak": notifikasi ke analis pembuatnya.
+	if before and before.status != "Ditolak" and doc.status == "Ditolak" and doc.owner:
+		try:
+			frappe.sendmail(
+				recipients=[doc.owner],
+				subject=frappe._("Test Result {0} ditolak").format(doc.name),
+				message=frappe._("Test Result {0} ditolak oleh Manajer Teknis. Catatan: {1}").format(
+					doc.name, doc.catatan_validasi or "-"
+				),
+			)
+		except Exception:
+			frappe.log_error(title="Gagal mengirim notifikasi email", message=frappe.get_traceback())
+
 	if doc.status != "Divalidasi" or not doc.sample:
 		return
 
