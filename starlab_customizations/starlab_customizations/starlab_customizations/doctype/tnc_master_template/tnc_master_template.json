@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "field:versi_template",
+ "creation": "2026-07-26 09:00:00.000000",
+ "description": "Nama teknis disingkat jadi \"TNC Master Template\" (bukan \"T&C Master Template\" persis seperti di TSD Bab 4.5) karena karakter \"&\" pada nama DocType tidak aman dipakai Frappe -- frappe.scrub() tidak menghapus \"&\", sehingga hasil scrub-nya bukan identifier Python yang valid untuk folder/module lookup (masalah yang sama seperti alasan Kaji Ulang Tender di-rename). Template Syarat & Ketentuan (T&C) ini di-render otomatis saat cetak Quotation gabungan. Hanya diubah di level institusional (Administrasi) -- tidak ada mekanisme edit T&C per-dokumen quotation individual (PRD v6 SS5.3, RESOLVED v4).",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "versi_template",
+  "berlaku_sejak",
+  "konten_tnc",
+  "diubah_oleh"
+ ],
+ "fields": [
+  {
+   "fieldname": "versi_template",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Versi Template",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "berlaku_sejak",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Berlaku Sejak",
+   "reqd": 1
+  },
+  {
+   "description": "Isi minimal 12 poin standar SAI (masa berlaku penawaran, mekanisme PO, dasar perhitungan harga, jadwal sampling, proses LHU, dokumen penagihan, syarat pembayaran, revisi faktur pajak/PPh23, jam penerimaan sampel, retensi sampel, pembatalan PO).",
+   "fieldname": "konten_tnc",
+   "fieldtype": "Text Editor",
+   "label": "Konten T&C",
+   "reqd": 1
+  },
+  {
+   "fieldname": "diubah_oleh",
+   "fieldtype": "Link",
+   "label": "Diubah Oleh",
+   "options": "Employee",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-26 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "TNC Master Template",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

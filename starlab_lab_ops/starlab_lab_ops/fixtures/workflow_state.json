@@ -61,5 +61,32 @@
   "name": "Dimusnahkan",
   "style": "",
   "workflow_state_name": "Dimusnahkan"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Diajukan Validasi",
+  "style": "",
+  "workflow_state_name": "Diajukan Validasi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "remove",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Ditolak",
+  "style": "Danger",
+  "workflow_state_name": "Ditolak"
  }
 ]

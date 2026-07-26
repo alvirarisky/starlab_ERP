@@ -81,7 +81,12 @@ echo "==> Checking if site '$SITE_NAME' already exists"
 if docker compose -p frappe -f compose.custom.yaml exec -T backend test -f "sites/$SITE_NAME/site_config.json" 2>/dev/null; then
   echo "    site already exists, skipping creation"
 else
-  echo "==> Creating site '$SITE_NAME' and installing erpnext + starlab_lab_ops"
+  echo "==> Creating site '$SITE_NAME' and installing erpnext + starlab_quality + starlab_lab_ops + starlab_customizations"
+  # Order matters: starlab_lab_ops.required_apps includes starlab_quality
+  # (Test Parameter.metode_uji links to Document Master), and
+  # starlab_customizations.required_apps includes starlab_lab_ops (Client
+  # Inquiry Parameter Detail links to Test Parameter) -- see each app's
+  # hooks.py for the exact reasoning.
   docker compose -p frappe -f compose.custom.yaml exec -T backend \
     bench new-site "$SITE_NAME" \
     --mariadb-user-host-login-scope='%' \
@@ -89,7 +94,9 @@ else
     --db-root-password="$DB_ROOT_PASSWORD" \
     --admin-password="$ADMIN_PASSWORD" \
     --install-app erpnext \
+    --install-app starlab_quality \
     --install-app starlab_lab_ops \
+    --install-app starlab_customizations \
     --set-default
 fi
 

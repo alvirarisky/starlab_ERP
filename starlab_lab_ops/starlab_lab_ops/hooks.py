@@ -12,7 +12,13 @@ use_json_request_body = True
 # Apps
 # ------------------
 
-required_apps = ["erpnext"]
+# starlab_quality is required because Test Parameter.metode_uji is a Link
+# field with options="Document Master" (owned by starlab_quality) baked
+# directly into test_parameter.json. Installing/migrating this app before
+# starlab_quality exists raises WrongOptionsDoctypeLinkError. Declaring it
+# here makes `bench install-app starlab_lab_ops` auto-install starlab_quality
+# first if it isn't already present.
+required_apps = ["erpnext", "starlab_quality"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -162,7 +168,11 @@ doc_events = {
 		"validate": "starlab_lab_ops.wo_hooks.validate_sample",
 	},
 	"Test Result": {
+		"validate": "starlab_lab_ops.wo_hooks.validate_test_result",
 		"on_update": "starlab_lab_ops.wo_hooks.on_update_test_result",
+	},
+	"LHU": {
+		"validate": "starlab_lab_ops.lhu_hooks.populate_test_result_list",
 	},
 }
 
@@ -176,23 +186,27 @@ fixtures = [
 		"dt": "Workflow State",
 		"filters": [
 			["name", "in", [
-				"In Progress", "Completed", "Diterima", "Sedang Diuji", "Divalidasi", "Diarsipkan", "Dimusnahkan",
+				"Draft", "In Progress", "Completed", "Diterima", "Sedang Diuji", "Divalidasi", "Diarsipkan",
+				"Dimusnahkan", "Diajukan Validasi", "Ditolak",
 			]]
 		],
 	},
 	{
 		"dt": "Workflow Action Master",
 		"filters": [
-			["name", "in", ["Mulai Pengujian", "Selesaikan", "Buka Kembali", "Mulai Uji", "Arsipkan", "Musnahkan"]]
+			["name", "in", [
+				"Mulai Pengujian", "Selesaikan", "Buka Kembali", "Mulai Uji", "Arsipkan", "Musnahkan",
+				"Ajukan Validasi", "Validasi", "Batalkan Validasi", "Tolak", "Revisi",
+			]]
 		],
 	},
-	{"dt": "Workflow", "filters": [["document_type", "in", ["Work Order Pengujian", "Sample"]]]},
+	{"dt": "Workflow", "filters": [["document_type", "in", ["Work Order Pengujian", "Sample", "Test Result"]]]},
 	{"dt": "Custom Field", "filters": [["dt", "=", "Work Order Pengujian"]]},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "in", ["Work Order Pengujian", "Sample"]],
-			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance"]],
+			["parent", "in", ["Work Order Pengujian", "Sample", "Test Result", "LHU"]],
+			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance", "Manajer Mutu"]],
 		],
 	},
 	{"dt": "Number Card", "filters": [["name", "in", ["Sample Belum Diuji", "Sample Sedang Diuji"]]]},

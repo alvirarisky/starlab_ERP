@@ -8,7 +8,9 @@ app_license = "mit"
 # Apps
 # ------------------
 
-# required_apps = []
+# starlab_lab_ops is required because Client Inquiry Parameter Detail.parameter
+# is a Link field with options="Test Parameter" (owned by starlab_lab_ops).
+required_apps = ["starlab_lab_ops"]
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -43,6 +45,7 @@ app_license = "mit"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
+doctype_js = {"Quotation": "public/js/quotation.js"}
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -142,6 +145,9 @@ doc_events = {
 	"Quotation": {
 		"validate": "starlab_customizations.quotation_hooks.validate",
 	},
+	"Kaji Ulang Tender": {
+		"on_update": "starlab_customizations.client_inquiry_hooks.sync_client_inquiry_from_kaji_ulang",
+	},
 }
 
 # Fixtures
@@ -162,6 +168,7 @@ fixtures = [
 			["name", "in", [
 				"Draft", "Menunggu Approval MT", "Menunggu Approval MM", "Menunggu Approval Finance",
 				"Menunggu Approval Marketing", "Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
+				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT",
 			]]
 		],
 	},
@@ -169,12 +176,14 @@ fixtures = [
 		"dt": "Workflow Action Master",
 		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
 	},
-	{"dt": "Workflow", "filters": [["document_type", "=", "Quotation"]]},
-	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation"]]]},
+	{"dt": "Workflow", "filters": [["document_type", "in", ["Quotation", "Client Inquiry"]]]},
+	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation", "Customer", "Print Settings"]]]},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "in", ["Quotation", "Customer"]],
+			["parent", "in", [
+				"Quotation", "Customer", "Client Inquiry", "Kaji Ulang Tender", "TNC Master Template",
+			]],
 			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
 		],
 	},
@@ -183,23 +192,17 @@ fixtures = [
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"starlab_customizations.tasks.all"
-# 	],
-# 	"daily": [
-# 		"starlab_customizations.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"starlab_customizations.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"starlab_customizations.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"starlab_customizations.tasks.monthly"
-# 	],
-# }
+# PRD v6 SS5.5 -- eskalasi SLA approval Quotation (>1x24 jam) & notifikasi
+# auto-expiry. Lihat starlab_customizations/tasks.py untuk detail + TODO
+# terkait Open Question #1 (target eskalasi belum dikonfirmasi PO).
+scheduler_events = {
+	"hourly": [
+		"starlab_customizations.tasks.check_quotation_sla",
+	],
+	"daily": [
+		"starlab_customizations.tasks.check_quotation_expiry",
+	],
+}
 
 # Testing
 # -------
