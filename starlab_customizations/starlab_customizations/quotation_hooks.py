@@ -59,3 +59,25 @@ def _reset_sla_escalation_flag(doc):
 	before = doc.get_doc_before_save()
 	if before and before.workflow_state != doc.workflow_state:
 		doc.eskalasi_terkirim = 0
+
+
+def on_update(doc, method=None):
+	# TSD Bagian 10 "Approval Pending": notifikasi SEGERA begitu Quotation
+	# masuk ke state "Menunggu Approval [Role]" -- beda dari
+	# check_quotation_sla di tasks.py yang baru mengingatkan setelah macet
+	# >1x24 jam.
+	before = doc.get_doc_before_save()
+	if not before or before.workflow_state == doc.workflow_state:
+		return
+
+	from starlab_customizations.tasks import ROLE_BY_STATE, _notify_role
+
+	role = ROLE_BY_STATE.get(doc.workflow_state)
+	if not role:
+		return
+
+	_notify_role(
+		role,
+		frappe._("Quotation {0} menunggu approval Anda").format(doc.name),
+		frappe._("Quotation {0} sudah masuk ke tahap approval Anda ({1}).").format(doc.name, doc.workflow_state),
+	)

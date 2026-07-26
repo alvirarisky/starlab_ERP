@@ -1,6 +1,19 @@
 import frappe
 from frappe.utils import add_to_date, now_datetime, nowdate
 
+
+def _safe_sendmail(recipients, subject, message):
+	# frappe.sendmail raises OutgoingEmailError immediately (not just a
+	# queued/deferred failure) when no default outgoing Email Account is
+	# configured -- a real risk on a fresh site. A notification failing to
+	# send must never block whatever workflow transition/scheduled job
+	# triggered it.
+	try:
+		frappe.sendmail(recipients=recipients, subject=subject, message=message)
+	except Exception:
+		frappe.log_error(title="Gagal mengirim notifikasi email", message=frappe.get_traceback())
+
+
 PENDING_APPROVAL_STATES = [
 	"Menunggu Approval MT",
 	"Menunggu Approval MM",
@@ -55,10 +68,10 @@ def _notify_pending_approver(quotation, workflow_state):
 	if not users:
 		return
 
-	frappe.sendmail(
-		recipients=users,
-		subject=frappe._("Eskalasi SLA: Quotation {0} belum di-approve >1x24 jam").format(quotation),
-		message=frappe._(
+	_safe_sendmail(
+		users,
+		frappe._("Eskalasi SLA: Quotation {0} belum di-approve >1x24 jam").format(quotation),
+		frappe._(
 			"Quotation {0} sudah lebih dari 1x24 jam menunggu approval pada tahap {1}. "
 			"Mohon segera ditindaklanjuti."
 		).format(quotation, workflow_state),
@@ -90,11 +103,61 @@ def check_quotation_expiry():
 		return
 
 	for row in quotations:
-		frappe.sendmail(
-			recipients=users,
-			subject=frappe._("Quotation {0} sudah kedaluwarsa").format(row.name),
-			message=frappe._(
+		_safe_sendmail(
+			users,
+			frappe._("Quotation {0} sudah kedaluwarsa").format(row.name),
+			frappe._(
 				"Quotation {0} sudah melewati tanggal kedaluwarsa dan belum direspons client."
 			).format(row.name),
 		)
 		frappe.db.set_value("Quotation", row.name, "kedaluwarsa_notif_terkirim", 1)
+
+
+def _notify_role(role, subject, message):
+	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+	if not users:
+		return
+	_safe_sendmail(users, subject, message)
+
+
+def check_invoice_due():
+	# TSD Bagian 10: Sales Invoice due_date jatuh dalam H-3 dan
+	# outstanding_amount > 0 -- reminder ke Finance & Administrasi.
+	h3 = add_to_date(nowdate(), days=3, as_string=True)
+	invoices = frappe.get_all(
+		"Sales Invoice",
+		filters={
+			"docstatus": 1,
+			"due_date": ["between", [nowdate(), h3]],
+			"outstanding_amount": [">", 0],
+		},
+		fields=["name", "due_date", "outstanding_amount"],
+	)
+	for inv in invoices:
+		message = frappe._("Invoice {0}: jatuh tempo {1}, outstanding {2}.").format(
+			inv.name, inv.due_date, inv.outstanding_amount
+		)
+		_notify_role("Finance", frappe._("Invoice jatuh tempo H-3: {0}").format(inv.name), message)
+		_notify_role("Administrasi", frappe._("Invoice jatuh tempo H-3: {0}").format(inv.name), message)
+
+
+def check_invoice_overdue():
+	# TSD Bagian 10: due_date < hari ini dan outstanding_amount > 0 --
+	# eskalasi ke Finance & Direksi. ERPNext core sendiri sudah otomatis
+	# menandai status "Overdue" (scheduled job update_invoice_status di
+	# erpnext/hooks.py) -- ini menambahkan sisi notifikasinya saja.
+	invoices = frappe.get_all(
+		"Sales Invoice",
+		filters={
+			"docstatus": 1,
+			"due_date": ["<", nowdate()],
+			"outstanding_amount": [">", 0],
+		},
+		fields=["name", "due_date", "outstanding_amount"],
+	)
+	for inv in invoices:
+		message = frappe._("Invoice {0}: sudah melewati jatuh tempo {1}, outstanding {2}.").format(
+			inv.name, inv.due_date, inv.outstanding_amount
+		)
+		_notify_role("Finance", frappe._("Invoice Overdue: {0}").format(inv.name), message)
+		_notify_role("Direksi", frappe._("Invoice Overdue: {0}").format(inv.name), message)
