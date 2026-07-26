@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import flt
 
 
 def execute(filters=None):
@@ -16,6 +17,7 @@ def get_columns():
 		{"label": "Keterangan", "fieldname": "keterangan", "fieldtype": "Data", "width": 250},
 		{"label": "Nominal", "fieldname": "nominal", "fieldtype": "Currency", "width": 130},
 		{"label": "Status", "fieldname": "status", "fieldtype": "Data", "width": 130},
+		{"label": "Saldo Kas Kecil", "fieldname": "saldo", "fieldtype": "Currency", "width": 140},
 	]
 
 
@@ -50,6 +52,11 @@ def get_data(filters):
 				"keterangan": pc.item,
 				"nominal": pc.nominal,
 				"status": pc.status,
+				# Petty Cash Entry adalah catatan pengajuan/approval, bukan
+				# mutasi buku besar itu sendiri -- saldo hanya dihitung dari
+				# Journal Entry yang benar-benar membukukan ke akun Kas
+				# Kecil (lihat _attach_saldo_kas_kecil).
+				"saldo": None,
 			})
 
 	if not kategori or kategori == "Entri Jurnal":
@@ -79,7 +86,59 @@ def get_data(filters):
 				"keterangan": je.user_remark,
 				"nominal": je.total_debit,
 				"status": "Tersubmit",
+				"saldo": None,
 			})
 
+	_attach_saldo_kas_kecil(rows)
 	rows.sort(key=lambda r: r["tanggal"], reverse=True)
 	return rows
+
+
+def _attach_saldo_kas_kecil(rows):
+	# Format "Laporan Keuangan SAI - Operasional Harian" asli (docs/dokumen
+	# asli/) punya kolom SALDO berjalan setelah tiap transaksi. Dihitung dari
+	# GL Entry akun Kas Kecil yang benar-benar terpaut ke Journal Entry yang
+	# muncul di laporan ini -- bukan dari nominal Petty Cash Entry langsung,
+	# supaya tetap akurat kalau nanti ada mutasi Kas Kecil dari sumber lain
+	# (top-up manual, dsb).
+	company = frappe.defaults.get_global_default("company")
+	if not company:
+		return
+
+	abbr = frappe.get_cached_value("Company", company, "abbr")
+	account = f"Kas Kecil - {abbr}"
+	if not frappe.db.exists("Account", account):
+		return
+
+	je_rows = [row for row in rows if row["kategori"] == "Entri Jurnal"]
+	if not je_rows:
+		return
+	je_rows.sort(key=lambda r: r["tanggal"])
+
+	je_names = [row["referensi"] for row in je_rows]
+	gl_by_voucher = dict(
+		frappe.db.sql(
+			"""
+			SELECT voucher_no, SUM(debit) - SUM(credit)
+			FROM `tabGL Entry`
+			WHERE account = %s AND voucher_type = 'Journal Entry' AND voucher_no IN %s AND is_cancelled = 0
+			GROUP BY voucher_no
+			""",
+			(account, je_names),
+		)
+	)
+
+	opening = flt(
+		frappe.db.sql(
+			"""
+			SELECT SUM(debit) - SUM(credit) FROM `tabGL Entry`
+			WHERE account = %s AND posting_date < %s AND is_cancelled = 0
+			""",
+			(account, je_rows[0]["tanggal"]),
+		)[0][0]
+	)
+
+	running = opening
+	for row in je_rows:
+		running += flt(gl_by_voucher.get(row["referensi"]))
+		row["saldo"] = running

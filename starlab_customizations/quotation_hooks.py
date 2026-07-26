@@ -1,10 +1,24 @@
 import frappe
-from frappe.utils import add_days, flt
+from frappe.model.naming import make_autoname
+from frappe.utils import add_days, flt, getdate, nowdate
 
-# TODO: format auto-numbering Quotation belum sesuai SAI, lihat PRD v6 Open
-# Question #5 -- naming saat ini masih naming series default bawaan ERPNext
-# (bukan format Quo-SAI/[bulan romawi]/[tahun]/[no urut] dari BRA/PRD).
-# Jangan hardcode asumsi format final apa pun sebelum dikonfirmasi Administrasi.
+# Format dikonfirmasi dari dokumen Quotation asli SAI (Quo-SAI/V/2026/076,
+# Quo-SAI/V/2026/075 -- lihat docs/dokumen asli/): "Quo-SAI/[bulan
+# romawi]/[tahun]/[no urut 3 digit]". Nomor urut naik terus per TAHUN
+# (bukan reset tiap bulan -- 075/076 sama-sama bulan Mei), jadi key seri
+# di bawah sengaja hanya menyertakan tahun, bukan tahun+bulan.
+ROMAN_MONTHS = {
+	1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI",
+	7: "VII", 8: "VIII", 9: "IX", 10: "X", 11: "XI", 12: "XII",
+}
+
+
+def autoname(doc, method=None):
+	date = getdate(doc.transaction_date or nowdate())
+	roman = ROMAN_MONTHS[date.month]
+	series_name = make_autoname(f"Quo-SAI-{date.year}-.###", doc.doctype)
+	running_number = series_name.rsplit("-", 1)[-1]
+	doc.name = f"Quo-SAI/{roman}/{date.year}/{running_number}"
 
 
 def validate(doc, method=None):
