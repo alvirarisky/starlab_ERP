@@ -11,7 +11,7 @@ frappe.query_reports["Rekap Kepatuhan Dokumen Mutu"] = {
 			"fieldname": "status",
 			"label": __("Status"),
 			"fieldtype": "Select",
-			"options": "\nAktif\nDalam Revisi\nUsang",
+			"options": "\nDraft\nMenunggu Approval MM\nMenunggu Approval Direksi\nAktif\nDalam Revisi\nUsang",
 			"default": "",
 		},
 		{

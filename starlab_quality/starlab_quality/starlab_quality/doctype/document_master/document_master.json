@@ -4,6 +4,7 @@
  "allow_rename": 1,
  "autoname": "field:document_no",
  "creation": "2026-07-23 16:27:36.515013",
+ "description": "TSD SS6.5 mendeskripsikan siklus revisi sebagai \"versi lama tetap Aktif sampai versi baru disetujui\" dengan status \"Usang\" untuk versi yang digantikan -- membaca ini secara literal butuh 2 record terpisah per edisi dokumen. Atas keputusan eksplisit PO, diimplementasikan sebagai 1 record yang sama berputar lewat status-nya sendiri (Aktif -> Dalam Revisi -> Menunggu Approval MM -> Menunggu Approval Direksi -> Aktif lagi, edisi_revisi di-bump & Riwayat Revisi bertambah tiap siklus). \"Usang\" tetap ada di opsi Status untuk penandaan manual/historis, tapi tidak ada transisi Workflow otomatis yang menujunya.\n\nCatatan permission: TSD SS6.5 mengatur transisi Draft->Menunggu Approval MM (\"Ajukan\") dilakukan oleh \"divisi pemilik dokumen\" (owner_division, bisa salah satu dari 7 role) -- ini secara teknis butuh Create+Write DocPerm untuk ketujuh role tersebut supaya draft mereka sendiri bisa dibuat/diajukan, sehingga menyimpang dari tabel SS7.8 yang menulis Marketing/Administrasi/Finance/Laboratorium/Direksi sebagai Read-only. Pembatasan row-level (hanya boleh mengubah dokumen milik divisinya sendiri) dipindahkan ke has_permission/get_permission_query_conditions di document_control_hooks.py, bukan lewat Custom DocPerm murni.",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -16,6 +17,7 @@
   "owner_division",
   "status",
   "file_dokumen",
+  "catatan_revisi",
   "distribusi",
   "revisi_history"
  ],
@@ -65,13 +67,13 @@
    "reqd": 1
   },
   {
-   "default": "Aktif",
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "Aktif\nDalam Revisi\nUsang",
+   "options": "Draft\nMenunggu Approval MM\nMenunggu Approval Direksi\nAktif\nDalam Revisi\nUsang",
    "reqd": 1
   },
   {
@@ -79,6 +81,12 @@
    "fieldtype": "Attach",
    "label": "File Dokumen",
    "reqd": 1
+  },
+  {
+   "fieldname": "catatan_revisi",
+   "fieldtype": "Small Text",
+   "label": "Catatan Revisi (diisi sebelum Terbitkan)",
+   "description": "Diisi divisi pemilik sebelum mengajukan/menerbitkan revisi -- otomatis dipindahkan ke Riwayat Revisi dan dikosongkan lagi saat status jadi Aktif."
   },
   {
    "fieldname": "distribusi",
@@ -98,7 +106,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-07-23 16:27:36.515013",
+ "modified": "2026-07-26 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Quality",
  "name": "Document Master",
