@@ -40,5 +40,40 @@
   "modified": "2026-07-26 02:42:00.698223",
   "name": "Musnahkan",
   "workflow_action_name": "Musnahkan"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Ajukan Validasi",
+  "workflow_action_name": "Ajukan Validasi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Validasi",
+  "workflow_action_name": "Validasi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Batalkan Validasi",
+  "workflow_action_name": "Batalkan Validasi"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Tolak",
+  "workflow_action_name": "Tolak"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow Action Master",
+  "modified": "2026-07-26 10:00:00.000000",
+  "name": "Revisi",
+  "workflow_action_name": "Revisi"
  }
 ]
