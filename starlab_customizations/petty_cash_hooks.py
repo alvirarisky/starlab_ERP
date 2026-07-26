@@ -4,7 +4,21 @@ from frappe.utils import flt
 
 def on_update_petty_cash_entry(doc, method=None):
 	before = doc.get_doc_before_save()
-	if not before or before.status == doc.status or doc.status != "Disetujui":
+	if not before or before.status == doc.status:
+		return
+
+	# TSD Bagian 10 "Approval Pending": notifikasi segera begitu Petty Cash
+	# Entry masuk ke state Menunggu Approval.
+	if doc.status == "Menunggu Approval":
+		from starlab_customizations.tasks import _notify_role
+
+		_notify_role(
+			"Direksi",
+			frappe._("Petty Cash Entry {0} menunggu approval Anda").format(doc.name),
+			frappe._("Petty Cash Entry {0} ({1}) menunggu approval Anda.").format(doc.name, doc.item),
+		)
+
+	if doc.status != "Disetujui":
 		return
 
 	_set_disetujui_oleh(doc)

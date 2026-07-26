@@ -1,0 +1,299 @@
+[
+ {
+  "cards": [
+   {
+    "card": "WO Aktif",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "WO Selesai",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Quotation Menunggu Approval Direksi",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Petty Cash Menunggu Approval",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Dokumen Menunggu Approval Direksi",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Invoice Overdue",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Invoice Unpaid",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Quotation Dibuat",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Direksi",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Direksi"
+ },
+ {
+  "cards": [
+   {
+    "card": "Quotation Draft",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Quotation Approved",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Quotation Rejected",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Quotation Dibuat",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Marketing",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Marketing"
+ },
+ {
+  "cards": [
+   {
+    "card": "Quotation Draft",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "WO Selesai",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Petty Cash Menunggu Approval",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Quotation Dibuat",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Administrasi",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Administrasi"
+ },
+ {
+  "cards": [
+   {
+    "card": "Invoice Overdue",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Invoice Unpaid",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Invoice Due 7 Hari",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Petty Cash Menunggu Approval",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Petty Cash Disetujui Bulan Ini",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Invoice Dibuat",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Finance",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Finance"
+ },
+ {
+  "cards": [
+   {
+    "card": "Sample Belum Diuji",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Sample Sedang Diuji",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "WO Draft Menunggu Approval",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "LHU Draft Menunggu Diterbitkan",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Sample Diterima",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Laboratorium",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Laboratorium"
+ },
+ {
+  "cards": [
+   {
+    "card": "Test Result Menunggu Validasi",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "WO Draft Menunggu Approval",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Test Result Ditolak",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Test Result Dibuat",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Manajer Teknis",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Manajer Teknis"
+ },
+ {
+  "cards": [
+   {
+    "card": "Dokumen Menunggu Approval MM",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Distribusi Belum Dibaca",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "LHU Draft Menunggu Diterbitkan",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Dokumen Aktif",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   },
+   {
+    "card": "Dokumen Usang",
+    "doctype": "Number Card Link",
+    "parentfield": "cards"
+   }
+  ],
+  "charts": [
+   {
+    "chart": "Tren Dokumen Direvisi",
+    "doctype": "Dashboard Chart Link",
+    "width": "Full",
+    "parentfield": "charts"
+   }
+  ],
+  "chart_options": null,
+  "dashboard_name": "Dashboard Manajer Mutu",
+  "docstatus": 0,
+  "doctype": "Dashboard",
+  "is_default": 0,
+  "is_standard": 0,
+  "module": "Starlab Customizations",
+  "modified": "2026-07-26 22:00:00.000000",
+  "name": "Dashboard Manajer Mutu"
+ }
+]

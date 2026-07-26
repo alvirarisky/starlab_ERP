@@ -94,6 +94,8 @@ doctype_js = {
 # before_install = "starlab_customizations.install.before_install"
 # after_install = "starlab_customizations.install.after_install"
 
+after_migrate = "starlab_customizations.install.after_migrate"
+
 # Uninstallation
 # ------------
 
@@ -147,6 +149,7 @@ doctype_js = {
 doc_events = {
 	"Quotation": {
 		"validate": "starlab_customizations.quotation_hooks.validate",
+		"on_update": "starlab_customizations.quotation_hooks.on_update",
 	},
 	"Kaji Ulang Tender": {
 		"on_update": "starlab_customizations.client_inquiry_hooks.sync_client_inquiry_from_kaji_ulang",
@@ -195,6 +198,34 @@ fixtures = [
 			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
 		],
 	},
+	{
+		"dt": "Number Card",
+		"filters": [
+			["name", "in", [
+				"Quotation Draft", "Quotation Approved", "Quotation Rejected",
+				"Quotation Menunggu Approval Direksi", "Petty Cash Menunggu Approval",
+				"Petty Cash Disetujui Bulan Ini", "Invoice Overdue", "Invoice Unpaid", "Invoice Due 7 Hari",
+			]]
+		],
+	},
+	{
+		"dt": "Dashboard",
+		"filters": [
+			["name", "in", [
+				"Dashboard Direksi", "Dashboard Marketing", "Dashboard Administrasi", "Dashboard Finance",
+				"Dashboard Laboratorium", "Dashboard Manajer Teknis", "Dashboard Manajer Mutu",
+			]]
+		],
+	},
+	{
+		"dt": "Dashboard Chart",
+		"filters": [
+			["name", "in", [
+				"Tren Quotation Dibuat", "Tren Invoice Dibuat", "Tren Sample Diterima",
+				"Tren Test Result Dibuat", "Tren Dokumen Direvisi",
+			]]
+		],
+	},
 ]
 
 # Scheduled Tasks
@@ -209,6 +240,8 @@ scheduler_events = {
 	],
 	"daily": [
 		"starlab_customizations.tasks.check_quotation_expiry",
+		"starlab_customizations.tasks.check_invoice_due",
+		"starlab_customizations.tasks.check_invoice_overdue",
 	],
 }
 
