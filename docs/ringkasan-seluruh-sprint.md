@@ -1,6 +1,6 @@
 # Ringkasan Pengerjaan Seluruh Sprint (Sprint 1 – 11)
 
-**Cakupan:** Seluruh riwayat proyek ERP SAI dari Sprint 1 (Setup & Master Data) sampai `starlab_integrations` (TSD Sprint 9 asli). Sprint 1–4 dikerjakan sebelum sesi ini (ringkasan diambil dari `docs/audit-sebelum-sprint-5.md`); Sprint 5–11 dikerjakan dalam sesi ini, commit `6b067cd` sampai `8b988ff` di branch `develop`.
+**Cakupan:** Seluruh riwayat proyek ERP SAI dari Sprint 1 (Setup & Master Data) sampai `starlab_integrations` (TSD Sprint 9 asli). Sprint 1–4 dikerjakan sebelum sesi ini (ringkasan diambil dari `docs/audit-sebelum-sprint-5.md`); Sprint 5–11 dikerjakan dalam sesi ini, commit `6b067cd` sampai `8b988ff` di branch `develop`. Commit `53d85bb` (setelah dokumen ini pertama ditulis) menutup 4 gap yang baru ketahuan setelah cross-check ke dokumen asli SAI (`docs/dokumen asli/`) — lihat Bagian 2 & 3.18.
 
 **Catatan penomoran:** Sprint yang kita sebut "5, 6, 7, ... 11" di percakapan adalah urutan kerja kita sendiri, BUKAN nomor Sprint resmi TSD Bagian 12. Pemetaan ke nomor TSD asli ada di tabel Bagian 1 & 2.
 
@@ -34,6 +34,7 @@ Dikerjakan oleh developer sebelumnya (dan sebagian sebagai "Fase 2" informal, di
 | 9 | Sales Invoice custom field/permission, tombol LHU→Invoice, akses Bank Reconciliation | Sisa Sprint 6 TSD | `cbb3e57` |
 | 10 | Dashboard (7 role), Report (akses native), Notification Framework | Sprint 8 TSD (Dashboard, Report & Notification) | `b41e8c7` |
 | 11 | `starlab_integrations`: WhatsApp Gateway (kerangka) + Client Portal + sinkronisasi `docker/apps.json` | Sprint 9 TSD (Integrasi WhatsApp & Client Portal) | `8b988ff` |
+| — | Cross-check ke dokumen asli SAI (`docs/dokumen asli/`) → resolusi 4 gap: format nomor Quotation, konten TNC, opsi distribusi MK3/Eksternal, saldo Kas Kecil | Menjawab PRD v6 Open Question #5 + 2 gap baru yang ketahuan dari data real | `53d85bb` |
 
 **Yang TIDAK bisa dikerjakan lewat coding** (Sprint 10 TSD asli — Migrasi Data, UAT, Go-Live): butuh data historis asli, staf yang benar-benar melakukan UAT, dan keputusan go-live bertahap. Ini PR manusia, dicatat di Bagian 6.
 
@@ -122,6 +123,16 @@ Dikerjakan oleh developer sebelumnya (dan sebagian sebagai "Fase 2" informal, di
 ### 3.17 Perbaikan infrastruktur Docker
 - `docker/apps.json` ternyata menunjuk ke branch/repo yang macet di Sprint 1–4, terpisah dari `develop`. Disinkronkan (`app-starlab-customizations`, `app-starlab-quality`, `app-starlab-lab-ops` di-update ke state `develop` saat ini; `app-starlab-integrations` dibuat baru) supaya `docker/start.sh` benar-benar mendeploy kode terbaru.
 
+### 3.18 Resolusi 4 gap dari dokumen asli SAI — `starlab_customizations` / `starlab_quality` (commit `53d85bb`)
+Ground truth diambil langsung dari dokumen bisnis asli SAI di `docs/dokumen asli/` (Quotation, Daftar Induk Dokumen dan Distribusi, Laporan Keuangan Operasional Harian) — bukan dari BRA/PRD/TSD lagi, karena 4 hal ini memang tidak/belum lengkap dijelaskan di sana.
+
+- **Quotation auto-numbering** (`quotation_hooks.py`, hook `autoname`): format `Quo-SAI/[bulan romawi]/[tahun]/[no urut 3 digit]`, dikonfirmasi dari 2 Quotation asli berbeda (`Quo-SAI/V/2026/075` & `.../076`, sama-sama bulan Mei — nomor urut naik per TAHUN, bukan reset tiap bulan). Menggantikan `naming_series` default ERPNext lewat `doc_events["Quotation"]["autoname"]` di `hooks.py` — dipilih karena `autoname` doc-event dijalankan Frappe SEBELUM `naming_series` bawaan DocType, jadi tidak perlu ubah skema Quotation.
+- **TNC Master Template v01**: diisi via patch (`patches/seed_tnc_master_template.py`, terdaftar di `patches.txt` `[post_model_sync]`) dengan 12 poin Syarat & Ketentuan asli, diambil verbatim dari dokumen "Quo 075-PT Yanmar Indonesia". Sebelumnya field `konten_tnc` kosong/placeholder.
+- **Document Distribution — opsi "MK3" dan "Eksternal"**: ditambahkan ke `divisi` (Select) karena ternyata ada di data distribusi real SAI tapi belum ada di sistem. Keduanya tidak punya Role/user sistem yang cocok (tidak ada role K3 di 7-role model TSD; Eksternal memang di luar organisasi) — jadi acknowledgment untuk 2 opsi ini tetap manual/di luar sistem, tidak lewat notifikasi otomatis seperti divisi lain (`ROLE_BY_DIVISION_CODE.get()` yang sudah ada otomatis mengembalikan `None` untuk keduanya, tidak perlu perubahan kode lain).
+- **Laporan Keuangan Operasional — kolom "Saldo Kas Kecil"**: ditambahkan mengikuti format ledger asli ("Laporan Keuangan SAI - Operasional Harian") yang punya kolom SALDO berjalan. Dihitung dari `GL Entry` akun `Kas Kecil - {abbr}` yang benar-benar terpaut ke tiap Journal Entry yang tampil di laporan — BUKAN dari nominal Petty Cash Entry langsung, karena Petty Cash Entry cuma catatan pengajuan/approval, bukan mutasi buku besar itu sendiri. Baris kategori "Petty Cash" sengaja tampil `Saldo = kosong`.
+
+Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`bench console` di sandbox sebelum di-push. Panduan testing manual (lewat Desk UI) ada di Bagian 7.10.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -129,7 +140,7 @@ Dikerjakan oleh developer sebelumnya (dan sebagian sebagai "Fase 2" informal, di
 | # | Topik | Keputusan | Alasan/Konteks |
 |---|---|---|---|
 | 1 | Status "Fase 2" (Test Result, LHU, Petty Cash, Document Control) | Dianggap selesai/delivered, bukan prioritas ulang — polish hanya kalau memang sedang disentuh | Sudah fungsional dari sebelum Sprint 5, tinggal dipoles |
-| 2 | Auto-numbering Quotation | Tetap default ERPNext, JANGAN hardcode format final SAI | PRD v6 Open Question #5 belum dijawab Administrasi |
+| 2 | Auto-numbering Quotation | **[Superseded oleh commit `53d85bb`]** Awalnya: tetap default ERPNext, jangan hardcode. Sekarang: `Quo-SAI/[bulan romawi]/[tahun]/[no urut]`, dikonfirmasi dari 2 dokumen Quotation asli SAI | PRD v6 Open Question #5 terjawab lewat `docs/dokumen asli/` — lihat Bagian 3.18 |
 | 3 | Client Inquiry (Form A) | Opsional, bukan satu-satunya jalan bikin Quotation | Administrasi tetap bisa bikin Quotation manual |
 | 4 | Lampiran A1 | Field attach/update sederhana di Quotation, bukan DocType/Workflow terpisah | Simplifikasi scope |
 | 5 | Dual approval Petty Cash Entry | Disederhanakan: Direksi saja (bukan Direksi+Finance) | Keputusan eksplisit setelah ditanya |
@@ -146,7 +157,6 @@ Dikerjakan oleh developer sebelumnya (dan sebagian sebagai "Fase 2" informal, di
 |---|---|---|
 | Akun GL Journal Entry Petty Cash | `starlab_customizations/petty_cash_hooks.py` — `"Kas Kecil - {abbr}"` / `"Beban Operasional Kantor - {abbr}"` | Finance konfirmasi nama akun COA asli, sesuaikan kode kalau beda |
 | Cost Center default Company | Company Setup | Pastikan Company punya Cost Center default terisi (biasanya otomatis dari Setup Wizard) |
-| Format auto-numbering Quotation | `starlab_customizations/quotation_hooks.py` (komentar TODO di baris atas) | Administrasi konfirmasi format resmi (`Quo-SAI/[bulan romawi]/[tahun]/[no]` dari BRA/PRD), baru diimplementasikan |
 | Rush fee Quotation | Field `rush_fee_hari`/`rush_fee_percent` sudah ada, belum masuk kalkulasi | PRD v6 Open Question #10 perlu dijawab dulu |
 | Target eskalasi SLA Quotation | `starlab_customizations/tasks.py::check_quotation_sla` | PRD v6 Open Question #1 — sekarang default "reminder ulang ke approver yang sama", ganti kalau ternyata harus ke atasan |
 | WhatsApp Settings | Desk → cari "WhatsApp Settings" | Isi provider, API URL, API Key, Nomor Pengirim begitu sudah pilih & daftar provider (Fonnte/Twilio/WhatsApp Business API), lalu centang "Aktifkan" |
@@ -227,6 +237,37 @@ Semua contoh di bawah pakai `bench --site <NAMA_SITE> console < nama_file.py` (p
 ### 7.9 Report akses Finance
 1. Login sebagai user role Finance (bukan System Manager).
 2. Desk → cari report "Accounts Receivable" dan "Bank Reconciliation Statement" — harus muncul di hasil pencarian & bisa dibuka (sebelumnya digembok ke Accounts Manager/User saja).
+
+### 7.10 4 gap dari dokumen asli SAI (commit `53d85bb`)
+
+**a. Quotation auto-numbering**
+1. Quotation baru → New, isi `Quotation To = Customer` + Customer apa saja, isi minimal 1 baris `Parameter Detail` (parameter, frekuensi, qty per titik, harga satuan).
+2. Save (tidak perlu submit) — cek nama dokumen berbentuk `Quo-SAI/[bulan-romawi]/[tahun]/[no-urut]`, contoh `Quo-SAI/VII/2026/001` kalau dibuat Juli 2026.
+3. Buat Quotation kedua dengan cara sama di tahun yang sama — nomor urut harus naik +1 dari yang pertama.
+4. (Opsional) Ganti `Transaction Date` ke bulan lain sebelum Save → angka romawi bulan ikut berubah (Januari = I, Desember = XII).
+
+**b. TNC Master Template**
+1. Desk → cari "TNC Master Template".
+2. Cek ada record `Versi Template = 01`, `Berlaku Sejak = 2022-11-14`.
+3. Buka record-nya, field `Konten TNC` harus berisi 12 poin S&K asli (bukan kosong).
+
+**c. Document Distribution — MK3 & Eksternal**
+1. Buka Document Master apa saja → tambah baris baru di child table Distribusi.
+2. Dropdown **Divisi** harus menampilkan 9 opsi: Direksi, MM, MT, Laboratorium, Administrasi, Finance, Marketing, **MK3**, **Eksternal**.
+3. Pilih "MK3" atau "Eksternal", isi Tanggal Distribusi, Save — tidak boleh ada error validasi.
+
+**d. Laporan Keuangan Operasional — Saldo Kas Kecil**
+1. Desk → jalankan report "Laporan Keuangan Operasional" tanpa filter.
+2. Cek kolom baru **Saldo Kas Kecil** di paling kanan.
+3. Baris kategori "Petty Cash" → Saldo kosong (by design — bukan mutasi buku besar).
+4. Baris kategori "Entri Jurnal" → Saldo terisi angka running balance, urut sesuai tanggal.
+5. (Opsional) Buat Petty Cash Entry baru → approve sampai "Disetujui" (trigger auto Journal Entry) → jalankan ulang report → baris "Entri Jurnal" baru muncul dengan Saldo ter-update.
+
+**Verifikasi cepat lewat console** (tanpa lewat UI):
+```python
+frappe.get_meta("Document Distribution").get_field("divisi").options
+frappe.db.exists("TNC Master Template", {"versi_template": "01"})
+```
 
 ---
 
