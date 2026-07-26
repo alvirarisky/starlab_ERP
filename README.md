@@ -1,6 +1,6 @@
 ### Starlab Integrations
 
-Modul integrasi eksternal SAI
+Modul integrasi WhatsApp Gateway dan Client Portal SAI
 
 ### Installation
 
@@ -8,7 +8,7 @@ You can install this app using the [bench](https://github.com/frappe/bench) CLI:
 
 ```bash
 cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch n
+bench get-app $URL_OF_THIS_REPO --branch develop
 bench install-app starlab_integrations
 ```
 
