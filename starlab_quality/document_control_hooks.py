@@ -17,6 +17,19 @@ ROLE_BY_DIVISION_CODE = {
 }
 
 
+def _notify_role(role, subject, message):
+	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+	if not users:
+		return
+	# frappe.sendmail raises OutgoingEmailError immediately when no default
+	# outgoing Email Account is configured -- must never block the workflow
+	# transition that triggered this notification.
+	try:
+		frappe.sendmail(recipients=users, subject=subject, message=message)
+	except Exception:
+		frappe.log_error(title="Gagal mengirim notifikasi email", message=frappe.get_traceback())
+
+
 def validate_document_master(doc, method=None):
 	before = doc.get_doc_before_save()
 	if not before or before.status == doc.status:
@@ -31,6 +44,16 @@ def on_update_document_master(doc, method=None):
 	before = doc.get_doc_before_save()
 	if not before or before.status == doc.status:
 		return
+
+	# TSD Bagian 10 "Approval Pending": notifikasi segera begitu dokumen masuk
+	# ke tahap approval-nya masing-masing.
+	approval_role = {"Menunggu Approval MM": "Manajer Mutu", "Menunggu Approval Direksi": "Direksi"}.get(doc.status)
+	if approval_role:
+		_notify_role(
+			approval_role,
+			frappe._("Dokumen {0} menunggu approval Anda").format(doc.name),
+			frappe._("Dokumen {0} ({1}) menunggu approval Anda.").format(doc.name, doc.document_name),
+		)
 
 	if doc.status == "Aktif" and before.status == "Menunggu Approval Direksi":
 		_append_revision_log(doc, before)

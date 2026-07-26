@@ -174,6 +174,15 @@ fixtures = [
 			]],
 		],
 	},
+	{
+		"dt": "Number Card",
+		"filters": [
+			["name", "in", [
+				"Dokumen Menunggu Approval MM", "Dokumen Menunggu Approval Direksi",
+				"Dokumen Aktif", "Dokumen Usang", "Distribusi Belum Dibaca",
+			]]
+		],
+	},
 ]
 
 # Scheduled Tasks
