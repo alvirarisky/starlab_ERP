@@ -28,3 +28,25 @@ def populate_test_result_list(doc, method=None):
 				"metode_acuan": metode_acuan,
 			},
 		)
+
+
+def before_insert(doc, method=None):
+	# Draft hasil "Amend" (native ERPNext, dipicu dari Cancel lalu tombol
+	# Amend) sudah punya amended_from terisi sejak sebelum insert -- pakai
+	# ini untuk membedakan "revisi dari LHU lama" vs LHU baru murni, karena
+	# field status sekarang read_only/dikontrol sistem sepenuhnya (lihat
+	# on_submit di bawah untuk Issued/Superseded).
+	if doc.amended_from:
+		doc.status = "Revised"
+
+
+def on_submit(doc, method=None):
+	doc.db_set("status", "Issued")
+
+	# LHU lama yang di-amend baru resmi "Superseded" begitu LHU pengganti
+	# ini benar-benar terbit (submit), bukan langsung saat Cancel/Amend --
+	# supaya tidak ada jeda di mana LHU lama sudah "usang" padahal LHU
+	# pengganti belum tentu jadi diterbitkan. db_set (bukan .save()) karena
+	# LHU lama sudah docstatus=2 (cancelled), tidak bisa disimpan normal.
+	if doc.amended_from:
+		frappe.db.set_value("LHU", doc.amended_from, "status", "Superseded")

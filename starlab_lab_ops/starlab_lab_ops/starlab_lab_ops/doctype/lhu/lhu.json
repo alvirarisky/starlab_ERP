@@ -7,6 +7,7 @@
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
+ "is_submittable": 1,
  "field_order": [
   "naming_series",
   "work_order",
@@ -73,7 +74,9 @@
    "in_standard_filter": 1,
    "label": "Status",
    "options": "Draft\nIssued\nRevised\nSuperseded",
-   "reqd": 1
+   "read_only": 1,
+   "reqd": 1,
+   "description": "Otomatis diatur sistem mengikuti submit/cancel/amend -- tidak bisa diisi manual."
   },
   {
    "fieldname": "file_lhu",

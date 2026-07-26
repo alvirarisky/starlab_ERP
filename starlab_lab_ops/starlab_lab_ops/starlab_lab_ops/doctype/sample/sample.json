@@ -62,6 +62,7 @@
    "reqd": 1
   },
   {
+   "description": "Durasi retensi belum berupa kebijakan otomatis (BRA Pertanyaan #9 belum dijawab) -- kolom ini & Tanggal Musnah masih diisi manual berdasarkan kebijakan lab saat ini, bukan hasil kalkulasi sistem.",
    "fieldname": "retensi",
    "fieldtype": "Select",
    "in_standard_filter": 1,

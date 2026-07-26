@@ -1,6 +1,9 @@
 frappe.ui.form.on("LHU", {
 	refresh(frm) {
-		if (frm.is_new() || frm.doc.status !== "Issued") return;
+		// docstatus (bukan field status custom) jadi sumber kebenaran sekarang
+		// bahwa LHU ini betul-betul Issued -- status tetap "Issued" (stale) di
+		// LHU yang sudah di-cancel/amend, docstatus-nya yang berubah jadi 2.
+		if (frm.is_new() || frm.doc.docstatus !== 1) return;
 
 		frm.add_custom_button(__("Buat Invoice"), () => {
 			frappe.call({

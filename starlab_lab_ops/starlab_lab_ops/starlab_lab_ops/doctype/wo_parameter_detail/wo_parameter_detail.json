@@ -55,6 +55,7 @@
   },
   {
    "default": "Pending",
+   "description": "Opsi 'Subkon' belum punya alur kerja vendor/SLA (BRA Bagian 8 Poin 5, butuh klarifikasi F0-5 ke Lab & Manajer Mutu) -- status ini murni penanda, penanganan subkontraktor masih manual di luar sistem.",
    "fieldname": "status_pengujian",
    "fieldtype": "Select",
    "in_list_view": 1,

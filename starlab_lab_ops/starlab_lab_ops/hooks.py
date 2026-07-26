@@ -173,6 +173,8 @@ doc_events = {
 	},
 	"LHU": {
 		"validate": "starlab_lab_ops.lhu_hooks.populate_test_result_list",
+		"before_insert": "starlab_lab_ops.lhu_hooks.before_insert",
+		"on_submit": "starlab_lab_ops.lhu_hooks.on_submit",
 	},
 }
 
