@@ -16,7 +16,8 @@
   "diterbitkan_oleh",
   "test_result_list",
   "status",
-  "file_lhu"
+  "file_lhu",
+  "amended_from"
  ],
  "fields": [
   {
@@ -82,6 +83,16 @@
    "fieldname": "file_lhu",
    "fieldtype": "Attach",
    "label": "File LHU"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "LHU",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
