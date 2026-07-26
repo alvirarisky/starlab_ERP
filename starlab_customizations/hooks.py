@@ -148,6 +148,9 @@ doc_events = {
 	"Kaji Ulang Tender": {
 		"on_update": "starlab_customizations.client_inquiry_hooks.sync_client_inquiry_from_kaji_ulang",
 	},
+	"Petty Cash Entry": {
+		"on_update": "starlab_customizations.petty_cash_hooks.on_update_petty_cash_entry",
+	},
 }
 
 # Fixtures
@@ -168,7 +171,7 @@ fixtures = [
 			["name", "in", [
 				"Draft", "Menunggu Approval MT", "Menunggu Approval MM", "Menunggu Approval Finance",
 				"Menunggu Approval Marketing", "Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
-				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT",
+				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT", "Menunggu Approval", "Disetujui",
 			]]
 		],
 	},
@@ -176,13 +179,14 @@ fixtures = [
 		"dt": "Workflow Action Master",
 		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
 	},
-	{"dt": "Workflow", "filters": [["document_type", "in", ["Quotation", "Client Inquiry"]]]},
+	{"dt": "Workflow", "filters": [["document_type", "in", ["Quotation", "Client Inquiry", "Petty Cash Entry"]]]},
 	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation", "Customer", "Print Settings"]]]},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
 			["parent", "in", [
 				"Quotation", "Customer", "Client Inquiry", "Kaji Ulang Tender", "TNC Master Template",
+				"Petty Cash Entry",
 			]],
 			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
 		],

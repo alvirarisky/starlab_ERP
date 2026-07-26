@@ -52,7 +52,7 @@ def get_data(filters):
 				"status": pc.status,
 			})
 
-	if not kategori or kategori == "Journal Entry":
+	if not kategori or kategori == "Entri Jurnal":
 		conditions = ["docstatus = 1"]
 		values = {}
 		if filters.get("from_date"):
@@ -74,11 +74,11 @@ def get_data(filters):
 		for je in journal_entries:
 			rows.append({
 				"tanggal": je.posting_date,
-				"kategori": "Journal Entry",
+				"kategori": "Entri Jurnal",
 				"referensi": je.name,
 				"keterangan": je.user_remark,
 				"nominal": je.total_debit,
-				"status": "Submitted",
+				"status": "Tersubmit",
 			})
 
 	rows.sort(key=lambda r: r["tanggal"], reverse=True)

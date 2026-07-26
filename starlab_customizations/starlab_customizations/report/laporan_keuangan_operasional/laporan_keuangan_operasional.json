@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "add_translate_data": 0,
  "columns": [],
  "creation": "2026-07-23 16:49:35.076124",
@@ -24,6 +24,12 @@
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "Finance"
+  },
+  {
+   "role": "Direksi"
   }
  ],
  "snapshot_report": 0,

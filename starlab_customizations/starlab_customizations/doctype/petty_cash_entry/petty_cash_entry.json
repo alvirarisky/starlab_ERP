@@ -3,6 +3,7 @@
  "allow_bulk_edit": 1,
  "allow_rename": 1,
  "creation": "2026-07-23 16:33:58.564376",
+ "description": "TSD SS6.7 mendeskripsikan approval \"Menunggu Approval -> Disetujui\" sebagai dual approval oleh Direksi DAN Finance (BRA 3.5). Atas keputusan eksplisit PO, disederhanakan jadi Direksi saja sebagai approver tunggal -- Finance tetap punya akses Read (lihat Custom DocPerm) tapi tidak lagi memegang aksi Workflow \"Setujui\"/\"Tolak\".",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -62,7 +63,7 @@
   {
    "fieldname": "journal_entry",
    "fieldtype": "Link",
-   "label": "Journal Entry",
+   "label": "Journal Entry Terkait",
    "options": "Journal Entry",
    "read_only": 1
   },

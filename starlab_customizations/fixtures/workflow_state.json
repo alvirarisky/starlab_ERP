@@ -106,5 +106,23 @@
   "name": "Ditolak MT",
   "style": "Danger",
   "workflow_state_name": "Ditolak MT"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-07-26 18:00:00.000000",
+  "name": "Menunggu Approval",
+  "style": "",
+  "workflow_state_name": "Menunggu Approval"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "ok-sign",
+  "modified": "2026-07-26 18:00:00.000000",
+  "name": "Disetujui",
+  "style": "Success",
+  "workflow_state_name": "Disetujui"
  }
 ]
