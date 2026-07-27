@@ -13,6 +13,38 @@ ROMAN_MONTHS = {
 }
 
 
+def onload(doc, method=None):
+	_populate_histori_lhu_klien(doc)
+
+
+def _populate_histori_lhu_klien(doc):
+	# Custom field histori_lhu_klien (Table, read_only -- lihat
+	# custom_field.json) SENGAJA tidak disimpan sebagai data permanen di baris
+	# Quotation ini; di-fetch ulang tiap form dibuka supaya selalu mencerminkan
+	# LHU milik Customer yang sama secara live, termasuk LHU yang terbit
+	# setelah Quotation ini dibuat.
+	doc.set("histori_lhu_klien", [])
+	if doc.quotation_to != "Customer" or not doc.party_name:
+		return
+
+	lhu_list = frappe.get_all(
+		"LHU",
+		filters={"customer": doc.party_name},
+		fields=["name", "work_order", "tanggal_terbit", "status"],
+		order_by="tanggal_terbit desc",
+	)
+	for row in lhu_list:
+		doc.append(
+			"histori_lhu_klien",
+			{
+				"lhu": row.name,
+				"work_order": row.work_order,
+				"tanggal_terbit": row.tanggal_terbit,
+				"status": row.status,
+			},
+		)
+
+
 def autoname(doc, method=None):
 	date = getdate(doc.transaction_date or nowdate())
 	roman = ROMAN_MONTHS[date.month]

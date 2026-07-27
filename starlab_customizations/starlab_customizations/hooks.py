@@ -149,6 +149,7 @@ after_migrate = "starlab_customizations.install.after_migrate"
 doc_events = {
 	"Quotation": {
 		"autoname": "starlab_customizations.quotation_hooks.autoname",
+		"onload": "starlab_customizations.quotation_hooks.onload",
 		"validate": "starlab_customizations.quotation_hooks.validate",
 		"on_update": "starlab_customizations.quotation_hooks.on_update",
 	},
@@ -176,7 +177,7 @@ fixtures = [
 		"dt": "Workflow State",
 		"filters": [
 			["name", "in", [
-				"Draft", "Menunggu Approval MT", "Menunggu Approval MM", "Menunggu Approval Finance",
+				"Draft", "Menunggu Approval MT", "Menunggu Approval MM",
 				"Menunggu Approval Marketing", "Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
 				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT", "Menunggu Approval", "Disetujui",
 			]]
@@ -228,6 +229,13 @@ fixtures = [
 		],
 	},
 ]
+
+# Workspace TIDAK lewat mekanisme fixtures di atas -- Frappe mensinkronkan
+# Workspace sebagai "module doc" biasa (seperti DocType/Report), dibaca
+# langsung dari starlab_customizations/starlab_customizations/workspace/
+# <slug>/<slug>.json saat bench migrate. Kalau didaftarkan di fixtures,
+# migrate malah MENGHAPUSNYA di langkah "Removing orphan Workspaces" karena
+# tidak ketemu file module yang cocok.
 
 # Scheduled Tasks
 # ---------------

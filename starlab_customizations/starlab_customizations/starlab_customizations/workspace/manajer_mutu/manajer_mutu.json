@@ -1,0 +1,151 @@
+{
+ "app": "starlab_customizations",
+ "charts": [
+  {
+   "chart_name": "Tren Dokumen Direvisi",
+   "label": "Tren Dokumen Direvisi"
+  }
+ ],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Dokumen Menunggu Approval MM\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Distribusi Belum Dibaca\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"LHU Draft Menunggu Diterbitkan\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Dokumen Aktif\", \"col\": 4}}, {\"id\": \"number_card-5\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Dokumen Usang\", \"col\": 4}}, {\"id\": \"spacer-6\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-7\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-8\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Dokumen Direvisi\", \"col\": 12}}, {\"id\": \"spacer-9\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-10\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Document Master\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Document Distribution\", \"col\": 3}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"LHU\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}]",
+ "creation": "2026-07-27 09:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "shield-check",
+ "idx": 0,
+ "indicator_color": "pink",
+ "is_hidden": 0,
+ "label": "Manajer Mutu",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-07-27 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Manajer Mutu",
+ "number_cards": [
+  {
+   "number_card_name": "Dokumen Menunggu Approval MM",
+   "label": "Dokumen Menunggu Approval MM"
+  },
+  {
+   "number_card_name": "Distribusi Belum Dibaca",
+   "label": "Distribusi Belum Dibaca"
+  },
+  {
+   "number_card_name": "LHU Draft Menunggu Diterbitkan",
+   "label": "LHU Draft Menunggu Diterbitkan"
+  },
+  {
+   "number_card_name": "Dokumen Aktif",
+   "label": "Dokumen Aktif"
+  },
+  {
+   "number_card_name": "Dokumen Usang",
+   "label": "Dokumen Usang"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Manajer Mutu"
+  }
+ ],
+ "sequence_id": 7.0,
+ "shortcuts": [
+  {
+   "label": "Document Master",
+   "link_to": "Document Master",
+   "type": "DocType"
+  },
+  {
+   "label": "Document Distribution",
+   "link_to": "Document Distribution",
+   "type": "DocType"
+  },
+  {
+   "label": "LHU",
+   "link_to": "LHU",
+   "type": "DocType"
+  },
+  {
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Manajer Mutu",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "shield-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Document Master",
+   "link_to": "Document Master",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "send",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Document Distribution",
+   "link_to": "Document Distribution",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "LHU",
+   "link_to": "LHU",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "Manajer Mutu",
+ "type": "Workspace"
+}

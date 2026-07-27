@@ -133,6 +133,14 @@ Ground truth diambil langsung dari dokumen bisnis asli SAI di `docs/dokumen asli
 
 Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`bench console` di sandbox sebelum di-push. Panduan testing manual (lewat Desk UI) ada di Bagian 7.10.
 
+### 3.19 Finance read-only di Quotation, 7 Workspace per role, histori LHU klien — `starlab_customizations`
+- **Quotation: Finance bukan approver lagi**. State "Menunggu Approval Finance" dihapus total dari Workflow Quotation (`fixtures/workflow.json`) — alur approval sekarang MT → MM → Marketing → Direksi langsung (Manajer Mutu approve langsung lanjut ke Marketing). `PENDING_APPROVAL_STATES`/`ROLE_BY_STATE` di `tasks.py` disesuaikan. Custom DocPerm Finance di Quotation diset `read=1, write=0, submit=0` — benar-benar read-only, cuma untuk keperluan lihat data buat laporan keuangan.
+  - **Petty Cash Entry dual approval (Finance+Direksi) SENGAJA TIDAK dikerjakan** meski awalnya diminta — ini membalikkan keputusan PO #5 (dual approval sudah pernah eksplisit disederhanakan jadi Direksi-saja). Dikonfirmasi ulang ke PO saat dikerjakan: tetap Direksi-saja, tidak jadi dibalik.
+  - Test otomatis pertama di seluruh proyek yang beneran jalan & lolos: `starlab_customizations/starlab_customizations/tests/test_quotation_workflow_permission.py` — membuktikan user dengan role Finance TIDAK punya workflow transition apa pun di Quotation, di state manapun (MT/MM/Marketing/Direksi), plus assert permission read-only. Lihat catatan penting soal test discovery di Bagian 6.
+- **7 Workspace per role** (Direksi, Marketing, Administrasi, Finance, Laboratorium, Manajer Teknis, Manajer Mutu) — `starlab_customizations/starlab_customizations/workspace/<slug>/<slug>.json`, masing-masing berisi Number Card + Chart (reuse dari Dashboard yang sudah ada di Bagian 3.14) + Shortcut ke DocType terkait, dan dibatasi visibility-nya lewat child table `roles` (cuma muncul di Desk untuk user dengan role itu).
+  - **Penting — Workspace TIDAK disinkronkan lewat mekanisme `fixtures` di `hooks.py`** seperti Dashboard/Number Card/dsb. Sempat dicoba lewat `fixtures/workspace.json` dan langsung ke-delete otomatis oleh `bench migrate` di langkah "Removing orphan Workspaces", karena Frappe mensinkronkan Workspace sebagai *module doc* (satu file JSON per folder di `starlab_customizations/workspace/<nama>/<nama>.json`, sama seperti DocType/Report), bukan lewat fixtures. Kalau mau nambah/ubah Workspace lagi ke depan, ikuti pola folder ini, JANGAN didaftarkan di `fixtures`.
+- **Field `histori_lhu_klien`** di Quotation (Table, read-only, child DocType baru "Quotation LHU History"): daftar LHU milik Customer yang sama dengan Quotation ini. Di-fetch ulang tiap form dibuka lewat `doc_events["Quotation"]["onload"]` (`quotation_hooks.py::_populate_histori_lhu_klien`) — SENGAJA tidak disimpan permanen di baris Quotation, supaya selalu mencerminkan LHU terbaru milik client tersebut secara live, termasuk LHU yang baru terbit setelah Quotation dibuat.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -143,7 +151,7 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 | 2 | Auto-numbering Quotation | **[Superseded oleh commit `53d85bb`]** Awalnya: tetap default ERPNext, jangan hardcode. Sekarang: `Quo-SAI/[bulan romawi]/[tahun]/[no urut]`, dikonfirmasi dari 2 dokumen Quotation asli SAI | PRD v6 Open Question #5 terjawab lewat `docs/dokumen asli/` — lihat Bagian 3.18 |
 | 3 | Client Inquiry (Form A) | Opsional, bukan satu-satunya jalan bikin Quotation | Administrasi tetap bisa bikin Quotation manual |
 | 4 | Lampiran A1 | Field attach/update sederhana di Quotation, bukan DocType/Workflow terpisah | Simplifikasi scope |
-| 5 | Dual approval Petty Cash Entry | Disederhanakan: Direksi saja (bukan Direksi+Finance) | Keputusan eksplisit setelah ditanya |
+| 5 | Dual approval Petty Cash Entry | Disederhanakan: Direksi saja (bukan Direksi+Finance) | Keputusan eksplisit setelah ditanya — **dikonfirmasi ulang & tetap dipertahankan** saat diminta lagi belakangan (lihat Bagian 3.19) |
 | 6 | Akun GL Journal Entry Petty Cash | Placeholder + TODO jelas, bukan skip fitur | Belum ada Chart of Accounts riil dari Finance |
 | 7 | Model versi Document Master | 1 record berputar lewat status-nya sendiri, bukan 2 record terpisah per edisi | Menghindari perubahan skema (`document_no` unique) di DocType existing |
 | 8 | WhatsApp Gateway | Bikin kerangka siap pakai, TIDAK isi kredensial asli | Belum ada akun/API key provider WhatsApp |
@@ -168,7 +176,8 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 ## 6. Catatan / PR untuk Kita (Follow-up)
 
 - **Sprint 10 TSD asli (Migrasi Data, UAT, Go-Live)** — tidak bisa dikerjakan lewat sesi coding. Butuh: file data historis (Excel/Google Drive lama), staf yang benar-benar melakukan UAT per role, keputusan go-live bertahap (Quotation/WO dulu → Sample/QC → sisanya).
-- **Belum ada test otomatis** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. Semua `test_*.py` di setiap DocType masih stub kosong. Regresi ke DocType lama (Quotation/Work Order/Sample) tidak akan kedeteksi otomatis kalau ada yang ubah lagi ke depan.
+- **Hampir tidak ada test otomatis yang beneran jalan** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. `test_*.py` di tiap folder DocType (`kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry`) masih stub kosong (class `IntegrationTestCase` tanpa method `test_*`, jadi 0 test jalan). Satu-satunya test yang beneran ada isinya & lolos sampai sekarang: `starlab_customizations/starlab_customizations/tests/test_quotation_workflow_permission.py` (2 test, lihat Bagian 3.19). Regresi ke DocType lama (Quotation/Work Order/Sample) sebagian besar masih TIDAK akan kedeteksi otomatis.
+  - **Temuan tambahan**: `starlab_lab_ops/tests/test_sanity.py` (2 test stub) ternyata diletakkan di folder yang SALAH — di luar `frappe.get_app_path("starlab_lab_ops")` (yaitu di root repo app, bukan di dalam package Python `starlab_lab_ops/starlab_lab_ops/`), jadi tidak pernah ke-discover oleh `bench run-tests`. File ini secara efektif mati/tidak pernah jalan. Perlu dipindah ke `starlab_lab_ops/starlab_lab_ops/tests/` (pola yang sama dipakai untuk test baru di `starlab_customizations`) kalau mau benar-benar aktif.
 - **Dashboard**: beberapa metrik TSD (saldo kas real-time, conversion rate, histori klien) butuh Query Report custom kalau mau benar-benar akurat — saat ini sengaja tidak dibuatkan Number Card supaya tidak menampilkan angka yang menyesatkan.
 - **`docker/apps.json`**: URL untuk `starlab_lab_ops` masih pakai repo lama (`alvirarisky/starlab_lab_ops.git`) yang menurut GitHub sendiri sudah "moved" ke `starlab_ERP.git`. Masih jalan (GitHub redirect otomatis), tapi lebih rapi kalau nanti diarahkan langsung ke URL kanonik.
 
@@ -268,6 +277,24 @@ Semua contoh di bawah pakai `bench --site <NAMA_SITE> console < nama_file.py` (p
 frappe.get_meta("Document Distribution").get_field("divisi").options
 frappe.db.exists("TNC Master Template", {"versi_template": "01"})
 ```
+
+### 7.11 Finance read-only, 7 Workspace, histori LHU klien (commit setelah `53d85bb`)
+
+**a. Finance tidak bisa approve Quotation**
+1. Login sebagai user role Finance saja (tanpa role approval lain).
+2. Buka Quotation manapun yang sedang "Menunggu Approval MT/MM/Marketing/Direksi" — tidak boleh ada tombol aksi Workflow (Setujui/Tolak) yang muncul buat Finance.
+3. Coba edit field apapun di Quotation itu — harus read-only/tidak bisa Save (Custom DocPerm Finance: write=0).
+4. Jalankan test otomatis: `bench --site <NAMA_SITE> run-tests --app starlab_customizations --module starlab_customizations.starlab_customizations.tests.test_quotation_workflow_permission`.
+
+**b. 7 Workspace per role**
+1. Login sebagai user dengan salah satu dari 7 role (misal Manajer Mutu) — di sidebar Desk kiri (app switcher/workspace list) harus muncul Workspace "Manajer Mutu" berisi Ringkasan (Number Card), Tren (Chart), dan Pintasan (Shortcut DocType terkait).
+2. Login sebagai user dengan role LAIN (misal Marketing) — Workspace "Manajer Mutu" TIDAK boleh muncul di listnya (dibatasi lewat `roles` child table).
+3. Kalau mau nambah/ubah Workspace ini ke depan: edit file di `starlab_customizations/starlab_customizations/workspace/<slug>/<slug>.json` langsung, JANGAN lewat fixtures (lihat catatan di Bagian 3.19).
+
+**c. Histori LHU Klien di Quotation**
+1. Buka Quotation dengan `Quotation To = Customer` yang punya minimal 1 LHU ber-status apapun.
+2. Cek child table baru **Histori LHU Klien** di form Quotation — harus terisi otomatis (read-only) dengan daftar LHU milik Customer tersebut, terurut dari yang terbaru.
+3. Terbitkan LHU baru untuk Customer yang sama, lalu refresh/buka ulang Quotation-nya — baris baru harus otomatis muncul (field ini fetch live tiap form dibuka, bukan snapshot statis).
 
 ---
 

@@ -1,0 +1,164 @@
+{
+ "app": "starlab_customizations",
+ "charts": [
+  {
+   "chart_name": "Tren Invoice Dibuat",
+   "label": "Tren Invoice Dibuat"
+  }
+ ],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Overdue\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Unpaid\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Due 7 Hari\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Menunggu Approval\", \"col\": 4}}, {\"id\": \"number_card-5\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Disetujui Bulan Ini\", \"col\": 4}}, {\"id\": \"spacer-6\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-7\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-8\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Invoice Dibuat\", \"col\": 12}}, {\"id\": \"spacer-9\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-10\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sales Invoice\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Petty Cash Entry\", \"col\": 3}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Bank Reconciliation Tool\", \"col\": 3}}]",
+ "creation": "2026-07-27 09:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "circle-dollar-sign",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Finance",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-07-27 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Finance",
+ "number_cards": [
+  {
+   "number_card_name": "Invoice Overdue",
+   "label": "Invoice Overdue"
+  },
+  {
+   "number_card_name": "Invoice Unpaid",
+   "label": "Invoice Unpaid"
+  },
+  {
+   "number_card_name": "Invoice Due 7 Hari",
+   "label": "Invoice Due 7 Hari"
+  },
+  {
+   "number_card_name": "Petty Cash Menunggu Approval",
+   "label": "Petty Cash Menunggu Approval"
+  },
+  {
+   "number_card_name": "Petty Cash Disetujui Bulan Ini",
+   "label": "Petty Cash Disetujui Bulan Ini"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Finance"
+  }
+ ],
+ "sequence_id": 4.0,
+ "shortcuts": [
+  {
+   "label": "Sales Invoice",
+   "link_to": "Sales Invoice",
+   "type": "DocType"
+  },
+  {
+   "label": "Petty Cash Entry",
+   "link_to": "Petty Cash Entry",
+   "type": "DocType"
+  },
+  {
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "type": "DocType"
+  },
+  {
+   "label": "Bank Reconciliation Tool",
+   "link_to": "Bank Reconciliation Tool",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Finance",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "receipt-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Sales Invoice",
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "wallet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Petty Cash Entry",
+   "link_to": "Petty Cash Entry",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "book-open-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Bank Reconciliation Tool",
+   "link_to": "Bank Reconciliation Tool",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "sheet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Laporan Keuangan Operasional",
+   "link_to": "Laporan Keuangan Operasional",
+   "link_type": "Report",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "Finance",
+ "type": "Workspace"
+}

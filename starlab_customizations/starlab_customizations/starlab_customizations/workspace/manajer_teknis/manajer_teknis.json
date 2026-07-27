@@ -1,0 +1,143 @@
+{
+ "app": "starlab_customizations",
+ "charts": [
+  {
+   "chart_name": "Tren Test Result Dibuat",
+   "label": "Tren Test Result Dibuat"
+  }
+ ],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Test Result Menunggu Validasi\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Draft Menunggu Approval\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Test Result Ditolak\", \"col\": 4}}, {\"id\": \"spacer-4\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-5\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-6\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Test Result Dibuat\", \"col\": 12}}, {\"id\": \"spacer-7\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-8\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Result\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Kaji Ulang Tender\", \"col\": 3}}]",
+ "creation": "2026-07-27 09:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "settings",
+ "idx": 0,
+ "indicator_color": "purple",
+ "is_hidden": 0,
+ "label": "Manajer Teknis",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-07-27 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Manajer Teknis",
+ "number_cards": [
+  {
+   "number_card_name": "Test Result Menunggu Validasi",
+   "label": "Test Result Menunggu Validasi"
+  },
+  {
+   "number_card_name": "WO Draft Menunggu Approval",
+   "label": "WO Draft Menunggu Approval"
+  },
+  {
+   "number_card_name": "Test Result Ditolak",
+   "label": "Test Result Ditolak"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Manajer Teknis"
+  }
+ ],
+ "sequence_id": 6.0,
+ "shortcuts": [
+  {
+   "label": "Work Order Pengujian",
+   "link_to": "Work Order Pengujian",
+   "type": "DocType"
+  },
+  {
+   "label": "Test Result",
+   "link_to": "Test Result",
+   "type": "DocType"
+  },
+  {
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "type": "DocType"
+  },
+  {
+   "label": "Kaji Ulang Tender",
+   "link_to": "Kaji Ulang Tender",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Manajer Teknis",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "wrench",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Work Order Pengujian",
+   "link_to": "Work Order Pengujian",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "flask-conical",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Test Result",
+   "link_to": "Test Result",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "clipboard-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Kaji Ulang Tender",
+   "link_to": "Kaji Ulang Tender",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "Manajer Teknis",
+ "type": "Workspace"
+}
