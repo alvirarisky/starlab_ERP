@@ -142,7 +142,7 @@
   "impersonate": 0,
   "import": 0,
   "mask": 0,
-  "modified": "2026-07-26 00:10:19.610384",
+  "modified": "2026-07-28 09:00:00.000000",
   "name": "iuksvui7l1",
   "parent": "Quotation",
   "permlevel": 0,
@@ -153,7 +153,7 @@
   "select": 0,
   "share": 0,
   "submit": 0,
-  "write": 1
+  "write": 0
  },
  {
   "amend": 0,

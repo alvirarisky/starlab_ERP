@@ -178,7 +178,7 @@ fixtures = [
 		"filters": [
 			["name", "in", [
 				"Draft", "Menunggu Approval MT", "Menunggu Approval MM",
-				"Menunggu Approval Marketing", "Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
+				"Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
 				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT", "Menunggu Approval", "Disetujui",
 			]]
 		],

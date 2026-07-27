@@ -150,6 +150,14 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 - **Default filter per shortcut Workspace** — pakai field `stats_filter` (Code/JSON) di Workspace Shortcut, yang di Frappe dobel fungsi: badge angka di kartu shortcut DAN `frappe.route_options` yang otomatis kepasang saat shortcut diklik (`shortcut_widget.js`). Contoh: shortcut Quotation di Workspace Direksi → `{"workflow_state": "Menunggu Approval Direksi"}`; Manajer Teknis → `{"workflow_state": "Menunggu Approval MT"}`; dst — masing-masing difilter ke state/status yang jadi *actionable queue* role tersebut, konsisten dengan Number Card yang sudah ada.
   - **Bug ditemukan & difix**: shortcut "Document Distribution" di Workspace Manajer Mutu (dibuat di Bagian 3.19) ternyata tidak akan pernah bisa dibuka — itu child table (`istable: 1`), tidak punya List View sendiri. Dihapus dari daftar shortcut; datanya tetap kelihatan lewat Number Card "Distribusi Belum Dibaca" (yang memang query lewat `parent_document_type`, jadi valid) dan lewat form Document Master langsung.
 
+### 3.21 Client Dashboard tanpa login + Marketing bukan approver Quotation — `starlab_integrations` / `starlab_customizations`
+- **Client Dashboard nomor pesanan tanpa login** (PRD v8 Bagian 5.7 / TSD Bab 11) — endpoint baru `starlab_integrations.tracking.track_order` (`@frappe.whitelist(allow_guest=True)` + `@rate_limit(limit=30, seconds=60)`), menerima nomor Quotation ATAU Work Order Pengujian, mengembalikan status pekerjaan + status/tautan unduh LHU kalau sudah terbit — **tidak pernah** mengembalikan data harga/finansial apa pun. Halaman publik di `/tracking` (`www/tracking.html` + `.py`) — form sederhana + JS `frappe.call`, murni client-side fetch ke endpoint di atas, tidak ada pengecekan login sama sekali.
+  - **Diverifikasi beneran lewat HTTP guest** (bukan cuma manggil fungsi Python langsung): jalanin `bench serve` sementara, `curl` ke endpoint TANPA cookie session — responsnya `Set-Cookie: sid=Guest` (native Frappe, konfirmasi request ini benar-benar dianggap tamu anonim) dan tetap dapat data yang benar. Halaman `/tracking` juga dicek langsung return HTTP 200 tanpa redirect ke `/login`.
+  - `/status-klien` (versi login/Portal User, dari Sprint 10 lama) tetap ada apa adanya sebagai kanal alternatif — sesuai TSD Bab 11, bukan kanal utama.
+- **Marketing bukan approver Quotation** — pola persis sama seperti Finance (Bagian 3.19): state "Menunggu Approval Marketing" dihapus total dari Workflow Quotation (MM approve langsung ke Direksi), `PENDING_APPROVAL_STATES`/`ROLE_BY_STATE` di `tasks.py` disesuaikan, Custom DocPerm Marketing di Quotation diset `write=0` (read tetap 1). **Role "Marketing", Employee dengan Designation Marketing, dan Workspace "Marketing" TIDAK dihapus** — cuma kemampuan approve di workflow Quotation yang hilang, persis seperti perlakuan Finance.
+  - Shortcut Quotation di Workspace Marketing (dibuat Bagian 3.20) yang sebelumnya filter ke `workflow_state: "Menunggu Approval Marketing"` ikut diperbaiki jadi tanpa filter (nampilin semua Quotation) — Marketing sekarang murni visibilitas pipeline, tidak punya "actionable queue" approval lagi.
+  - Test `test_quotation_workflow_permission.py` direfactor: logika Finance & Marketing digabung lewat mixin (`_QuotationNonApproverPermissionMixin`, BUKAN subclass `TestCase` supaya tidak ikut ke-discover sebagai test class sendiri), dipakai oleh 2 test class konkret (`...FinancePermission`, `...MarketingPermission`) — total 4 test, semua lolos.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -323,6 +331,21 @@ frappe.db.exists("TNC Master Template", {"versi_template": "01"})
 1. Login sebagai Direksi, buka Workspace Direksi, klik shortcut "Quotation" — List View yang terbuka harus otomatis ke-filter `Workflow State = Menunggu Approval Direksi` (bukan nampilin semua Quotation).
 2. Login sebagai Manajer Teknis, klik shortcut "Quotation" di Workspace-nya — harus ke-filter `Workflow State = Menunggu Approval MT`.
 3. Workspace Manajer Mutu: pastikan TIDAK ada lagi shortcut "Document Distribution" (sudah dihapus karena tidak pernah bisa dibuka).
+
+### 7.13 Client Dashboard tanpa login & Marketing bukan approver (commit setelah `a26a97f`)
+
+**a. Client Dashboard tanpa login**
+1. Buka `/tracking` di browser **tanpa login sama sekali** (mode incognito juga boleh) — halaman harus tampil normal, TIDAK redirect ke `/login`.
+2. Masukkan nomor Quotation atau Work Order yang valid → klik "Cek Status" — harus muncul status pekerjaan (dan status/tautan unduh LHU kalau sudah terbit), TANPA menampilkan harga/nominal apa pun.
+3. Masukkan nomor yang tidak ada → harus muncul pesan "tidak ditemukan", bukan error.
+4. `/status-klien` (versi login) tetap bisa diakses seperti biasa oleh user dengan Portal User terdaftar — tidak berubah.
+
+**b. Marketing bukan approver Quotation**
+1. Login sebagai user role Marketing saja (tanpa role approval lain) — buka Quotation manapun yang sedang "Menunggu Approval MT/MM/Direksi": tidak boleh ada tombol Workflow Action (Setujui/Tolak) yang muncul.
+2. Coba edit field apapun di Quotation itu sebagai Marketing — harus read-only/tidak bisa Save.
+3. Cek Role List (Desk → Role) dan daftar Employee — role "Marketing" dan Employee dengan Designation Marketing harus **masih ada**, tidak terhapus.
+4. Login sebagai Marketing, buka Workspace "Marketing" → shortcut "Quotation" — sekarang nampilin semua Quotation (tanpa filter state tertentu, karena Marketing tidak lagi punya approval queue).
+5. Jalankan test otomatis: `bench --site <NAMA_SITE> run-tests --app starlab_customizations --module starlab_customizations.starlab_customizations.tests.test_quotation_workflow_permission` — harus 4 test lolos (2 Finance, 2 Marketing).
 
 ---
 

@@ -1,0 +1,92 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Cek Status Pesanan{% endblock %}
+
+{% block page_content %}
+<div class="container" style="max-width: 700px; margin-top: 2rem;">
+	<h2>Cek Status Pesanan</h2>
+	<p>Masukkan nomor Quotation atau Work Order Anda untuk melihat status pekerjaan dan Laporan Hasil Uji (LHU). Tidak perlu login.</p>
+
+	<form id="tracking-form" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem;">
+		<input
+			type="text"
+			name="nomor_pesanan"
+			class="form-control"
+			placeholder="Contoh: Quo-SAI/VII/2026/001"
+			required
+		>
+		<button type="submit" class="btn btn-primary">Cek Status</button>
+	</form>
+
+	<div id="tracking-result"></div>
+</div>
+
+<script>
+frappe.ready(function () {
+	$("#tracking-form").on("submit", function (e) {
+		e.preventDefault();
+		var nomor = $('[name="nomor_pesanan"]').val().trim();
+		var $result = $("#tracking-result");
+		if (!nomor) return;
+
+		$result.html("<p>Mencari...</p>");
+
+		frappe.call({
+			type: "GET",
+			method: "starlab_integrations.tracking.track_order",
+			args: { nomor_pesanan: nomor },
+			callback: function (r) {
+				var data = r.message;
+				if (!data || !data.found) {
+					$result.html("<p>Nomor pesanan tidak ditemukan. Pastikan nomor sudah benar.</p>");
+					return;
+				}
+				$result.html(render_result(data));
+			},
+			error: function () {
+				$result.html("<p>Terjadi kesalahan. Silakan coba lagi.</p>");
+			},
+		});
+	});
+
+	function render_result(data) {
+		var html = "<h4>Nomor Pesanan: " + frappe.utils.escape_html(data.nomor_pesanan) + "</h4>";
+
+		if (data.status_pekerjaan) {
+			html += "<p><b>Status:</b> " + frappe.utils.escape_html(data.status_pekerjaan) + "</p>";
+		}
+
+		if (data.pekerjaan && data.pekerjaan.length) {
+			data.pekerjaan.forEach(function (p) {
+				html += "<div style='border-top: 1px solid #ddd; padding-top: 0.75rem; margin-top: 0.75rem;'>";
+				html += "<p><b>Work Order:</b> " + frappe.utils.escape_html(p.work_order) + "</p>";
+				html += "<p><b>Status Pekerjaan:</b> " + frappe.utils.escape_html(p.status_pekerjaan) + "</p>";
+				if (p.lhu && p.lhu.length) {
+					p.lhu.forEach(function (lhu) {
+						html +=
+							"<p><b>LHU " +
+							frappe.utils.escape_html(lhu.name) +
+							":</b> " +
+							frappe.utils.escape_html(lhu.status);
+						if (lhu.file_lhu) {
+							html +=
+								" — <a href='" +
+								frappe.utils.escape_html(lhu.file_lhu) +
+								"' target='_blank'>Unduh LHU</a>";
+						}
+						html += "</p>";
+					});
+				} else {
+					html += "<p>LHU belum diterbitkan.</p>";
+				}
+				html += "</div>";
+			});
+		} else if (!data.status_pekerjaan) {
+			html += "<p>Belum ada Work Order untuk pesanan ini.</p>";
+		}
+
+		return html;
+	}
+});
+</script>
+{% endblock %}

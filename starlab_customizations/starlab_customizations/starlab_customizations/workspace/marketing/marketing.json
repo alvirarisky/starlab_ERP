@@ -57,8 +57,7 @@
   {
    "label": "Quotation",
    "link_to": "Quotation",
-   "type": "DocType",
-   "stats_filter": "{\"workflow_state\": \"Menunggu Approval Marketing\"}"
+   "type": "DocType"
   },
   {
    "label": "Customer",
