@@ -5,3 +5,5 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 starlab_customizations.patches.seed_tnc_master_template
+starlab_customizations.patches.seed_tnc_master_template_v2
+starlab_customizations.patches.consolidate_customer_kategori_pelanggan

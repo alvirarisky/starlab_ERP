@@ -20,6 +20,15 @@
  {
   "docstatus": 0,
   "doctype": "Workflow State",
+  "icon": "time",
+  "modified": "2026-07-29 09:00:00.000000",
+  "name": "Kedaluwarsa",
+  "style": "Warning",
+  "workflow_state_name": "Kedaluwarsa"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
   "icon": "",
   "modified": "2026-07-26 00:08:47.370412",
   "name": "Draft",

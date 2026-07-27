@@ -33,12 +33,14 @@ def sync_client_inquiry_from_kaji_ulang(doc, method=None):
 
 
 def _create_quotation_draft(client_inquiry):
-	# Form A is optional (PRD v6 keputusan PO): Administrasi tetap bisa
-	# membuat Quotation langsung tanpa Client Inquiry. Simetrisnya, kalau
-	# Client Inquiry ini belum tertaut ke Customer terdaftar, kita tidak
-	# memaksakan auto-create (Quotation core ERPNext mewajibkan party_name)
-	# -- cukup catat di timeline supaya Administrasi tahu harus membuat
-	# Quotation manual dan mengisi client_inquiry sendiri.
+	# [PRD v8 Sprint 12] Form A/client_inquiry sekarang WAJIB di Quotation --
+	# fungsi ini sudah selalu mengisinya (lihat quotation.client_inquiry di
+	# bawah), jadi tidak perlu perubahan untuk itu. Yang masih perlu
+	# di-guard: kalau Client Inquiry ini belum tertaut ke Customer
+	# terdaftar, auto-create tetap tidak dipaksakan (Quotation core ERPNext
+	# mewajibkan party_name) -- cukup catat di timeline supaya Administrasi
+	# tahu harus membuat Quotation manual (tetap wajib mengisi Referensi
+	# Form A sendiri di form manual itu).
 	if not client_inquiry.customer:
 		client_inquiry.add_comment(
 			"Info",

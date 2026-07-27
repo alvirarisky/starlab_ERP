@@ -158,6 +158,20 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
   - Shortcut Quotation di Workspace Marketing (dibuat Bagian 3.20) yang sebelumnya filter ke `workflow_state: "Menunggu Approval Marketing"` ikut diperbaiki jadi tanpa filter (nampilin semua Quotation) — Marketing sekarang murni visibilitas pipeline, tidak punya "actionable queue" approval lagi.
   - Test `test_quotation_workflow_permission.py` direfactor: logika Finance & Marketing digabung lewat mixin (`_QuotationNonApproverPermissionMixin`, BUKAN subclass `TestCase` supaya tidak ikut ke-discover sebagai test class sendiri), dipakai oleh 2 test class konkret (`...FinancePermission`, `...MarketingPermission`) — total 4 test, semua lolos.
 
+### 3.22 PRD v8 Sprint 12 — Penyesuaian Quotation Berdasarkan Keputusan Product Owner — `starlab_customizations`
+8 keputusan PO baru yang mengubah/mempertegas beberapa perilaku Quotation & dokumen terkait dari sprint-sprint sebelumnya:
+
+1. **Reset penuh approval saat konten diubah pasca-approval sebagian** — sebelumnya, approver di tahap MM/Direksi (yang punya `allow_edit` di state mereka sendiri) bisa mengedit konten Quotation tanpa lewat Tolak/Revisi, sehingga approval MT/MM yang sudah ada seolah tetap berlaku untuk konten yang sudah berubah. `quotation_hooks.py::_revert_to_mt_if_content_changed_mid_approval` sekarang membandingkan field numerik/teks penting + isi tabel `parameter_detail` sebelum/sesudah save (`get_doc_before_save()`); kalau ada perubahan konten SAAT state masih di "Menunggu Approval MM" atau "Menunggu Approval Direksi" (bukan hasil transisi Workflow yang sah), state di-`db_set` paksa balik ke "Menunggu Approval MT" + notifikasi ulang ke Manajer Teknis. Perubahan di tahap MT sendiri (sebelum approval pertama) tidak memicu reset apa pun — itu memang wajar.
+2. **Masa berlaku Quotation 30 → 45 hari + state "Kedaluwarsa" + reaktivasi** — `EXPIRY_DAYS` di `quotation_hooks.py` naik jadi 45. Workflow Quotation (`fixtures/workflow.json`) dapat state baru "Kedaluwarsa" (`doc_status=1`, `allow_edit: Administrasi`) plus action "Aktifkan Kembali" (transisi balik ke "Approved"). Scheduled job harian `tasks.py::check_quotation_expiry` sekarang benar-benar memindahkan Quotation Approved yang lewat `tanggal_kadaluwarsa` ke state "Kedaluwarsa" (sebelumnya cuma kirim notifikasi tanpa mengubah state). "Aktifkan Kembali" adalah transisi Workflow asli (aksi Administrasi genuine) yang memperpanjang `tanggal_kadaluwarsa` 45 hari dari hari ini — tidak perlu bikin Quotation baru dari nol.
+3. **`client_inquiry` wajib di Quotation** — Custom Field `Quotation.client_inquiry` sekarang `reqd=1`. Membalikkan keputusan PRD v6 (Bagian 4 baris 3) yang tadinya menjadikan Form A opsional — sekarang seluruh Quotation, termasuk client repeat, wajib melalui pencatatan Client Inquiry terlebih dahulu. `_create_quotation_draft` di `client_inquiry_hooks.py` sudah otomatis mengisi field ini sejak awal, jadi tidak ada perubahan logika di jalur auto-create.
+4. **Field baru `tingkat_percepatan`** (Select) di Quotation — opsi: Normal (default), "7 Hari Kerja (+80%)", "5 Hari Kerja (+100%)", "Lainnya (Input Manual)". `quotation_hooks.py::_apply_tingkat_percepatan` auto-isi `rush_fee_hari`/`rush_fee_percent` untuk 2 tier yang sudah dikonfirmasi PO; pilih "Normal" mengosongkan kedua field rush fee; pilih "Lainnya" membiarkan `rush_fee_hari`/`rush_fee_percent` diisi manual (field lama dari sebelumnya, sekarang jadi fallback untuk kasus di luar 2 tier baku).
+5. **Konsolidasi `jenis_industri` + `kategori_pelanggan` di Customer** — dikonfirmasi PO kedua field ini identik/redundan. Patch baru `consolidate_customer_kategori_pelanggan.py` (`[post_model_sync]`) memindahkan nilai `jenis_industri` ke `kategori_pelanggan` untuk Customer yang belum terisi `kategori_pelanggan` (skip + `frappe.log_error` kalau ada konflik nilai atau nilai di luar opsi baku, untuk direview manual), lalu menghapus Custom Field `Customer-jenis_industri`. Field `pic_name` yang sebelumnya `insert_after: jenis_industri` dipindah ke `insert_after: customer_type`.
+6. **Konten T&C Master Template diperbarui** — bukan mengedit versi `01` yang sudah lama dipakai Quotation lama, tapi menambah **versi baru `02`** (patch `seed_tnc_master_template_v2.py`, `berlaku_sejak` = tanggal patch dijalankan) dengan poin masa berlaku "45 hari" (bukan 30) dan poin pelunasan "7 (tujuh) hari kalender setelah invoice diterima" (bukan 30 hari). Quotation lama tetap merujuk v01 apa adanya; Quotation baru otomatis memilih v02 lewat logika pemilihan versi terbaru yang sudah ada di `_set_active_tnc_template`.
+7. **Payment Terms Sales Invoice: due date = tanggal invoice + 7 hari** — hook baru `invoice_hooks.py::set_due_date` (doc_event `Sales Invoice.validate`) meng-set `due_date = posting_date + 7 hari` untuk invoice draft. Terdaftar di `hooks.py::doc_events`.
+8. **Test untuk seluruh 7 poin di atas** — lihat Bagian 7.14 untuk daftar file test & cara jalankan; ringkas: 24 test baru/direfactor di `starlab_customizations`, semua lolos (`bench run-tests --app starlab_customizations`).
+
+> **Catatan implementasi**: item 1 & 2 (arah Approved→Kedaluwarsa) memakai pola `doc.db_set(...)` bypass yang sudah dipakai di `wo_hooks.py` sejak sprint-sprint awal — dipilih karena keduanya dipicu sistem (scheduled job / deteksi otomatis saat save), bukan aksi eksplisit user yang punya role terkait. "Aktifkan Kembali" (Kedaluwarsa→Approved) sebaliknya memakai transisi Workflow asli karena itu memang aksi user (Administrasi) yang genuine. Perhatikan juga: Frappe memicu `on_update_after_submit` (bukan `on_update`) untuk save pada dokumen yang docstatus-nya sudah 1→1 (kasus "Aktifkan Kembali") — `on_update` Quotation didaftarkan di kedua event di `hooks.py` supaya logika reaktivasi tetap jalan.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -166,7 +180,7 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 |---|---|---|---|
 | 1 | Status "Fase 2" (Test Result, LHU, Petty Cash, Document Control) | Dianggap selesai/delivered, bukan prioritas ulang — polish hanya kalau memang sedang disentuh | Sudah fungsional dari sebelum Sprint 5, tinggal dipoles |
 | 2 | Auto-numbering Quotation | **[Superseded oleh commit `53d85bb`]** Awalnya: tetap default ERPNext, jangan hardcode. Sekarang: `Quo-SAI/[bulan romawi]/[tahun]/[no urut]`, dikonfirmasi dari 2 dokumen Quotation asli SAI | PRD v6 Open Question #5 terjawab lewat `docs/dokumen asli/` — lihat Bagian 3.18 |
-| 3 | Client Inquiry (Form A) | Opsional, bukan satu-satunya jalan bikin Quotation | Administrasi tetap bisa bikin Quotation manual |
+| 3 | Client Inquiry (Form A) | **[Superseded oleh PRD v8 Sprint 12]** Awalnya: opsional, bukan satu-satunya jalan bikin Quotation. Sekarang: **wajib** (`client_inquiry` jadi `reqd=1`), tidak ada lagi jalur bikin Quotation tanpa Form A | Keputusan PO baru — lihat Bagian 3.22 poin 3 |
 | 4 | Lampiran A1 | Field attach/update sederhana di Quotation, bukan DocType/Workflow terpisah | Simplifikasi scope |
 | 5 | Dual approval Petty Cash Entry | Disederhanakan: Direksi saja (bukan Direksi+Finance) | Keputusan eksplisit setelah ditanya — **dikonfirmasi ulang & tetap dipertahankan** saat diminta lagi belakangan (lihat Bagian 3.19) |
 | 6 | Akun GL Journal Entry Petty Cash | Placeholder + TODO jelas, bukan skip fitur | Belum ada Chart of Accounts riil dari Finance |
@@ -346,6 +360,50 @@ frappe.db.exists("TNC Master Template", {"versi_template": "01"})
 3. Cek Role List (Desk → Role) dan daftar Employee — role "Marketing" dan Employee dengan Designation Marketing harus **masih ada**, tidak terhapus.
 4. Login sebagai Marketing, buka Workspace "Marketing" → shortcut "Quotation" — sekarang nampilin semua Quotation (tanpa filter state tertentu, karena Marketing tidak lagi punya approval queue).
 5. Jalankan test otomatis: `bench --site <NAMA_SITE> run-tests --app starlab_customizations --module starlab_customizations.starlab_customizations.tests.test_quotation_workflow_permission` — harus 4 test lolos (2 Finance, 2 Marketing).
+
+### 7.14 PRD v8 Sprint 12 — Penyesuaian Quotation (lihat Bagian 3.22)
+
+**a. Reset penuh approval saat konten diubah pasca-approval sebagian**
+1. Buat Quotation baru (via Client Inquiry), approve sampai state "Menunggu Approval MM" (login sebagai Manajer Teknis, klik "Setujui").
+2. Login sebagai Manajer Mutu, buka Quotation itu → ubah `Discount Percent` atau baris Parameter Detail apapun → Save (jangan klik tombol Workflow Action).
+3. Cek state Quotation — harus balik ke "Menunggu Approval MT", BUKAN tetap "Menunggu Approval MM".
+4. Ulangi sampai state "Menunggu Approval Direksi", ubah konten lagi sebagai Direksi → harus tetap reset PENUH ke "Menunggu Approval MT" (bukan mundur satu tahap ke MM).
+5. Sebagai kontrol: save Quotation di state manapun TANPA mengubah konten apa pun — state tidak boleh berubah.
+
+**b. Expiry 45 hari + state Kedaluwarsa + Aktifkan Kembali**
+1. Buat Quotation baru → cek field `Tanggal Kadaluwarsa` = `Transaction Date` + 45 hari (bukan 30).
+2. Approve Quotation sampai "Approved", lalu set `Tanggal Kadaluwarsa` manual ke tanggal lampau (lewat Desk atau `bench console`) → jalankan `bench --site <NAMA_SITE> execute starlab_customizations.tasks.check_quotation_expiry` → state harus berubah jadi "Kedaluwarsa".
+3. Buka Quotation yang sudah "Kedaluwarsa" → harus ada tombol Workflow Action "Aktifkan Kembali" (role Administrasi) → klik → state balik ke "Approved" dan `Tanggal Kadaluwarsa` diperpanjang 45 hari dari hari ini.
+
+**c. `client_inquiry` wajib**
+1. Coba buat Quotation manual dari Desk tanpa mengisi field "Referensi Form A" (`client_inquiry`) → Save harus gagal dengan error field wajib.
+2. Isi field itu dengan Client Inquiry yang valid → Save harus berhasil.
+
+**d. Field `tingkat_percepatan`**
+1. Buka Quotation manapun (state Draft) → set `Tingkat Percepatan` ke "5 Hari Kerja (+100%)" → Save → cek `Rush Fee Hari` = 5, `Rush Fee Percent` = 100 (otomatis terisi).
+2. Ganti ke "7 Hari Kerja (+80%)" → cek `Rush Fee Hari` = 7, `Rush Fee Percent` = 80.
+3. Ganti ke "Normal" → kedua field rush fee harus kosong/0.
+4. Ganti ke "Lainnya (Input Manual)" → isi `Rush Fee Hari`/`Rush Fee Percent` manual → Save → nilai manual harus tetap tersimpan apa adanya (tidak ditimpa otomatis).
+
+**e. Konsolidasi `kategori_pelanggan`**
+1. Buka DocType Customer di Desk → cek field "Jenis Industri" sudah tidak ada lagi di form.
+2. Field "Kategori Pelanggan" tetap ada dengan opsi baku (Perusahaan, Individu-Perorangan, Institusi Pemerintah, Universitas-Sekolah, Lain-lain).
+3. Untuk Customer lama yang sebelumnya cuma punya `jenis_industri` terisi (bukan `kategori_pelanggan`) — cek nilainya sudah otomatis pindah ke `kategori_pelanggan` setelah `bench migrate` (patch jalan sekali saat migrate).
+
+**f. T&C v02**
+1. Buka menu "TNC Master Template" → harus ada record baru `Versi Template = 02` dengan `Konten TNC` menyebutkan "45 hari" dan pelunasan "7 (tujuh) hari kalender".
+2. Record `Versi Template = 01` yang lama TIDAK berubah (masih menyebutkan "30 hari").
+3. Buat Quotation baru → field `TNC Template` yang terisi otomatis harus menunjuk ke versi `02`.
+
+**g. Sales Invoice due date**
+1. Buat Sales Invoice baru (draft), isi `Posting Date` = hari ini → Save → cek `Due Date` = `Posting Date` + 7 hari.
+2. Buat Sales Invoice lain dengan `Posting Date` mundur/backdated (perlu centang "Set Posting Time" di Desk) → cek `Due Date` tetap konsisten `Posting Date` + 7 hari.
+
+**h. Jalankan seluruh test otomatis**
+```
+bench --site <NAMA_SITE> run-tests --app starlab_customizations
+```
+Harus 24 test lolos, mencakup semua poin a–g di atas (file: `test_quotation_revision_and_expiry.py`, `test_quotation_fields.py`, `test_sales_invoice_due_date.py`, plus `test_quotation_workflow_permission.py` yang direfactor pakai helper baru `quotation_test_utils.py`).
 
 ---
 

@@ -1,4 +1,16 @@
 import frappe
+from frappe.utils import add_days
+
+
+def set_due_date(doc, method=None):
+	# PRD v8 Sprint 12, item 7 / TSD Bab 6.7: Term of Payment default SAI --
+	# due_date = tanggal invoice terbit + 7 hari kalender, dikonfirmasi PO
+	# (terpisah dari DP 50% di muka yang sudah diatur di T&C Quotation).
+	# docstatus==0 guard sama seperti tanggal_kadaluwarsa Quotation -- sekali
+	# submitted, due_date tidak lagi dihitung ulang diam-diam kalau
+	# posting_date pernah diubah pasca-submit (amend, dst).
+	if doc.posting_date and doc.docstatus == 0:
+		doc.due_date = add_days(doc.posting_date, 7)
 
 
 @frappe.whitelist()
