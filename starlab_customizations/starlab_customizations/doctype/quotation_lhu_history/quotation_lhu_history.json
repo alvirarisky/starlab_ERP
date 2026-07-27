@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-07-27 09:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "lhu",
+  "work_order",
+  "tanggal_terbit",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "lhu",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "LHU",
+   "options": "LHU",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Work Order",
+   "options": "Work Order Pengujian",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tanggal_terbit",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Tanggal Terbit",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Status",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-27 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Quotation LHU History",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

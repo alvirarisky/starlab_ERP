@@ -1,0 +1,125 @@
+{
+ "app": "starlab_customizations",
+ "charts": [
+  {
+   "chart_name": "Tren Quotation Dibuat",
+   "label": "Tren Quotation Dibuat"
+  }
+ ],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Draft\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Approved\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Rejected\", \"col\": 4}}, {\"id\": \"spacer-4\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-5\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-6\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Quotation Dibuat\", \"col\": 12}}, {\"id\": \"spacer-7\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-8\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Client Inquiry\", \"col\": 3}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer\", \"col\": 3}}]",
+ "creation": "2026-07-27 09:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "megaphone",
+ "idx": 0,
+ "indicator_color": "orange",
+ "is_hidden": 0,
+ "label": "Marketing",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-07-27 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Marketing",
+ "number_cards": [
+  {
+   "number_card_name": "Quotation Draft",
+   "label": "Quotation Draft"
+  },
+  {
+   "number_card_name": "Quotation Approved",
+   "label": "Quotation Approved"
+  },
+  {
+   "number_card_name": "Quotation Rejected",
+   "label": "Quotation Rejected"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Marketing"
+  }
+ ],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "label": "Client Inquiry",
+   "link_to": "Client Inquiry",
+   "type": "DocType"
+  },
+  {
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "type": "DocType"
+  },
+  {
+   "label": "Customer",
+   "link_to": "Customer",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Marketing",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "clipboard-list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Client Inquiry",
+   "link_to": "Client Inquiry",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "file-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Quotation",
+   "link_to": "Quotation",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "users",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Customer",
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "Marketing",
+ "type": "Workspace"
+}

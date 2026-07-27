@@ -116,7 +116,7 @@
   "impersonate": 0,
   "import": 0,
   "mask": 0,
-  "modified": "2026-07-26 00:10:19.587416",
+  "modified": "2026-07-27 09:00:00.000000",
   "name": "iujd3l0ial",
   "parent": "Quotation",
   "permlevel": 0,
@@ -127,7 +127,7 @@
   "select": 0,
   "share": 0,
   "submit": 0,
-  "write": 1
+  "write": 0
  },
  {
   "amend": 0,

@@ -17,7 +17,6 @@ def _safe_sendmail(recipients, subject, message):
 PENDING_APPROVAL_STATES = [
 	"Menunggu Approval MT",
 	"Menunggu Approval MM",
-	"Menunggu Approval Finance",
 	"Menunggu Approval Marketing",
 	"Menunggu Approval Direksi",
 ]
@@ -25,7 +24,6 @@ PENDING_APPROVAL_STATES = [
 ROLE_BY_STATE = {
 	"Menunggu Approval MT": "Manajer Teknis",
 	"Menunggu Approval MM": "Manajer Mutu",
-	"Menunggu Approval Finance": "Finance",
 	"Menunggu Approval Marketing": "Marketing",
 	"Menunggu Approval Direksi": "Direksi",
 }
@@ -118,6 +116,18 @@ def _notify_role(role, subject, message):
 	if not users:
 		return
 	_safe_sendmail(users, subject, message)
+	_notify_role_whatsapp(role, message)
+
+
+def _notify_role_whatsapp(role, message):
+	# TSD Bagian 10/11: WhatsApp adalah channel TAMBAHAN, bukan pengganti
+	# email -- starlab_integrations bersifat opsional (belum tentu
+	# terinstall/terkonfigurasi), jadi ini benar-benar no-op kalau app-nya
+	# tidak ada atau WhatsApp Settings belum diisi (lihat whatsapp.py).
+	try:
+		frappe.get_attr("starlab_integrations.whatsapp.notify_role_via_whatsapp")(role, message)
+	except Exception:
+		pass
 
 
 def check_invoice_due():
