@@ -20,7 +20,7 @@
  "label": "Direksi",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-27 09:00:00.000000",
+ "modified": "2026-07-28 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Direksi",
@@ -68,22 +68,26 @@
   {
    "label": "Quotation",
    "link_to": "Quotation",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"workflow_state\": \"Menunggu Approval Direksi\"}"
   },
   {
    "label": "Petty Cash Entry",
    "link_to": "Petty Cash Entry",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Menunggu Approval\"}"
   },
   {
    "label": "Document Master",
    "link_to": "Document Master",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Menunggu Approval Direksi\"}"
   },
   {
    "label": "Sales Invoice",
    "link_to": "Sales Invoice",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Overdue\"}"
   },
   {
    "label": "Work Order Pengujian",

@@ -20,7 +20,7 @@
  "label": "Manajer Teknis",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-27 09:00:00.000000",
+ "modified": "2026-07-28 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Manajer Teknis",
@@ -52,17 +52,20 @@
   {
    "label": "Work Order Pengujian",
    "link_to": "Work Order Pengujian",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Draft\"}"
   },
   {
    "label": "Test Result",
    "link_to": "Test Result",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Diajukan Validasi\"}"
   },
   {
    "label": "Quotation",
    "link_to": "Quotation",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"workflow_state\": \"Menunggu Approval MT\"}"
   },
   {
    "label": "Kaji Ulang Tender",

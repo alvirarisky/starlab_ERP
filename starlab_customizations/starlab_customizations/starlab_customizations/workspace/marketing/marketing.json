@@ -20,7 +20,7 @@
  "label": "Marketing",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-27 09:00:00.000000",
+ "modified": "2026-07-28 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Marketing",
@@ -57,7 +57,8 @@
   {
    "label": "Quotation",
    "link_to": "Quotation",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"workflow_state\": \"Menunggu Approval Marketing\"}"
   },
   {
    "label": "Customer",

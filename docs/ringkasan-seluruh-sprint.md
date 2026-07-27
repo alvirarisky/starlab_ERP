@@ -141,6 +141,15 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
   - **Penting — Workspace TIDAK disinkronkan lewat mekanisme `fixtures` di `hooks.py`** seperti Dashboard/Number Card/dsb. Sempat dicoba lewat `fixtures/workspace.json` dan langsung ke-delete otomatis oleh `bench migrate` di langkah "Removing orphan Workspaces", karena Frappe mensinkronkan Workspace sebagai *module doc* (satu file JSON per folder di `starlab_customizations/workspace/<nama>/<nama>.json`, sama seperti DocType/Report), bukan lewat fixtures. Kalau mau nambah/ubah Workspace lagi ke depan, ikuti pola folder ini, JANGAN didaftarkan di `fixtures`.
 - **Field `histori_lhu_klien`** di Quotation (Table, read-only, child DocType baru "Quotation LHU History"): daftar LHU milik Customer yang sama dengan Quotation ini. Di-fetch ulang tiap form dibuka lewat `doc_events["Quotation"]["onload"]` (`quotation_hooks.py::_populate_histori_lhu_klien`) — SENGAJA tidak disimpan permanen di baris Quotation, supaya selalu mencerminkan LHU terbaru milik client tersebut secara live, termasuk LHU yang baru terbit setelah Quotation dibuat.
 
+### 3.20 Kanban Board, kop surat resmi, icon Workspace, default filter shortcut
+- **Kanban Board "Sample per Status" & "Work Order Pengujian per Status"** — dibuat via patch (`starlab_lab_ops/patches/seed_kanban_boards.py`) yang manggil `quick_kanban_board()` bawaan Frappe (logika sama persis dengan tombol "Create Kanban Board" di List View), jadi kolomnya otomatis mengikuti opsi Select field `status` masing-masing DocType, bukan di-hardcode.
+- **Kop surat resmi PT Starlab Analitik Indonesia** — dibuat sebagai 1 record `Letter Head` terpusat (`starlab_customizations/letter_head/pt_starlab_analitik_indonesia/`, `is_default=1`), bukan hardcode HTML terpisah di tiap Print Format. Isi (nama, alamat, telepon, email, no. akreditasi KAN LP-2063-IDN) diambil verbatim dari kop surat asli di `docs/dokumen asli/LHU 023- PT Starlab Analitik Indoensia.pdf`. Print Format **Quotation Ringkasan Harga** (sebelumnya sama sekali tanpa kop surat) dan **LHU Resmi** (sebelumnya placeholder "[LOGO PLACEHOLDER]"/"Jl. Contoh Alamat Placeholder") sekarang sama-sama render `{{ letter_head }}` di baris paling atas.
+  - **Gap yang masih tersisa**: file gambar logo & badge akreditasi KAN yang asli (raster/vector) belum ada sebagai aset terpisah — cuma kelihatan di render PDF dokumen asli. Representasinya sementara teks "KAN / LP-2063-IDN" di kop surat. Ganti ke `<img>` di `content` Letter Head begitu SAI kirim file logo aslinya.
+  - **Penting — Letter Head, sama seperti Print Format & Workspace, disinkronkan sebagai *module doc*** (`starlab_customizations/letter_head/<slug>/<slug>.json`), BUKAN lewat `fixtures`.
+- **Icon per Workspace** — 7 Workspace sudah punya icon Lucide yang berbeda-beda sejak awal dibuat (Direksi=briefcase, Marketing=megaphone, Administrasi=clipboard-list, Finance=circle-dollar-sign, Laboratorium=flask-conical, Manajer Teknis=settings, Manajer Mutu=shield-check) — dicek ulang, semua sudah tersimpan benar & berbeda-beda di database dev, dan semua nama icon valid (dicocokkan ke daftar asli di `frappe/public/icons/lucide/icons.svg`). Kalau di instance lain masih kelihatan "briefcase" semua, kemungkinan besar instance itu belum `bench migrate` dengan fixture terbaru, bukan bug di kode.
+- **Default filter per shortcut Workspace** — pakai field `stats_filter` (Code/JSON) di Workspace Shortcut, yang di Frappe dobel fungsi: badge angka di kartu shortcut DAN `frappe.route_options` yang otomatis kepasang saat shortcut diklik (`shortcut_widget.js`). Contoh: shortcut Quotation di Workspace Direksi → `{"workflow_state": "Menunggu Approval Direksi"}`; Manajer Teknis → `{"workflow_state": "Menunggu Approval MT"}`; dst — masing-masing difilter ke state/status yang jadi *actionable queue* role tersebut, konsisten dengan Number Card yang sudah ada.
+  - **Bug ditemukan & difix**: shortcut "Document Distribution" di Workspace Manajer Mutu (dibuat di Bagian 3.19) ternyata tidak akan pernah bisa dibuka — itu child table (`istable: 1`), tidak punya List View sendiri. Dihapus dari daftar shortcut; datanya tetap kelihatan lewat Number Card "Distribusi Belum Dibaca" (yang memang query lewat `parent_document_type`, jadi valid) dan lewat form Document Master langsung.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -295,6 +304,25 @@ frappe.db.exists("TNC Master Template", {"versi_template": "01"})
 1. Buka Quotation dengan `Quotation To = Customer` yang punya minimal 1 LHU ber-status apapun.
 2. Cek child table baru **Histori LHU Klien** di form Quotation — harus terisi otomatis (read-only) dengan daftar LHU milik Customer tersebut, terurut dari yang terbaru.
 3. Terbitkan LHU baru untuk Customer yang sama, lalu refresh/buka ulang Quotation-nya — baris baru harus otomatis muncul (field ini fetch live tiap form dibuka, bukan snapshot statis).
+
+### 7.12 Kanban Board, kop surat, icon Workspace, default filter shortcut
+
+**a. Kanban Board**
+1. Buka List View **Sample** atau **Work Order Pengujian** → klik ikon switch view → pilih **Kanban**.
+2. Board "Sample per Status" / "Work Order Pengujian per Status" harus muncul dengan kolom sesuai opsi Select `status` DocType itu (Sample: Diterima/Sedang Diuji/Divalidasi/Diarsipkan/Dimusnahkan; WO: Draft/Approved/In Progress/Completed/Cancelled).
+
+**b. Kop surat resmi**
+1. Cetak Quotation apapun lewat Print Format "Quotation Ringkasan Harga" — kop surat "PT STARLAB ANALITIK INDONESIA" + alamat + telepon + email + KAN LP-2063-IDN harus muncul di paling atas (sebelumnya tidak ada kop surat sama sekali).
+2. Cetak LHU apapun lewat Print Format "LHU Resmi" — kop surat yang SAMA (bukan lagi placeholder "[LOGO PLACEHOLDER]"/"Jl. Contoh Alamat Placeholder") harus muncul, dan baris kota di tanda tangan sudah "Bogor" (bukan "Kota Placeholder").
+3. Desk → cari "Letter Head" → record "PT Starlab Analitik Indonesia" harus ada dengan `Is Default` tercentang.
+
+**c. Icon Workspace**
+1. Login, lihat sidebar/App Switcher Desk — 7 Workspace role harus punya icon berbeda-beda (bukan briefcase semua). Kalau ternyata masih sama semua di instance yang dites, jalankan `bench migrate` dulu di instance itu — datanya sudah benar di fixture/module file, cuma belum ke-sync ke DB instance tersebut.
+
+**d. Default filter shortcut**
+1. Login sebagai Direksi, buka Workspace Direksi, klik shortcut "Quotation" — List View yang terbuka harus otomatis ke-filter `Workflow State = Menunggu Approval Direksi` (bukan nampilin semua Quotation).
+2. Login sebagai Manajer Teknis, klik shortcut "Quotation" di Workspace-nya — harus ke-filter `Workflow State = Menunggu Approval MT`.
+3. Workspace Manajer Mutu: pastikan TIDAK ada lagi shortcut "Document Distribution" (sudah dihapus karena tidak pernah bisa dibuka).
 
 ---
 
