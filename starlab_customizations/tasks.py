@@ -75,10 +75,18 @@ def _notify_pending_approver(quotation, workflow_state):
 
 
 def check_quotation_expiry():
-	# PRD v6 SS5.5 -- notifikasi ke Administrasi saat Quotation yang sudah
-	# terbit ke client (Approved) melewati tanggal_kadaluwarsa (30 hari sejak
-	# terbit) tanpa direspons. Belum menangani Open Question #6 (apakah bisa
-	# di-extend) -- ini murni notifikasi, tidak mengubah status quotation.
+	# PRD v8 Bagian 5.3/5.4 -- Quotation Approved yang melewati
+	# tanggal_kadaluwarsa (45 hari sejak terbit, lihat quotation_hooks.py)
+	# tanpa direspons client dipindah otomatis ke state "Kedaluwarsa".
+	# Administrasi bisa mengaktifkannya kembali (action "Aktifkan Kembali")
+	# tanpa perlu membuat Quotation baru dari nol -- lihat
+	# quotation_hooks.py::_extend_expiry_on_reactivation.
+	#
+	# workflow_state di-set langsung lewat db_set (bypass Workflow engine),
+	# bukan apply_workflow(), karena ini transisi otomatis oleh sistem
+	# (scheduled job), bukan aksi user -- pola yang sama dipakai wo_hooks.py
+	# untuk transisi otomatis lain. db_set melewati Version log, jadi
+	# Comment manual ditambahkan supaya tetap ada jejak di timeline dokumen.
 	quotations = frappe.get_all(
 		"Quotation",
 		filters={
@@ -95,17 +103,28 @@ def check_quotation_expiry():
 	users = frappe.get_all(
 		"Has Role", filters={"role": "Administrasi", "parenttype": "User"}, pluck="parent"
 	)
-	if not users:
-		return
 
 	for row in quotations:
-		_safe_sendmail(
-			users,
-			frappe._("Quotation {0} sudah kedaluwarsa").format(row.name),
+		frappe.db.set_value("Quotation", row.name, "workflow_state", "Kedaluwarsa")
+		doc = frappe.get_doc("Quotation", row.name)
+		doc.add_comment(
+			"Info",
 			frappe._(
-				"Quotation {0} sudah melewati tanggal kedaluwarsa dan belum direspons client."
-			).format(row.name),
+				"Quotation ini otomatis dipindah ke status Kedaluwarsa oleh sistem karena melewati"
+				" tanggal kedaluwarsa tanpa respons client. Gunakan aksi \"Aktifkan Kembali\" untuk"
+				" memperpanjang tanpa membuat Quotation baru."
+			),
 		)
+
+		if users:
+			_safe_sendmail(
+				users,
+				frappe._("Quotation {0} sudah kedaluwarsa").format(row.name),
+				frappe._(
+					"Quotation {0} sudah melewati tanggal kedaluwarsa dan belum direspons client."
+					" Gunakan aksi \"Aktifkan Kembali\" bila ingin memperpanjang."
+				).format(row.name),
+			)
 		frappe.db.set_value("Quotation", row.name, "kedaluwarsa_notif_terkirim", 1)
 
 

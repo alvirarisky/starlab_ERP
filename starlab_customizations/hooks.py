@@ -152,12 +152,20 @@ doc_events = {
 		"onload": "starlab_customizations.quotation_hooks.onload",
 		"validate": "starlab_customizations.quotation_hooks.validate",
 		"on_update": "starlab_customizations.quotation_hooks.on_update",
+		# Transisi "Aktifkan Kembali" (Kedaluwarsa -> Approved) terjadi
+		# antara dua state yang sama-sama docstatus=1 -- Frappe memicu
+		# on_update_after_submit untuk save seperti ini, BUKAN on_update
+		# biasa (lihat _extend_expiry_on_reactivation di quotation_hooks.py).
+		"on_update_after_submit": "starlab_customizations.quotation_hooks.on_update",
 	},
 	"Kaji Ulang Tender": {
 		"on_update": "starlab_customizations.client_inquiry_hooks.sync_client_inquiry_from_kaji_ulang",
 	},
 	"Petty Cash Entry": {
 		"on_update": "starlab_customizations.petty_cash_hooks.on_update_petty_cash_entry",
+	},
+	"Sales Invoice": {
+		"validate": "starlab_customizations.invoice_hooks.set_due_date",
 	},
 }
 
@@ -178,7 +186,7 @@ fixtures = [
 		"filters": [
 			["name", "in", [
 				"Draft", "Menunggu Approval MT", "Menunggu Approval MM",
-				"Menunggu Approval Direksi", "Approved", "Rejected", "Cancelled",
+				"Menunggu Approval Direksi", "Approved", "Rejected", "Kedaluwarsa", "Cancelled",
 				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT", "Menunggu Approval", "Disetujui",
 			]]
 		],

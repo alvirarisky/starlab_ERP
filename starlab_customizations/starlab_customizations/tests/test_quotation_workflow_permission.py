@@ -1,7 +1,8 @@
 import frappe
 from frappe.model.workflow import WorkflowTransitionError, apply_workflow, get_transitions
 from frappe.tests import IntegrationTestCase
-from frappe.utils import nowdate
+
+from starlab_customizations.starlab_customizations.tests.quotation_test_utils import make_quotation
 
 # Finance dan Marketing bukan approver Quotation (Finance: hanya perlu baca
 # data untuk laporan keuangan; Marketing: hanya perlu baca untuk visibilitas
@@ -15,55 +16,8 @@ PENDING_APPROVAL_STATES = [
 	"Menunggu Approval Direksi",
 ]
 
-TEST_ITEM_CODE = "TEST-ITEM-QUOTATION-PERM"
 APPROVER_ROLES = {"Manajer Teknis", "Manajer Mutu", "Direksi", "Administrasi"}
 NON_APPROVER_ROLES = {"Finance", "Marketing"}
-
-
-def _ensure_master_data():
-	if not frappe.db.exists("UOM", "Nos"):
-		frappe.get_doc({"doctype": "UOM", "uom_name": "Nos"}).insert(ignore_permissions=True)
-	if not frappe.db.exists("Item Group", "All Item Groups"):
-		frappe.get_doc(
-			{"doctype": "Item Group", "item_group_name": "All Item Groups", "is_group": 1}
-		).insert(ignore_permissions=True)
-	if not frappe.db.exists("Price List", "Standard Selling"):
-		frappe.get_doc(
-			{
-				"doctype": "Price List",
-				"price_list_name": "Standard Selling",
-				"currency": "IDR",
-				"selling": 1,
-			}
-		).insert(ignore_permissions=True)
-	if not frappe.db.exists("Item", TEST_ITEM_CODE):
-		frappe.get_doc(
-			{
-				"doctype": "Item",
-				"item_code": TEST_ITEM_CODE,
-				"item_name": TEST_ITEM_CODE,
-				"item_group": "All Item Groups",
-				"stock_uom": "Nos",
-				"is_stock_item": 0,
-			}
-		).insert(ignore_permissions=True)
-
-
-def _make_quotation():
-	customer = frappe.db.get_value("Customer", {}, "name")
-	doc = frappe.get_doc(
-		{
-			"doctype": "Quotation",
-			"quotation_to": "Customer",
-			"party_name": customer,
-			"transaction_date": nowdate(),
-			"selling_price_list": "Standard Selling",
-			"currency": "IDR",
-			"items": [{"item_code": TEST_ITEM_CODE, "qty": 1, "rate": 100}],
-		}
-	)
-	doc.insert(ignore_permissions=True)
-	return doc
 
 
 class _QuotationNonApproverPermissionMixin:
@@ -76,9 +30,8 @@ class _QuotationNonApproverPermissionMixin:
 	test_user_email = None
 
 	def setUp(self):
-		_ensure_master_data()
 		self.test_user = self._ensure_role_only_user()
-		self.quotation = _make_quotation()
+		self.quotation = make_quotation()
 
 	def tearDown(self):
 		frappe.set_user("Administrator")
