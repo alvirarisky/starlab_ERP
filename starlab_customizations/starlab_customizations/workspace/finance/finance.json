@@ -20,7 +20,7 @@
  "label": "Finance",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-27 09:00:00.000000",
+ "modified": "2026-07-28 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Finance",
@@ -60,7 +60,8 @@
   {
    "label": "Sales Invoice",
    "link_to": "Sales Invoice",
-   "type": "DocType"
+   "type": "DocType",
+   "stats_filter": "{\"status\": \"Overdue\"}"
   },
   {
    "label": "Petty Cash Entry",
