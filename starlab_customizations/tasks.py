@@ -17,14 +17,12 @@ def _safe_sendmail(recipients, subject, message):
 PENDING_APPROVAL_STATES = [
 	"Menunggu Approval MT",
 	"Menunggu Approval MM",
-	"Menunggu Approval Marketing",
 	"Menunggu Approval Direksi",
 ]
 
 ROLE_BY_STATE = {
 	"Menunggu Approval MT": "Manajer Teknis",
 	"Menunggu Approval MM": "Manajer Mutu",
-	"Menunggu Approval Marketing": "Marketing",
 	"Menunggu Approval Direksi": "Direksi",
 }
 
