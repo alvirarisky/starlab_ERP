@@ -193,6 +193,25 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 
 > **Catatan lingkungan (bukan perubahan kode)**: menulis test nyata untuk Document Master pertama kali di sesi ini memicu bug lama di seeding default Department milik ERPNext core (`Company.on_update` gagal dengan `Could not find Parent Department: All Departments`) — dipicu lewat rantai dependency `Document Master` → child table `Document Revision` → Link `diubah_oleh` (Employee) → Company, saat Frappe mencoba auto-generate test record Employee. Dihindari dengan `IGNORE_TEST_RECORD_DEPENDENCIES = ["Employee"]` di `test_document_master.py` (tidak ada test di bawah yang butuh Employee ter-generate otomatis). Bug seeding Department itu sendiri murni masalah environment/ERPNext core, di luar scope perbaikan sesi ini.
 
+### 3.24 Polish tampilan Client Dashboard + branding dasar — `starlab_customizations` / `starlab_integrations`
+
+Logo resmi PT Starlab Analitik Indonesia (`docs/dokumen asli/SAI Logo_name.png`, dari user) sekarang jadi aset kode, bukan cuma dipakai di kop surat sebagai teks:
+
+- **Aset logo** — logo asli (2000x2000, banyak whitespace) di-crop jadi 2 varian dan dibundel sebagai static asset app (`public/images/`, bukan File doctype — ini aset branding yang menempel ke kode, bukan data upload user):
+  - `sai-logo.png` (256px, ikon bintang+LAB saja tanpa nama perusahaan) — dipakai untuk App Logo Desk & header halaman `/tracking`. Dibundel di KEDUA app (`starlab_customizations` untuk Desk, `starlab_integrations` untuk halaman publik) supaya `/tracking` tidak bergantung diam-diam ke asset app lain yang tidak ada di `required_apps`-nya.
+  - `sai-favicon.png` (64px, ikon yang sama) — dipakai sebagai favicon.
+  - Warna brand yang diambil presisi dari file asli (bukan tebakan): navy `#050066`, cyan `#11A8E0`, merah `#FE0000`.
+- **Patch baru `set_sai_branding.py`** (`[post_model_sync]`) — idempotent, mengeset:
+  1. `Website Settings.app_logo` & `.favicon` ke path asset di atas.
+  2. `Color` doc baru (`#11A8E0`) + `Website Theme` custom baru ("PT Starlab Analitik Indonesia") dengan `primary_color` mengarah ke situ, di-set sebagai `Website Settings.website_theme` aktif.
+  3. **Temuan penting**: field `Website Theme.primary_color` (mekanisme resmi Frappe) ternyata **tidak lagi mengontrol warna tombol** di versi Frappe ini — sistem desain "espresso" bawaan Frappe men-style `.btn-primary` dari token `--btn-primary` yang di-hardcode ke abu-abu gelap (`--surface-gray-10`), sama sekali tidak membaca `$primary`/`primary_color` (dikonfirmasi dengan membaca source SCSS-nya langsung, bukan tebakan). Kalau cuma set `primary_color` seperti yang diminta secara harfiah, tombol tetap abu-abu gelap, bukan biru default Bootstrap seperti dugaan awal tapi juga bukan warna brand. **Fix**: tambahan `custom_scss` override eksplisit (`--btn-primary` + `.btn-primary` dengan `!important`) di field `Website Theme.custom_scss` — field escape-hatch resmi yang memang disediakan untuk kasus seperti ini, dirender setelah semua import sehingga menang di cascade. Sudah diverifikasi sampai ke compiled CSS yang benar-benar disajikan browser (`.btn-primary{background-color:#11a8e0 !important}`), bukan cuma dicek field-nya kesimpen di DB.
+- **`tracking.html` dirombak**:
+  - Logo + heading + subjudul di atas form (bukan cuma teks polos).
+  - "Mencari..." diganti spinner CSS murni (tanpa library eksternal).
+  - Hasil pencarian sekarang per-Work-Order jadi card terpisah (border kiri aksen cyan, background lembut), status pakai badge warna (hijau = selesai/disetujui/issued, kuning = proses/draft/menunggu, merah = dibatalkan/ditolak/superseded, biru = revised/diterima) — klasifikasi berdasarkan kata kunci di teks status supaya otomatis menangani ketiga vocabulary status yang beda-beda (WO, LHU, Quotation) tanpa mapping tetap yang gampang basi.
+  - Form input+tombol pakai flexbox dengan `@media (max-width: 480px)` supaya tombol jadi full-width & stack ke bawah di layar HP, bukan kepotong side-by-side.
+  - Semua interpolasi teks tetap lewat `frappe.utils.escape_html` (tidak ada perubahan postur keamanan dari versi sebelumnya).
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -463,6 +482,16 @@ bench --site <NAMA_SITE> run-tests --app starlab_quality
 bench --site <NAMA_SITE> run-tests --app starlab_integrations
 ```
 Total 37 test lolos (27 + 2 + 4 + 4).
+
+### 7.16 Polish Client Dashboard + branding (lihat Bagian 3.24)
+1. Setelah `bench migrate` (patch `set_sai_branding` jalan otomatis), login ke Desk → cek logo di pojok kiri atas navbar sekarang logo SAI (ikon bintang+LAB), bukan logo Frappe default.
+2. Cek favicon tab browser juga berubah jadi logo SAI yang sama.
+3. Buka `/tracking` tanpa login → cek logo SAI muncul di atas form, di atas judul "Cek Status Pesanan".
+4. Klik "Cek Status" dengan input kosong-lalu-diisi → **selama loading**, harus muncul spinner berputar + teks "Mencari...", bukan cuma teks statis.
+5. Masukkan nomor Quotation/Work Order yang valid dan punya Work Order + LHU → hasil harus tampil sebagai card terpisah per Work Order (ada border kiri warna cyan, background sedikit berbeda dari putih polos), status Work Order & LHU masing-masing pakai badge warna (ijo/kuning/merah/biru sesuai isi statusnya).
+6. Masukkan nomor yang statusnya "Cancelled"/"Ditolak" (kalau ada datanya) → badge harus merah. Nomor dengan status "Completed"/"Issued"/"Disetujui" → badge hijau.
+7. Buka `/tracking` di layar HP (atau resize browser ke < 480px lebar) → tombol "Cek Status" harus turun ke bawah input (stack vertikal), bukan kepotong/menyempit di samping input.
+8. Cek tombol "Cek Status" warnanya cyan brand SAI (`#11A8E0`), bukan hitam/abu-abu gelap atau biru default Bootstrap — **kalau masih abu-abu/hitam, kemungkinan besar cache CSS browser, hard refresh dulu** (compiled CSS Website Theme punya nama file unik per generate, jadi seharusnya tidak butuh clear cache manual, tapi in case tetap perlu).
 
 ---
 
