@@ -1,9 +1,10 @@
 import frappe
 from frappe.tests import IntegrationTestCase
-from frappe.utils import nowdate
+from frappe.utils import flt, nowdate
 
 from starlab_customizations.starlab_customizations.tests.quotation_test_utils import (
 	TEST_ITEM_CODE,
+	TEST_PARAMETER_NAME,
 	ensure_master_data,
 	make_quotation,
 )
@@ -74,6 +75,54 @@ class IntegrationTestQuotationTingkatPercepatan(IntegrationTestCase):
 		reloaded = frappe.get_doc("Quotation", self.quotation.name)
 		self.assertEqual(reloaded.rush_fee_hari, 3)
 		self.assertEqual(reloaded.rush_fee_percent, 50)
+
+
+class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
+	"""PRD v8 Sprint 12, TUGAS 1: rush_fee_amount (Sub Total x Rush Fee %)
+	harus ikut mempengaruhi total_invoice. Posisi urutan kalkulasi (Rush Fee
+	sebelum Discount) masih ASUMSI kerja -- lihat catatan di
+	quotation_hooks._calculate_price_summary."""
+
+	def setUp(self):
+		# harga_satuan di-fetch otomatis dari Test Parameter.harga_satuan_default
+		# (lihat quotation_test_utils.ensure_master_data) -- tidak diisi manual
+		# di sini karena fetch_from akan menimpanya saat insert/save.
+		self.parameter_detail = [{"parameter": TEST_PARAMETER_NAME, "frekuensi": 1, "qty_per_titik": 1}]
+
+	def test_rush_fee_amount_added_to_total_when_tier_set(self):
+		normal = make_quotation(parameter_detail=self.parameter_detail)
+		self.assertEqual(normal.rush_fee_amount, 0)
+
+		doc = frappe.get_doc("Quotation", normal.name)
+		doc.tingkat_percepatan = "5 Hari Kerja (+100%)"
+		doc.save(ignore_permissions=True)
+		reloaded = frappe.get_doc("Quotation", normal.name)
+
+		self.assertEqual(reloaded.rush_fee_amount, reloaded.sub_total)
+		self.assertGreater(reloaded.total_invoice, normal.total_invoice)
+
+	def test_total_invoice_unchanged_when_normal(self):
+		doc = make_quotation(parameter_detail=self.parameter_detail)
+		self.assertEqual(doc.tingkat_percepatan, "Normal")
+		self.assertEqual(doc.rush_fee_amount, 0)
+
+		expected_total = doc.dpp + (doc.dpp * flt(doc.ppn_percent) / 100) + flt(doc.biaya_kirim)
+		self.assertEqual(doc.total_invoice, expected_total)
+
+	def test_total_invoice_matches_rush_fee_before_discount_formula(self):
+		doc = make_quotation(parameter_detail=self.parameter_detail)
+		doc = frappe.get_doc("Quotation", doc.name)
+		doc.tingkat_percepatan = "7 Hari Kerja (+80%)"
+		doc.discount_percent = 10
+		doc.save(ignore_permissions=True)
+		reloaded = frappe.get_doc("Quotation", doc.name)
+
+		base_after_rush_fee = reloaded.sub_total + reloaded.rush_fee_amount
+		expected_dpp = base_after_rush_fee - (base_after_rush_fee * flt(reloaded.discount_percent) / 100)
+		expected_total = expected_dpp + (expected_dpp * flt(reloaded.ppn_percent) / 100) + flt(reloaded.biaya_kirim)
+
+		self.assertEqual(reloaded.dpp, expected_dpp)
+		self.assertEqual(reloaded.total_invoice, expected_total)
 
 
 class IntegrationTestTncMasterTemplateV2(IntegrationTestCase):
