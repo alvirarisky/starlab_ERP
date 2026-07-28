@@ -172,6 +172,27 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 
 > **Catatan implementasi**: item 1 & 2 (arah Approved→Kedaluwarsa) memakai pola `doc.db_set(...)` bypass yang sudah dipakai di `wo_hooks.py` sejak sprint-sprint awal — dipilih karena keduanya dipicu sistem (scheduled job / deteksi otomatis saat save), bukan aksi eksplisit user yang punya role terkait. "Aktifkan Kembali" (Kedaluwarsa→Approved) sebaliknya memakai transisi Workflow asli karena itu memang aksi user (Administrasi) yang genuine. Perhatikan juga: Frappe memicu `on_update_after_submit` (bukan `on_update`) untuk save pada dokumen yang docstatus-nya sudah 1→1 (kasus "Aktifkan Kembali") — `on_update` Quotation didaftarkan di kedua event di `hooks.py` supaya logika reaktivasi tetap jalan.
 
+### 3.23 Rush fee masuk kalkulasi Total Invoice, bersih-bersih TODO basi, tutup gap test coverage — `starlab_customizations` / `starlab_lab_ops` / `starlab_quality` / `starlab_integrations`
+
+**a. Rush fee masuk kalkulasi Total Invoice (dampak uang)**
+- Field baru `rush_fee_amount` (Currency, read-only) di Quotation = `sub_total x rush_fee_percent / 100`, dihitung di `quotation_hooks._calculate_price_summary`. Urutan ringkasan harga sekarang: Sub Total → **Rush Fee** → Discount (%) → DPP → PPN (%) → Biaya Kirim → Total Invoice.
+- **⚠️ ASUMSI KERJA, BELUM DIKONFIRMASI KE PO**: `rush_fee_amount` ditambahkan ke Sub Total SEBELUM Discount dihitung, jadi Discount % ikut memotong nominal Rush Fee juga (bukan cuma Sub Total murni). Ini interpretasi kerja dari instruksi "tambahkan baris baru setelah sub_total, sebelum discount" — **perlu divalidasi eksplisit ke PO sebelum dipakai untuk Quotation produksi beneran**. Kalau PO memutuskan Rush Fee seharusnya tidak ikut didiskon, tinggal ganti base discount di `_calculate_price_summary` dari `base_after_rush_fee` balik ke `doc.sub_total` saja (satu baris, lokasinya sudah ditandai di komentar kode).
+- Print Format "Quotation Ringkasan Harga" (`starlab_customizations/print_format/quotation_ringkasan_harga/`) menampilkan baris Rush Fee di antara Sub Total dan Discount, tapi HANYA kalau `rush_fee_amount > 0` (disembunyikan untuk Quotation Normal/tanpa percepatan) — plus catatan kecil di footer print yang mengingatkan status ASUMSI di atas.
+- 3 test baru (`IntegrationTestQuotationRushFeeInTotal` di `test_quotation_fields.py`) mengunci formula ini secara eksplisit — kalau urutan kalkulasinya berubah nanti (menuruti keputusan PO), test-test ini akan gagal dan menandai tempat yang perlu disesuaikan.
+
+**b. TODO basi di `check_quotation_sla` dibersihkan**
+- Komentar di `tasks.py::check_quotation_sla` sebelumnya masih bilang "target eskalasi belum dikonfirmasi PO (PRD v6 Open Question #1)" — padahal PRD v8 sudah menjawabnya (reminder ulang ke approver yang sama, bukan ke atasan/Direksi langsung). Komentar diperbarui untuk menyatakan ini KEPUTUSAN FINAL PO, bukan default sementara. Tidak ada perubahan logika, murni akurasi dokumentasi kode.
+
+**c. Gap test coverage 0-test ditutup sebagian**
+- **`starlab_lab_ops`**: `test_sanity.py` (2 test) dipindah dari lokasi salah (`starlab_lab_ops/tests/`, di luar `frappe.get_app_path`) ke lokasi yang benar-benar ke-discover `bench run-tests` (`starlab_lab_ops/starlab_lab_ops/starlab_lab_ops/tests/`, sejajar dengan folder `doctype/`) — bug yang sama persis dengan yang sempat ditemukan & dicatat di Bagian 6 untuk app ini sebelumnya, sekarang benar-benar difix.
+- **`starlab_quality`**: stub kosong `IntegrationTestDocumentMaster` (0 test method) sekarang berisi 4 test nyata: siklus Draft→Menunggu Approval MM→Menunggu Approval Direksi→Aktif, tolak di tahap MM (dengan & tanpa `catatan_revisi` — harus divalidasi wajib), dan satu test yang **mengunci temuan penting**: opsi Status "Usang" memang ada di field (`document_master.json`), tapi TIDAK ADA jalur Workflow otomatis mana pun yang menujunya — sesuai keputusan PO eksplisit yang sudah didokumentasikan di description field DocType-nya sendiri (1 record berputar lewat status, bukan 2 record lama/baru — lihat Bagian 4 baris 7). **Lihat catatan penting di bawah** soal ini.
+- **`starlab_integrations`**: `test_tracking.py` (4 test, baru) untuk `track_order()` — guest bisa akses tanpa login (divalidasi lewat `frappe.is_whitelisted()`, jalur pemeriksaan yang sama persis dipakai `frappe.handler` untuk request HTTP asli), response tidak pernah membocorkan field harga/finansial (pengecekan rekursif ke seluruh struktur response terhadap daftar kata kunci harga), dan rate-limiting (`@rate_limit(limit=30, seconds=60)`) benar-benar memblokir permintaan ke-31 dalam window yang sama (disimulasikan dengan mengisi `frappe.local.request` — di luar konteks HTTP asli, decorator ini no-op).
+- **Masih 0 test**: `kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry` (stub `starlab_customizations`) — di luar scope task ini, lihat Bagian 6.
+
+> ⚠️ **Perlu keputusan PO/user**: instruksi task ini juga meminta test yang membuktikan "dokumen Document Master lama otomatis jadi Usang saat versi baru Aktif" — tapi behavior itu **tidak ada di kode saat ini** dan justru bertentangan dengan keputusan PO yang sudah didokumentasikan eksplisit (Bagian 4 baris 7 & description `document_master.json`): modelnya sengaja 1 record yang berputar lewat status-nya sendiri per edisi (bukan 2 record lama/baru), dan "Usang" sengaja TIDAK dapat transisi otomatis. Daripada membangun ulang logika production baru yang membalik keputusan itu tanpa konfirmasi, test yang ditulis (`test_status_option_usang_exists_but_has_no_automatic_transition`) justru MENGUNCI perilaku "tidak ada auto-transition" sebagai baseline yang terverifikasi. Kalau PO memang mau mengubah keputusan lama itu, butuh instruksi eksplisit dulu sebelum diimplementasikan.
+
+> **Catatan lingkungan (bukan perubahan kode)**: menulis test nyata untuk Document Master pertama kali di sesi ini memicu bug lama di seeding default Department milik ERPNext core (`Company.on_update` gagal dengan `Could not find Parent Department: All Departments`) — dipicu lewat rantai dependency `Document Master` → child table `Document Revision` → Link `diubah_oleh` (Employee) → Company, saat Frappe mencoba auto-generate test record Employee. Dihindari dengan `IGNORE_TEST_RECORD_DEPENDENCIES = ["Employee"]` di `test_document_master.py` (tidak ada test di bawah yang butuh Employee ter-generate otomatis). Bug seeding Department itu sendiri murni masalah environment/ERPNext core, di luar scope perbaikan sesi ini.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -196,7 +217,7 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 |---|---|---|
 | Akun GL Journal Entry Petty Cash | `starlab_customizations/petty_cash_hooks.py` — `"Kas Kecil - {abbr}"` / `"Beban Operasional Kantor - {abbr}"` | Finance konfirmasi nama akun COA asli, sesuaikan kode kalau beda |
 | Cost Center default Company | Company Setup | Pastikan Company punya Cost Center default terisi (biasanya otomatis dari Setup Wizard) |
-| Rush fee Quotation | Field `rush_fee_hari`/`rush_fee_percent` sudah ada, belum masuk kalkulasi | PRD v6 Open Question #10 perlu dijawab dulu |
+| Rush fee Quotation | **[Sebagian terjawab]** Sekarang sudah masuk kalkulasi Total Invoice (`rush_fee_amount`, lihat Bagian 3.23a) — tapi posisi di urutan kalkulasi (ditambahkan sebelum Discount, jadi ikut terdiskon) masih ASUMSI kerja | PRD v6 Open Question #10 — bagian "apakah rush fee masuk kalkulasi" sudah terjawab (ya), bagian "di mana posisinya relatif ke Discount" masih perlu konfirmasi eksplisit ke PO |
 | Target eskalasi SLA Quotation | `starlab_customizations/tasks.py::check_quotation_sla` | PRD v6 Open Question #1 — sekarang default "reminder ulang ke approver yang sama", ganti kalau ternyata harus ke atasan |
 | WhatsApp Settings | Desk → cari "WhatsApp Settings" | Isi provider, API URL, API Key, Nomor Pengirim begitu sudah pilih & daftar provider (Fonnte/Twilio/WhatsApp Business API), lalu centang "Aktifkan" |
 | Item master untuk Quotation/Invoice | `Quotation Parameter Detail`, tombol "Buat Invoice" di LHU | Test Parameter belum ditautkan ke Item master ERPNext — auto-create Quotation/Invoice sengaja TIDAK isi tabel `items` standar karena ini. Kalau mau full-otomatis, perlu diputuskan dulu: bikin 1 Item generik "Jasa Pengujian" atau mapping per parameter |
@@ -207,8 +228,8 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 ## 6. Catatan / PR untuk Kita (Follow-up)
 
 - **Sprint 10 TSD asli (Migrasi Data, UAT, Go-Live)** — tidak bisa dikerjakan lewat sesi coding. Butuh: file data historis (Excel/Google Drive lama), staf yang benar-benar melakukan UAT per role, keputusan go-live bertahap (Quotation/WO dulu → Sample/QC → sisanya).
-- **Hampir tidak ada test otomatis yang beneran jalan** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. `test_*.py` di tiap folder DocType (`kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry`) masih stub kosong (class `IntegrationTestCase` tanpa method `test_*`, jadi 0 test jalan). Satu-satunya test yang beneran ada isinya & lolos sampai sekarang: `starlab_customizations/starlab_customizations/tests/test_quotation_workflow_permission.py` (2 test, lihat Bagian 3.19). Regresi ke DocType lama (Quotation/Work Order/Sample) sebagian besar masih TIDAK akan kedeteksi otomatis.
-  - **Temuan tambahan**: `starlab_lab_ops/tests/test_sanity.py` (2 test stub) ternyata diletakkan di folder yang SALAH — di luar `frappe.get_app_path("starlab_lab_ops")` (yaitu di root repo app, bukan di dalam package Python `starlab_lab_ops/starlab_lab_ops/`), jadi tidak pernah ke-discover oleh `bench run-tests`. File ini secara efektif mati/tidak pernah jalan. Perlu dipindah ke `starlab_lab_ops/starlab_lab_ops/tests/` (pola yang sama dipakai untuk test baru di `starlab_customizations`) kalau mau benar-benar aktif.
+- **Hampir tidak ada test otomatis yang beneran jalan** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. **[Update Bagian 3.23c]** Ditutup sebagian: `starlab_lab_ops` (2 test), `starlab_quality` (4 test, Document Master), `starlab_integrations` (4 test, `track_order`) sekarang punya test nyata yang lolos. `test_*.py` di `kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry` (folder DocType di `starlab_customizations`) masih stub kosong (class `IntegrationTestCase` tanpa method `test_*`, jadi 0 test jalan) — belum tersentuh. Total test yang beneran lolos di seluruh 4 app sekarang: 37 (27 `starlab_customizations` + 2 `starlab_lab_ops` + 4 `starlab_quality` + 4 `starlab_integrations`). Regresi ke DocType lama (Quotation/Work Order/Sample) sebagian besar masih TIDAK akan kedeteksi otomatis di luar yang sudah ditest.
+  - **[Selesai]** `starlab_lab_ops/tests/test_sanity.py` yang dulu diletakkan di folder salah (di luar `frappe.get_app_path`, jadi tidak pernah ke-discover `bench run-tests`) sudah dipindah ke `starlab_lab_ops/starlab_lab_ops/starlab_lab_ops/tests/` dan sekarang benar-benar jalan (lihat Bagian 3.23c).
 - **Dashboard**: beberapa metrik TSD (saldo kas real-time, conversion rate, histori klien) butuh Query Report custom kalau mau benar-benar akurat — saat ini sengaja tidak dibuatkan Number Card supaya tidak menampilkan angka yang menyesatkan.
 - **`docker/apps.json`**: URL untuk `starlab_lab_ops` masih pakai repo lama (`alvirarisky/starlab_lab_ops.git`) yang menurut GitHub sendiri sudah "moved" ke `starlab_ERP.git`. Masih jalan (GitHub redirect otomatis), tapi lebih rapi kalau nanti diarahkan langsung ke URL kanonik.
 
@@ -403,7 +424,45 @@ frappe.db.exists("TNC Master Template", {"versi_template": "01"})
 ```
 bench --site <NAMA_SITE> run-tests --app starlab_customizations
 ```
-Harus 24 test lolos, mencakup semua poin a–g di atas (file: `test_quotation_revision_and_expiry.py`, `test_quotation_fields.py`, `test_sales_invoice_due_date.py`, plus `test_quotation_workflow_permission.py` yang direfactor pakai helper baru `quotation_test_utils.py`).
+Saat ditulis (sebelum Bagian 3.23 rush fee menambah 3 test lagi), harus 24 test lolos, mencakup semua poin a–g di atas (file: `test_quotation_revision_and_expiry.py`, `test_quotation_fields.py`, `test_sales_invoice_due_date.py`, plus `test_quotation_workflow_permission.py` yang direfactor pakai helper baru `quotation_test_utils.py`). Lihat Bagian 7.15h untuk angka terbaru (27 test).
+
+### 7.15 Rush fee di Total Invoice, TODO SLA dibersihkan, test coverage baru (lihat Bagian 3.23)
+
+**a. Rush fee masuk Total Invoice**
+1. Buat Quotation baru, isi minimal 1 baris Parameter Detail dengan harga > 0.
+2. Set `Tingkat Percepatan` = "5 Hari Kerja (+100%)" → Save.
+3. Cek field baru `Rush Fee (Nominal)` (`rush_fee_amount`) terisi = `Sub Total x 100%` (sama dengan Sub Total).
+4. Cek `Total Invoice` naik dibanding sebelum tier diisi (ikut menghitung rush fee).
+5. Set `Discount (%)` ke suatu angka > 0 → cek potongan Discount di Print Format "Quotation Ringkasan Harga" menghitung dari (Sub Total + Rush Fee), bukan Sub Total saja — **ini bagian yang masih ASUMSI, laporkan ke PO kalau ternyata seharusnya beda**.
+6. Cetak Print Format "Quotation Ringkasan Harga" → baris "Rush Fee" harus muncul (karena nilainya > 0), lengkap dengan catatan kecil soal status ASUMSI di bagian bawah.
+7. Set `Tingkat Percepatan` balik ke "Normal" di Quotation lain (atau yang baru) → cetak Print Format lagi → baris "Rush Fee" harus TIDAK muncul sama sekali.
+
+**b. Document Master workflow (test otomatis baru)**
+```
+bench --site <NAMA_SITE> run-tests --app starlab_quality
+```
+Harus 4 test lolos: siklus Draft→Menunggu Approval MM→Menunggu Approval Direksi→Aktif, tolak di MM dengan/tanpa `catatan_revisi`, dan test yang mengunci bahwa status "Usang" tidak punya jalur otomatis (lihat catatan keputusan PO di Bagian 3.23).
+
+**c. `starlab_lab_ops` sanity test (sekarang benar-benar jalan)**
+```
+bench --site <NAMA_SITE> run-tests --app starlab_lab_ops
+```
+Harus 2 test lolos (sebelumnya 0 karena salah folder).
+
+**d. Client Dashboard `track_order` (test otomatis baru)**
+```
+bench --site <NAMA_SITE> run-tests --app starlab_integrations
+```
+Harus 4 test lolos: akses guest tanpa login, response tanpa field harga/finansial, rate-limit 30 request/60 detik benar-benar memblokir permintaan ke-31, dan nomor pesanan tidak ditemukan mengembalikan `{"found": false}`.
+
+**e. Jalankan seluruh 4 app sekaligus**
+```
+bench --site <NAMA_SITE> run-tests --app starlab_customizations
+bench --site <NAMA_SITE> run-tests --app starlab_lab_ops
+bench --site <NAMA_SITE> run-tests --app starlab_quality
+bench --site <NAMA_SITE> run-tests --app starlab_integrations
+```
+Total 37 test lolos (27 + 2 + 4 + 4).
 
 ---
 

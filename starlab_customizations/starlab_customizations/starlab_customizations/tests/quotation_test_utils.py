@@ -41,6 +41,11 @@ def ensure_master_data():
 				"regulasi_acuan": "Test Regulation",
 				"satuan": "mg/L",
 				"status": "Aktif",
+				# quotation_parameter_detail.harga_satuan pakai fetch_from
+				# parameter.harga_satuan_default -- kalau kosong, harga_satuan
+				# manapun yang di-set langsung di parameter_detail row bakal
+				# ketiban 0 saat insert/save.
+				"harga_satuan_default": 1000,
 			}
 		).insert(ignore_permissions=True)
 
@@ -67,7 +72,7 @@ def make_client_inquiry(customer=None):
 	return doc.name
 
 
-def make_quotation(customer=None, client_inquiry=None):
+def make_quotation(customer=None, client_inquiry=None, parameter_detail=None):
 	ensure_master_data()
 	customer = customer or frappe.db.get_value("Customer", {}, "name")
 	client_inquiry = client_inquiry or make_client_inquiry(customer)
@@ -81,6 +86,7 @@ def make_quotation(customer=None, client_inquiry=None):
 			"currency": "IDR",
 			"client_inquiry": client_inquiry,
 			"items": [{"item_code": TEST_ITEM_CODE, "qty": 1, "rate": 100}],
+			"parameter_detail": parameter_detail or [],
 		}
 	)
 	doc.insert(ignore_permissions=True)

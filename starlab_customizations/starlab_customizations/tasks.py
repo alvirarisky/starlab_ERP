@@ -30,13 +30,11 @@ ROLE_BY_STATE = {
 def check_quotation_sla():
 	# PRD v6 SS5.5 -- eskalasi otomatis kalau approval Quotation macet >1x24 jam.
 	#
-	# TODO: target eskalasi (PRD v6 Open Question #1) belum dikonfirmasi PO --
-	# opsinya "atasan approver", "langsung ke Direksi", atau "reminder ulang ke
-	# approver yang sama". Default yang dipakai di sini SENGAJA yang paling
-	# aman: reminder ulang ke approver yang sama pada state saat ini (role
-	# lewat ROLE_BY_STATE) -- tidak menebak hierarki/atasan yang belum
-	# terkonfirmasi, supaya notifikasi tidak salah kirim ke pihak yang keliru.
-	# Ganti logika ini begitu PO memutuskan target eskalasi yang benar.
+	# Target eskalasi (PRD v6 Open Question #1) sudah dijawab PO di PRD v8:
+	# reminder ulang ke approver yang sama pada state saat ini (role lewat
+	# ROLE_BY_STATE). Ini KEPUTUSAN FINAL PO, bukan default sementara yang
+	# menunggu konfirmasi lagi -- jangan diganti ke opsi "atasan approver"
+	# atau "langsung ke Direksi" tanpa keputusan PO baru yang eksplisit.
 	cutoff = add_to_date(now_datetime(), hours=-24, as_string=False)
 	quotations = frappe.get_all(
 		"Quotation",
