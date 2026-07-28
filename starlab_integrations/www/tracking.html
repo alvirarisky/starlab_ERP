@@ -3,11 +3,14 @@
 {% block title %}Cek Status Pesanan{% endblock %}
 
 {% block page_content %}
-<div class="container" style="max-width: 700px; margin-top: 2rem;">
-	<h2>Cek Status Pesanan</h2>
-	<p>Masukkan nomor Quotation atau Work Order Anda untuk melihat status pekerjaan dan Laporan Hasil Uji (LHU). Tidak perlu login.</p>
+<div class="sai-tracking container" style="max-width: 700px; margin-top: 2rem; margin-bottom: 3rem;">
+	<div class="sai-tracking-header">
+		<img src="/assets/starlab_integrations/images/sai-logo.png" alt="PT Starlab Analitik Indonesia">
+		<h2>Cek Status Pesanan</h2>
+		<p>Masukkan nomor Quotation atau Work Order Anda untuk melihat status pekerjaan dan Laporan Hasil Uji (LHU). Tidak perlu login.</p>
+	</div>
 
-	<form id="tracking-form" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem;">
+	<form id="tracking-form" class="sai-tracking-form">
 		<input
 			type="text"
 			name="nomor_pesanan"
@@ -21,15 +24,154 @@
 	<div id="tracking-result"></div>
 </div>
 
+<style>
+	.sai-tracking-header {
+		text-align: center;
+		margin-bottom: 1.5rem;
+	}
+	.sai-tracking-header img {
+		width: 84px;
+		height: auto;
+		margin-bottom: 0.5rem;
+	}
+	.sai-tracking-header h2 {
+		margin-bottom: 0.35rem;
+	}
+	.sai-tracking-header p {
+		color: #666;
+		margin-bottom: 0;
+	}
+
+	.sai-tracking-form {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+	.sai-tracking-form input {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+	.sai-tracking-form button {
+		flex: 0 0 auto;
+	}
+	@media (max-width: 480px) {
+		.sai-tracking-form {
+			flex-direction: column;
+		}
+		.sai-tracking-form button {
+			width: 100%;
+		}
+	}
+
+	#tracking-result {
+		margin-top: 1.5rem;
+	}
+
+	.sai-spinner {
+		display: inline-block;
+		width: 1.25rem;
+		height: 1.25rem;
+		border: 3px solid #d6eefb;
+		border-top-color: #11a8e0;
+		border-radius: 50%;
+		animation: sai-spin 0.7s linear infinite;
+		vertical-align: middle;
+		margin-right: 0.6rem;
+	}
+	@keyframes sai-spin {
+		to { transform: rotate(360deg); }
+	}
+	.sai-loading {
+		display: flex;
+		align-items: center;
+		color: #555;
+		padding: 0.5rem 0;
+	}
+
+	.sai-message {
+		padding: 1rem 1.25rem;
+		border-radius: 8px;
+		background: #f8f9fa;
+		border: 1px solid #e2e2e2;
+		color: #444;
+	}
+	.sai-message-error {
+		background: #fdecea;
+		border-color: #f5c6cb;
+		color: #7a2530;
+	}
+
+	.sai-result-header {
+		margin-bottom: 0.85rem;
+	}
+	.sai-result-header h4 {
+		margin: 0 0 0.4rem;
+		font-size: 1.05rem;
+		color: #050066;
+	}
+
+	.sai-order-card {
+		border: 1px solid #e2e2e2;
+		border-left: 4px solid #11a8e0;
+		border-radius: 8px;
+		padding: 1.1rem 1.25rem;
+		margin-bottom: 1rem;
+		background: #fbfdff;
+	}
+	.sai-order-card .sai-row-label {
+		color: #777;
+		font-size: 0.8rem;
+		margin-bottom: 0.15rem;
+	}
+	.sai-order-card .sai-wo-name {
+		font-weight: 600;
+		margin-bottom: 0.6rem;
+	}
+
+	.sai-badge {
+		display: inline-block;
+		padding: 0.2rem 0.65rem;
+		border-radius: 999px;
+		font-size: 0.78rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+	.sai-badge-success { background: #e3f6e8; color: #1e7a34; }
+	.sai-badge-warning { background: #fff4da; color: #8a6100; }
+	.sai-badge-danger  { background: #fdecea; color: #a3242f; }
+	.sai-badge-info    { background: #e4f6fd; color: #0b6f95; }
+	.sai-badge-muted   { background: #ececec; color: #555; }
+
+	.sai-lhu-list {
+		margin-top: 0.6rem;
+		border-top: 1px dashed #dde3e8;
+		padding-top: 0.5rem;
+	}
+	.sai-lhu-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.35rem 0;
+		flex-wrap: wrap;
+	}
+	.sai-lhu-download {
+		font-weight: 600;
+		white-space: nowrap;
+	}
+</style>
+
 <script>
 frappe.ready(function () {
-	$("#tracking-form").on("submit", function (e) {
+	var $form = $("#tracking-form");
+	var $result = $("#tracking-result");
+
+	$form.on("submit", function (e) {
 		e.preventDefault();
 		var nomor = $('[name="nomor_pesanan"]').val().trim();
-		var $result = $("#tracking-result");
 		if (!nomor) return;
 
-		$result.html("<p>Mencari...</p>");
+		$result.html('<div class="sai-loading"><span class="sai-spinner"></span> Mencari...</div>');
 
 		frappe.call({
 			type: "GET",
@@ -38,51 +180,109 @@ frappe.ready(function () {
 			callback: function (r) {
 				var data = r.message;
 				if (!data || !data.found) {
-					$result.html("<p>Nomor pesanan tidak ditemukan. Pastikan nomor sudah benar.</p>");
+					$result.html(sai_message("Nomor pesanan tidak ditemukan. Pastikan nomor sudah benar.", true));
 					return;
 				}
 				$result.html(render_result(data));
 			},
 			error: function () {
-				$result.html("<p>Terjadi kesalahan. Silakan coba lagi.</p>");
+				$result.html(sai_message("Terjadi kesalahan. Silakan coba lagi.", true));
 			},
 		});
 	});
 
-	function render_result(data) {
-		var html = "<h4>Nomor Pesanan: " + frappe.utils.escape_html(data.nomor_pesanan) + "</h4>";
+	function sai_message(text, is_error) {
+		return (
+			'<div class="sai-message' + (is_error ? " sai-message-error" : "") + '">' +
+			frappe.utils.escape_html(text) +
+			"</div>"
+		);
+	}
 
-		if (data.status_pekerjaan) {
-			html += "<p><b>Status:</b> " + frappe.utils.escape_html(data.status_pekerjaan) + "</p>";
+	function badge_class(status) {
+		var s = (status || "").toLowerCase();
+		if (
+			s.indexOf("cancel") !== -1 ||
+			s.indexOf("batal") !== -1 ||
+			s.indexOf("tolak") !== -1 ||
+			s.indexOf("superseded") !== -1
+		) {
+			return "sai-badge-danger";
 		}
+		if (
+			s.indexOf("complet") !== -1 ||
+			s.indexOf("selesai") !== -1 ||
+			s.indexOf("issued") !== -1 ||
+			s.indexOf("disetujui") !== -1 ||
+			s.indexOf("approved") !== -1
+		) {
+			return "sai-badge-success";
+		}
+		if (
+			s.indexOf("progress") !== -1 ||
+			s.indexOf("proses") !== -1 ||
+			s.indexOf("draft") !== -1 ||
+			s.indexOf("menunggu") !== -1
+		) {
+			return "sai-badge-warning";
+		}
+		if (s.indexOf("revised") !== -1 || s.indexOf("diterima") !== -1) {
+			return "sai-badge-info";
+		}
+		return "sai-badge-muted";
+	}
+
+	function status_badge(status) {
+		return (
+			'<span class="sai-badge ' + badge_class(status) + '">' + frappe.utils.escape_html(status) + "</span>"
+		);
+	}
+
+	function render_result(data) {
+		var html = '<div class="sai-result-header">';
+		html += "<h4>Nomor Pesanan: " + frappe.utils.escape_html(data.nomor_pesanan) + "</h4>";
+		if (data.status_pekerjaan) {
+			html += status_badge(data.status_pekerjaan);
+		}
+		html += "</div>";
 
 		if (data.pekerjaan && data.pekerjaan.length) {
 			data.pekerjaan.forEach(function (p) {
-				html += "<div style='border-top: 1px solid #ddd; padding-top: 0.75rem; margin-top: 0.75rem;'>";
-				html += "<p><b>Work Order:</b> " + frappe.utils.escape_html(p.work_order) + "</p>";
-				html += "<p><b>Status Pekerjaan:</b> " + frappe.utils.escape_html(p.status_pekerjaan) + "</p>";
+				html += '<div class="sai-order-card">';
+				html += '<div class="sai-row-label">Work Order</div>';
+				html +=
+					'<div class="sai-wo-name">' +
+					frappe.utils.escape_html(p.work_order) +
+					" " +
+					status_badge(p.status_pekerjaan) +
+					"</div>";
+
 				if (p.lhu && p.lhu.length) {
+					html += '<div class="sai-lhu-list">';
 					p.lhu.forEach(function (lhu) {
+						html += '<div class="sai-lhu-row">';
 						html +=
-							"<p><b>LHU " +
+							"<span>LHU " +
 							frappe.utils.escape_html(lhu.name) +
-							":</b> " +
-							frappe.utils.escape_html(lhu.status);
+							" " +
+							status_badge(lhu.status) +
+							"</span>";
 						if (lhu.file_lhu) {
 							html +=
-								" — <a href='" +
+								"<a class='sai-lhu-download' href='" +
 								frappe.utils.escape_html(lhu.file_lhu) +
-								"' target='_blank'>Unduh LHU</a>";
+								"' target='_blank' rel='noopener'>Unduh LHU</a>";
 						}
-						html += "</p>";
+						html += "</div>";
 					});
+					html += "</div>";
 				} else {
-					html += "<p>LHU belum diterbitkan.</p>";
+					html += '<div class="sai-row-label" style="margin-top: 0.5rem;">LHU belum diterbitkan.</div>';
 				}
 				html += "</div>";
 			});
 		} else if (!data.status_pekerjaan) {
-			html += "<p>Belum ada Work Order untuk pesanan ini.</p>";
+			html += '<div class="sai-order-card">Belum ada Work Order untuk pesanan ini.</div>';
 		}
 
 		return html;
