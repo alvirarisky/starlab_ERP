@@ -20,38 +20,38 @@
  "label": "Direksi",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-28 09:00:00.000000",
+ "modified": "2026-07-29 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Direksi",
  "number_cards": [
   {
-   "number_card_name": "WO Aktif",
-   "label": "WO Aktif"
+   "label": "WO Aktif",
+   "number_card_name": "WO Aktif"
   },
   {
-   "number_card_name": "WO Selesai",
-   "label": "WO Selesai"
+   "label": "WO Selesai",
+   "number_card_name": "WO Selesai"
   },
   {
-   "number_card_name": "Quotation Menunggu Approval Direksi",
-   "label": "Quotation Menunggu Approval Direksi"
+   "label": "Quotation Menunggu Approval Direksi",
+   "number_card_name": "Quotation Menunggu Approval Direksi"
   },
   {
-   "number_card_name": "Petty Cash Menunggu Approval",
-   "label": "Petty Cash Menunggu Approval"
+   "label": "Petty Cash Menunggu Approval",
+   "number_card_name": "Petty Cash Menunggu Approval"
   },
   {
-   "number_card_name": "Dokumen Menunggu Approval Direksi",
-   "label": "Dokumen Menunggu Approval Direksi"
+   "label": "Dokumen Menunggu Approval Direksi",
+   "number_card_name": "Dokumen Menunggu Approval Direksi"
   },
   {
-   "number_card_name": "Invoice Overdue",
-   "label": "Invoice Overdue"
+   "label": "Invoice Overdue",
+   "number_card_name": "Invoice Overdue"
   },
   {
-   "number_card_name": "Invoice Unpaid",
-   "label": "Invoice Unpaid"
+   "label": "Invoice Unpaid",
+   "number_card_name": "Invoice Unpaid"
   }
  ],
  "owner": "Administrator",
@@ -63,31 +63,31 @@
    "role": "Direksi"
   }
  ],
- "sequence_id": 1.0,
+ "sequence_id": 5.0,
  "shortcuts": [
   {
    "label": "Quotation",
    "link_to": "Quotation",
-   "type": "DocType",
-   "stats_filter": "{\"workflow_state\": \"Menunggu Approval Direksi\"}"
+   "stats_filter": "{\"workflow_state\": \"Menunggu Approval Direksi\"}",
+   "type": "DocType"
   },
   {
    "label": "Petty Cash Entry",
    "link_to": "Petty Cash Entry",
-   "type": "DocType",
-   "stats_filter": "{\"status\": \"Menunggu Approval\"}"
+   "stats_filter": "{\"status\": \"Menunggu Approval\"}",
+   "type": "DocType"
   },
   {
    "label": "Document Master",
    "link_to": "Document Master",
-   "type": "DocType",
-   "stats_filter": "{\"status\": \"Menunggu Approval Direksi\"}"
+   "stats_filter": "{\"status\": \"Menunggu Approval Direksi\"}",
+   "type": "DocType"
   },
   {
    "label": "Sales Invoice",
    "link_to": "Sales Invoice",
-   "type": "DocType",
-   "stats_filter": "{\"status\": \"Overdue\"}"
+   "stats_filter": "{\"status\": \"Overdue\"}",
+   "type": "DocType"
   },
   {
    "label": "Work Order Pengujian",

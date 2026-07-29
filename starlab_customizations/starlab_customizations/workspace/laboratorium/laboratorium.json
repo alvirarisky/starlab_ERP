@@ -6,7 +6,7 @@
    "label": "Tren Sample Diterima"
   }
  ],
- "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Belum Diuji\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Sedang Diuji\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Draft Menunggu Approval\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"LHU Draft Menunggu Diterbitkan\", \"col\": 4}}, {\"id\": \"spacer-5\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-6\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-7\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Sample Diterima\", \"col\": 12}}, {\"id\": \"spacer-8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"LHU\", \"col\": 3}}]",
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Draft Menunggu Approval\", \"col\": 4}}, {\"id\": \"spacer-5\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-6\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-7\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Sample Diterima\", \"col\": 12}}, {\"id\": \"spacer-8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"LHU\", \"col\": 3}}]",
  "creation": "2026-07-27 09:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -20,30 +20,18 @@
  "label": "Laboratorium",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-28 09:00:00.000000",
+ "modified": "2026-07-29 09:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Laboratorium",
  "number_cards": [
   {
-   "number_card_name": "Sample Belum Diuji",
-   "label": "Sample Belum Diuji"
-  },
-  {
-   "number_card_name": "Sample Sedang Diuji",
-   "label": "Sample Sedang Diuji"
-  },
-  {
-   "number_card_name": "WO Draft Menunggu Approval",
-   "label": "WO Draft Menunggu Approval"
-  },
-  {
-   "number_card_name": "LHU Draft Menunggu Diterbitkan",
-   "label": "LHU Draft Menunggu Diterbitkan"
+   "label": "WO Draft Menunggu Approval",
+   "number_card_name": "WO Draft Menunggu Approval"
   }
  ],
  "owner": "Administrator",
- "parent_page": "",
+ "parent_page": "LIMS",
  "public": 1,
  "quick_lists": [],
  "roles": [
@@ -56,8 +44,8 @@
   {
    "label": "Sample",
    "link_to": "Sample",
-   "type": "DocType",
-   "stats_filter": "{\"status\": \"Diterima\"}"
+   "stats_filter": "{\"status\": \"Diterima\"}",
+   "type": "DocType"
   },
   {
    "label": "Work Order Pengujian",
@@ -67,8 +55,8 @@
   {
    "label": "LHU",
    "link_to": "LHU",
-   "type": "DocType",
-   "stats_filter": "{\"status\": \"Draft\"}"
+   "stats_filter": "{\"status\": \"Draft\"}",
+   "type": "DocType"
   }
  ],
  "sidebar_items": [
