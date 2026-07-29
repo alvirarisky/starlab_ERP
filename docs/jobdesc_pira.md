@@ -62,9 +62,13 @@ git push --force origin app-<nama_app>
 
 Kalau ini kelewat, device/CI lain akan build dari kode versi lama tanpa ada error yang jelas — sudah beberapa kali kejadian. Perlu disepakati eksplisit siapa yang pegang tanggung jawab ini di tiap sesi kerja.
 
-### 6. (Opsional, prioritas rendah) Query Report custom untuk Dashboard
+### 6. (Opsional, prioritas rendah) Query Report custom untuk Dashboard — ✅ selesai (lihat `docs/ringkasan-seluruh-sprint.md` Bagian 3.27)
 
-Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histori order per klien) sengaja belum dibuatkan Number Card karena butuh Query Report custom biar angkanya gak menyesatkan. Nice-to-have kalau semua di atas sudah beres.
+Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histori order per klien) sengaja belum dibuatkan Number Card karena butuh Query Report custom biar angkanya gak menyesatkan.
+
+- **Saldo kas real-time** — ternyata sudah tercakup oleh report "Laporan Keuangan Operasional" yang sudah ada (baris paling atas = saldo saat ini), jadi tidak dibuatkan report baru.
+- **Conversion rate Quotation→WO** — report baru "Konversi Quotation ke Work Order" (rekap per bulan).
+- **Histori order per klien** — report baru "Histori Order per Klien" (satu baris per Customer).
 
 ---
 

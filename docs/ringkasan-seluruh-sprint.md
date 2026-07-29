@@ -239,6 +239,16 @@ Item 1 jobdesc Pira (`docs/jobdesc_pira.md`) — 4 DocType yang dari awal sesi b
 
 Total test `starlab_customizations` sekarang 44 (naik dari 27), total keseluruhan 4 app: **54** (44 + 2 `starlab_lab_ops` + 4 `starlab_quality` + 4 `starlab_integrations`).
 
+### 3.27 Query Report custom untuk metrik Dashboard yang butuh perhitungan lintas-DocType — `starlab_customizations`
+
+Item 6 jobdesc Pira (opsional/prioritas rendah). Bagian 6 (Catatan/PR) mencatat 3 metrik TSD yang sengaja belum dibuatkan Number Card karena Number Card biasa (Count/Sum satu DocType) akan menghasilkan angka yang salah/menyesatkan untuk metrik-metrik ini:
+
+- **Saldo kas real-time** — **ternyata sudah tercakup**, tidak perlu report baru. Report "Laporan Keuangan Operasional" (Bagian 3.13) yang sudah ada, kalau dijalankan tanpa filter tanggal, baris paling atas (terurut terbaru dulu) SUDAH menunjukkan saldo Kas Kecil real-time yang benar (dihitung dari GL Entry akun Kas Kecil, bukan sekadar jumlah nominal Petty Cash Entry). Membuat report terpisah untuk data yang sama akan jadi duplikasi -- lebih baik dokumentasikan di sini daripada bikin kode yang tidak perlu.
+- **Konversi Quotation ke Work Order** (report baru: "Konversi Quotation ke Work Order") — rekap per bulan: jumlah Quotation dibuat, berapa yang punya Work Order Pengujian terkait, dan conversion rate (%). Filter: rentang tanggal.
+- **Histori order per klien** (report baru: "Histori Order per Klien") — satu baris per Customer: total Quotation, total Work Order, total LHU terbit, tanggal order terakhir. Filter: Customer (opsional), rentang tanggal.
+
+Keduanya Script Report biasa (pola sama dengan report yang sudah ada di app ini/`starlab_lab_ops`), roles: System Manager, Direksi, Marketing. Tidak lewat mekanisme fixtures -- Report disinkronkan sebagai module doc (folder `report/<nama>/` berisi `.py` + `.json` + `.js`), sama seperti report-report lain yang sudah ada di project ini.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -554,6 +564,13 @@ bench --site <NAMA_SITE> run-tests --app starlab_quality
 bench --site <NAMA_SITE> run-tests --app starlab_integrations
 ```
 Total 54 test lolos (44 + 2 + 4 + 4). File baru/terisi: `doctype/kaji_ulang_tender/test_kaji_ulang_tender.py`, `doctype/tnc_master_template/test_tnc_master_template.py`, `doctype/client_inquiry/test_client_inquiry.py`, `doctype/petty_cash_entry/test_petty_cash_entry.py` (semua di `starlab_customizations`).
+
+### 7.19 Query Report metrik Dashboard (lihat Bagian 3.27)
+1. Buka menu **Report** → cari "Konversi Quotation ke Work Order" (atau lewat awesomebar) → jalankan tanpa filter → cek muncul baris per bulan dengan kolom Quotation Dibuat, Quotation dengan Work Order, dan Conversion Rate (%) yang masuk akal (Conversion Rate = Quotation dengan WO ÷ Quotation Dibuat).
+2. Isi filter "Dari Tanggal"/"Sampai Tanggal" → cek hasil ikut ke-filter sesuai `transaction_date` Quotation.
+3. Buka report **"Histori Order per Klien"** → jalankan tanpa filter → cek satu baris per Customer, kolom Total Quotation/Total Work Order/Total LHU Terbit/Order Terakhir terisi masuk akal.
+4. Isi filter Customer ke salah satu Customer spesifik → cek hasil cuma nampilin baris Customer itu.
+5. Buka **Laporan Keuangan Operasional** (report lama, Bagian 3.13) tanpa filter tanggal → cek baris PALING ATAS (data terurut terbaru dulu) menunjukkan saldo Kas Kecil saat ini yang benar -- ini yang dimaksud "saldo kas real-time" di Bagian 3.27, sengaja tidak dibuatkan report terpisah karena sudah tercakup di sini.
 
 ---
 
