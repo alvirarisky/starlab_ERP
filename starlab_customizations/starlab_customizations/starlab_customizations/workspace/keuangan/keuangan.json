@@ -1,0 +1,124 @@
+{
+ "app": "starlab_customizations",
+ "charts": [],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Overdue\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Unpaid\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Invoice Due 7 Hari\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Menunggu Approval\", \"col\": 4}}, {\"id\": \"number_card-5\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Disetujui Bulan Ini\", \"col\": 4}}, {\"id\": \"spacer-6\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-7\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sales Invoice\", \"col\": 4}}, {\"id\": \"shortcut-9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Petty Cash Entry\", \"col\": 4}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Bank Reconciliation Tool\", \"col\": 4}}]",
+ "creation": "2026-07-29 09:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "banknote",
+ "idx": 0,
+ "indicator_color": "red",
+ "is_hidden": 0,
+ "label": "Keuangan",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-07-29 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Customizations",
+ "name": "Keuangan",
+ "number_cards": [
+  {
+   "label": "Invoice Overdue",
+   "number_card_name": "Invoice Overdue"
+  },
+  {
+   "label": "Invoice Unpaid",
+   "number_card_name": "Invoice Unpaid"
+  },
+  {
+   "label": "Invoice Due 7 Hari",
+   "number_card_name": "Invoice Due 7 Hari"
+  },
+  {
+   "label": "Petty Cash Menunggu Approval",
+   "number_card_name": "Petty Cash Menunggu Approval"
+  },
+  {
+   "label": "Petty Cash Disetujui Bulan Ini",
+   "number_card_name": "Petty Cash Disetujui Bulan Ini"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 3.0,
+ "shortcuts": [
+  {
+   "label": "Sales Invoice",
+   "link_to": "Sales Invoice",
+   "type": "DocType"
+  },
+  {
+   "label": "Petty Cash Entry",
+   "link_to": "Petty Cash Entry",
+   "type": "DocType"
+  },
+  {
+   "label": "Bank Reconciliation Tool",
+   "link_to": "Bank Reconciliation Tool",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Keuangan",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "receipt-text",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Sales Invoice",
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "wallet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Petty Cash Entry",
+   "link_to": "Petty Cash Entry",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "book-open-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Bank Reconciliation Tool",
+   "link_to": "Bank Reconciliation Tool",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "Keuangan",
+ "type": "Workspace"
+}

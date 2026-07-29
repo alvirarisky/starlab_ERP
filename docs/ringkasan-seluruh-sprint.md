@@ -249,6 +249,27 @@ Item 6 jobdesc Pira (opsional/prioritas rendah). Bagian 6 (Catatan/PR) mencatat 
 
 Keduanya Script Report biasa (pola sama dengan report yang sudah ada di app ini/`starlab_lab_ops`), roles: System Manager, Direksi, Marketing. Tidak lewat mekanisme fixtures -- Report disinkronkan sebagai module doc (folder `report/<nama>/` berisi `.py` + `.json` + `.js`), sama seperti report-report lain yang sudah ada di project ini.
 
+### 3.28 Restrukturisasi navigasi Workspace jadi domain-first (nested) — `starlab_customizations`
+
+7 Workspace role (Bagian 3.20-3.21) tadinya semuanya tampil SEJAJAR di level atas bareng CRM/LIMS (Bagian 3.25) -- 9 item flat di sidebar picker. Sekarang direstruktur jadi 2 level pakai fitur native Frappe `Workspace.parent_page` (Link ke Workspace lain -- field bawaan, bukan yang dibuat sesi ini; begitu di-set, Desk otomatis nge-nest child di bawah parent-nya di sidebar picker/tree, tidak perlu kode tambahan apa pun):
+
+- **2 Workspace domain baru** (pola sama persis CRM/LIMS -- header + number card + shortcut, isinya diambil dari Workspace role yang sudah ada, bukan dibuat dari nol):
+  - **Keuangan** (icon `banknote`, warna `red`, `sequence_id: 3`) -- 5 Number Card + chart diambil semua dari Finance (Invoice Overdue/Unpaid/Due 7 Hari, Petty Cash Menunggu Approval/Disetujui Bulan Ini), shortcut Sales Invoice/Petty Cash Entry/Bank Reconciliation Tool.
+  - **Kualitas** (icon `badge-check`, warna `darkgrey`, `sequence_id: 4`) -- 3 Number Card dari Manajer Mutu (Dokumen Aktif/Usang/Menunggu Approval MM), shortcut Document Master.
+- **`parent_page` di-set di 6 Workspace role** (bukan Direksi -- posisinya tetap cross-cutting/top-level, butuh ringkasan lintas semua domain): Administrasi & Marketing → `CRM`; Laboratorium & Manajer Teknis → `LIMS`; Finance → `Keuangan`; Manajer Mutu → `Kualitas`.
+- **Dedup Number Card yang 100% tumpang tindih antara child dan parent-nya** (setelah di-nest, beberapa card jadi ganda -- angka yang SAMA PERSIS tampil 2x di dua halaman berbeda, jelas mubazir):
+  | Child | Card yang DIHAPUS dari child (sudah ada di parent) | Card yang TETAP di child (khusus/beda) |
+  |---|---|---|
+  | Administrasi | Quotation Draft | WO Selesai, Petty Cash Menunggu Approval |
+  | Marketing | Quotation Draft, Approved, Rejected (ke-3-nya) | *(tidak ada lagi -- section "Ringkasan" dihapus total dari halaman, cuma sisa Tren + Pintasan)* |
+  | Laboratorium | Sample Belum Diuji, Sample Sedang Diuji, LHU Draft Menunggu Diterbitkan | WO Draft Menunggu Approval |
+  | Manajer Teknis | Test Result Menunggu Validasi | WO Draft Menunggu Approval, Test Result Ditolak |
+  | Finance | Invoice Overdue/Unpaid/Due 7 Hari, Petty Cash Menunggu Approval/Disetujui Bulan Ini (ke-5-nya) | *(tidak ada lagi -- section "Ringkasan" dihapus total)* |
+  | Manajer Mutu | Dokumen Menunggu Approval MM, Aktif, Usang | Distribusi Belum Dibaca, LHU Draft Menunggu Diterbitkan |
+
+  Shortcut (pintasan navigasi) SENGAJA TIDAK ikut di-dedup meski ada overlap sebagian (mis. Marketing & CRM sama-sama punya shortcut Quotation) -- beda dari Number Card (angka statistik yang identik, murni mubazir kalau dobel), shortcut tetap berguna di kedua tempat untuk akses cepat sesuai konteks halaman yang sedang dibuka.
+- **Urutan sidebar top-level final** (`sequence_id`): CRM (1) → LIMS (2) → Keuangan (3) → Kualitas (4) → Direksi (5). `sequence_id` ke-6 Workspace role yang di-nest TIDAK diubah (tidak lagi relevan untuk urutan top-level, dan task tidak minta itu disentuh).
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -571,6 +592,16 @@ Total 54 test lolos (44 + 2 + 4 + 4). File baru/terisi: `doctype/kaji_ulang_tend
 3. Buka report **"Histori Order per Klien"** → jalankan tanpa filter → cek satu baris per Customer, kolom Total Quotation/Total Work Order/Total LHU Terbit/Order Terakhir terisi masuk akal.
 4. Isi filter Customer ke salah satu Customer spesifik → cek hasil cuma nampilin baris Customer itu.
 5. Buka **Laporan Keuangan Operasional** (report lama, Bagian 3.13) tanpa filter tanggal → cek baris PALING ATAS (data terurut terbaru dulu) menunjukkan saldo Kas Kecil saat ini yang benar -- ini yang dimaksud "saldo kas real-time" di Bagian 3.27, sengaja tidak dibuatkan report terpisah karena sudah tercakup di sini.
+
+### 7.20 Navigasi Workspace domain-first / nested (lihat Bagian 3.28)
+1. Login sebagai `laboratorium.test@example.com` (role Laboratorium) → buka Workspace picker (ikon kiri atas/sidebar) → **cuma "LIMS" yang muncul di level atas**, TIDAK ada lagi "Laboratorium" sebagai item sejajar terpisah.
+2. Klik/expand "LIMS" → "Laboratorium" harus muncul ke-nest DI DALAMNYA (anak dari LIMS), bisa diklik untuk masuk ke halaman Laboratorium yang asli.
+3. Ulangi login dengan akun role lain buat mastiin ke-6 Workspace role ter-nest dengan benar: `marketing.test@example.com`/`administrasi.test@example.com` → nested di bawah CRM; `manajerteknis.test@example.com` → nested di bawah LIMS; `finance.test@example.com` → nested di bawah Keuangan; `manajermutu.test@example.com` → nested di bawah Kualitas.
+4. Login sebagai `direksi.test@example.com` → "Direksi" harus TETAP muncul sebagai item top-level sendiri, TIDAK ke-nest di bawah Workspace manapun.
+5. Cek urutan 5 item top-level di picker: CRM, LIMS, Keuangan, Kualitas, Direksi (dalam urutan itu).
+6. Buka Workspace "Marketing" (lewat nested di bawah CRM) → cek section "Ringkasan" (Number Card) sudah TIDAK ADA lagi (dihapus karena semua card-nya dobel sama CRM) -- yang tersisa cuma section "Tren" (chart) dan "Pintasan" (shortcut). Sama buat Workspace "Finance" (nested di bawah Keuangan).
+7. Buka Workspace "Laboratorium" (nested di bawah LIMS) → cek Number Card yang tampil sekarang cuma "WO Draft Menunggu Approval" (1 card, bukan 4 seperti sebelumnya) -- 3 card lain (Sample Belum Diuji/Sedang Diuji, LHU Draft Menunggu Diterbitkan) sudah dihapus karena dobel sama LIMS.
+8. Login sebagai Administrator → buka Workspace "Keuangan" dan "Kualitas" langsung → cek Number Card & shortcut-nya sesuai daftar di Bagian 3.28.
 
 ---
 
