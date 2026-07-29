@@ -215,6 +215,8 @@ fixtures = [
 				"Quotation Draft", "Quotation Approved", "Quotation Rejected",
 				"Quotation Menunggu Approval Direksi", "Petty Cash Menunggu Approval",
 				"Petty Cash Disetujui Bulan Ini", "Invoice Overdue", "Invoice Unpaid", "Invoice Due 7 Hari",
+				"Client Inquiry Draft", "Client Inquiry Diajukan Kaji Ulang",
+				"Client Inquiry Disetujui MT", "Client Inquiry Ditolak MT",
 			]]
 		],
 	},
@@ -233,6 +235,7 @@ fixtures = [
 			["name", "in", [
 				"Tren Quotation Dibuat", "Tren Invoice Dibuat", "Tren Sample Diterima",
 				"Tren Test Result Dibuat", "Tren Dokumen Direvisi",
+				"Funnel Form A - Quotation - Approved",
 			]]
 		],
 	},
