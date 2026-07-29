@@ -212,6 +212,16 @@ Logo resmi PT Starlab Analitik Indonesia (`docs/dokumen asli/SAI Logo_name.png`,
   - Form input+tombol pakai flexbox dengan `@media (max-width: 480px)` supaya tombol jadi full-width & stack ke bawah di layar HP, bukan kepotong side-by-side.
   - Semua interpolasi teks tetap lewat `frappe.utils.escape_html` (tidak ada perubahan postur keamanan dari versi sebelumnya).
 
+### 3.25 2 Workspace domain baru: CRM & LIMS — `starlab_customizations`
+
+Selain 7 Workspace per-role yang sudah ada (Bagian 2-3.20-3.21), sekarang ada 2 Workspace **domain-based** yang menyatukan pandangan lintas-role untuk 1 alur kerja utuh — **tidak menghapus/mengganti 7 Workspace lama**, murni tambahan:
+
+- **CRM** (icon `trending-up`, warna `yellow`, `sequence_id: 8`) — pintasan: Client Inquiry, Kaji Ulang Tender, Quotation, Customer, TNC Master Template. Number Card: 4 baru per status Client Inquiry (Draft/Diajukan Kaji Ulang/Disetujui MT/Ditolak MT — belum pernah ada Number Card untuk DocType ini sebelumnya) + 3 lama yang di-reuse (Quotation Draft/Approved/Rejected, sama seperti yang dipakai Workspace Marketing, tidak diduplikasi).
+- **LIMS** (icon `clipboard-check`, warna `light-blue`, `sequence_id: 9`) — pintasan: Work Order Pengujian, Sample, Test Result, Test Parameter, LHU, plus 2 pintasan Kanban Board yang sudah ada ("Sample per Status", "Work Order Pengujian per Status" dari Bagian 3.20) ditautkan lewat mekanisme native Frappe (`Workspace Shortcut.doc_view = "Kanban"` + `kanban_board`, BUKAN link URL manual). Number Card: 4-4-nya reuse dari `starlab_lab_ops` (Sample Belum Diuji, Sample Sedang Diuji, Test Result Menunggu Validasi, LHU Draft Menunggu Diterbitkan — sama persis dengan yang dipakai Workspace Laboratorium/Manajer Teknis), tidak ada Number Card baru dibuat untuk LIMS.
+- **`roles` dikosongkan di keduanya** (sesuai permintaan) — semua user internal yang login bisa melihat Workspace ini; pembatasan AKSI (bisa create/edit/approve atau tidak) tetap sepenuhnya dari Role Permission per-DocType seperti biasa, visibility Workspace bukan mekanisme pembatasan.
+- **Chart funnel "Form A → Quotation → Approved" (baru, custom)** — dicek dulu ke Workspace Direksi & Marketing, TIDAK ada chart funnel/konversi lintas-DocType yang sudah ada di sana (keduanya cuma punya "Tren Quotation Dibuat", chart tren waktu biasa, beda konsep) — jadi ini genuinely baru, bukan reuse. **Temuan penting**: Frappe versi ini tidak punya tipe chart "Funnel" bawaan (opsi field `type` di Dashboard Chart cuma Line/Bar/Percentage/Pie/Donut/Heatmap, dicek langsung dari `dashboard_chart.json`) — apalagi funnel yang diminta melintasi 2 DocType berbeda (Client Inquiry + Quotation) sama sekali tidak bisa direpresentasikan lewat chart_type bawaan manapun (Count/Sum/Average/Group By semuanya terikat ke SATU document_type). Diimplementasikan sebagai **Dashboard Chart Source custom** (`starlab_customizations/dashboard_chart_source/funnel_form_a_ke_approved/`, pola persis sama dengan yang dipakai ERPNext sendiri untuk chart lintas-DocType, lihat `erpnext/stock/dashboard_chart_source/warehouse_wise_stock_value/`) yang menghitung 3 angka (total Client Inquiry, total Quotation, Quotation Approved) dan ditampilkan sebagai Bar chart menurun — secara visual berfungsi sebagai funnel meski secara teknis bukan tipe "Funnel" asli.
+- **Dashboard Chart Source BUKAN fixture** — disinkronkan sebagai "module doc" (folder `dashboard_chart_source/<nama>/` berisi `.py` + `.json` + `.js`, persis pola Report/Print Format/Workspace), bukan lewat `fixtures/dashboard_chart.json`. Dashboard Chart-nya sendiri (yang mereferensikan source ini) TETAP fixture seperti chart-chart lain di app ini.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -492,6 +502,32 @@ Total 37 test lolos (27 + 2 + 4 + 4).
 6. Masukkan nomor yang statusnya "Cancelled"/"Ditolak" (kalau ada datanya) → badge harus merah. Nomor dengan status "Completed"/"Issued"/"Disetujui" → badge hijau.
 7. Buka `/tracking` di layar HP (atau resize browser ke < 480px lebar) → tombol "Cek Status" harus turun ke bawah input (stack vertikal), bukan kepotong/menyempit di samping input.
 8. Cek tombol "Cek Status" warnanya cyan brand SAI (`#11A8E0`), bukan hitam/abu-abu gelap atau biru default Bootstrap — **kalau masih abu-abu/hitam, kemungkinan besar cache CSS browser, hard refresh dulu** (compiled CSS Website Theme punya nama file unik per generate, jadi seharusnya tidak butuh clear cache manual, tapi in case tetap perlu).
+
+### 7.17 Workspace CRM & LIMS (lihat Bagian 3.25)
+
+**Cara buka**: login ke Desk (`/app`, redirect otomatis ke `/desk`) sebagai user internal manapun (semua role bisa lihat, `roles` dikosongkan) → klik ikon Workspace picker di pojok kiri atas (atau sidebar kiri) → "CRM" dan "LIMS" akan muncul di bawah 7 Workspace role yang sudah ada. Bisa juga langsung lewat URL `/app/crm` atau `/app/lims`.
+
+Kalau belum ada akun buat coba-coba: 7 akun test per role sudah di-seed otomatis saat `after_install` (kalau `developer_mode` aktif) lewat `starlab_integrations/seed_test_users.py` — semua pakai password `Test@12345`, contoh `direksi.test@example.com`, `marketing.test@example.com`, dst (lihat daftar lengkap `TEST_USERS` di file itu). Kalau site sudah lama ke-install sebelum patch ini ada, akun-akun ini tidak otomatis muncul (hook `after_install` cuma jalan sekali saat fresh install) — jalankan manual lewat `bench --site <NAMA_SITE> console`:
+```python
+import frappe
+frappe.conf.developer_mode = 1
+from starlab_integrations.seed_test_users import after_install
+after_install()
+```
+
+**a. Workspace CRM**
+1. Buka Workspace CRM → cek 7 Number Card muncul (4 Client Inquiry per status + 3 Quotation per status), angkanya masuk akal dibanding jumlah data aktual.
+2. Cek chart "Corong Konversi" muncul sebagai Bar chart 3 batang menurun: Form A (Client Inquiry) → Quotation Dibuat → Quotation Approved.
+3. Klik tiap pintasan (Client Inquiry, Kaji Ulang Tender, Quotation, Customer, TNC Master Template) → harus membuka List View DocType terkait, bukan error 404.
+4. Login sebagai role manapun (misal `laboratorium.test@example.com`, role yang TIDAK biasanya urus Marketing/Direksi) → Workspace CRM tetap harus bisa dibuka dan terlihat isinya (visibility tidak dibatasi role) — tapi coba create/edit Quotation baru tetap harus kena aturan Role Permission normal (kalau role itu memang tidak punya izin write ke Quotation).
+5. Cek 7 Workspace role lama (Direksi, Marketing, dst) masih ada semua, tidak ada yang hilang/berubah.
+
+**b. Workspace LIMS**
+1. Buka Workspace LIMS → cek 4 Number Card muncul (Sample Belum Diuji, Sample Sedang Diuji, Test Result Menunggu Validasi, LHU Draft Menunggu Diterbitkan).
+2. Di bagian "Papan Kanban", klik pintasan "Sample — Kanban" → harus langsung membuka Kanban View DocType Sample dengan board "Sample per Status" aktif (kolom sesuai opsi Select `status`), bukan List View biasa.
+3. Klik pintasan "Work Order Pengujian — Kanban" → sama, harus langsung ke Kanban View board "Work Order Pengujian per Status".
+4. Klik 5 pintasan biasa di bagian "Pintasan" (Work Order Pengujian, Sample, Test Result, Test Parameter, LHU) → semua harus membuka List View normal.
+5. Cek icon Workspace LIMS di sidebar picker beda dari icon Workspace Laboratorium (LIMS pakai `clipboard-check`, Laboratorium pakai `flask-conical`) — supaya kelihatan jelas ini dua Workspace yang berbeda, bukan duplikat.
 
 ---
 
