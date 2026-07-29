@@ -1,0 +1,27 @@
+/*
+ * Aksen tombol brand SAI (cyan) untuk halaman website publik.
+ *
+ * SEBELUMNYA ini di-set lewat Website Theme.custom_scss (lihat
+ * patches/set_sai_branding.py versi awal) -- ternyata Website Theme
+ * "custom" di versi Frappe ini dikompilasi lewat subprocess Node yang
+ * TIDAK meng-inline @import ber-ekstensi .css (perilaku standar Sass:
+ * import .css selalu jadi literal @import CSS browser, bukan di-inline),
+ * dan file hasil kompilasi itu disajikan dari /files/website_theme/ --
+ * bukan /assets/ -- jadi semua @import relatif di dalamnya (mis.
+ * "frappe/public/css/espresso/colors.css") resolve ke URL yang tidak
+ * pernah ada (500/404), bikin puluhan asset gagal load di SETIAP halaman
+ * website (dikonfirmasi lewat DevTools Network tab langsung, bukan
+ * asumsi). File CSS statis biasa via web_include_css (mekanisme yang
+ * sama dipakai strip_generic_login_redirect.js) sepenuhnya menghindari
+ * pipeline kompilasi itu -- lihat patches/fix_sai_branding_css_import.py
+ * untuk detail lengkap + revert Website Theme balik ke "Standard".
+ */
+.btn-primary {
+	background-color: #11a8e0 !important;
+	border-color: #11a8e0 !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+	background-color: #0d89b7 !important;
+	border-color: #0d89b7 !important;
+}
