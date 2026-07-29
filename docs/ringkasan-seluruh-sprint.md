@@ -270,6 +270,8 @@ Keduanya Script Report biasa (pola sama dengan report yang sudah ada di app ini/
   Shortcut (pintasan navigasi) SENGAJA TIDAK ikut di-dedup meski ada overlap sebagian (mis. Marketing & CRM sama-sama punya shortcut Quotation) -- beda dari Number Card (angka statistik yang identik, murni mubazir kalau dobel), shortcut tetap berguna di kedua tempat untuk akses cepat sesuai konteks halaman yang sedang dibuka.
 - **Urutan sidebar top-level final** (`sequence_id`): CRM (1) → LIMS (2) → Keuangan (3) → Kualitas (4) → Direksi (5). `sequence_id` ke-6 Workspace role yang di-nest TIDAK diubah (tidak lagi relevan untuk urutan top-level, dan task tidak minta itu disentuh).
 
+> **Follow-up ditemukan & langsung difix saat testing manual Bagian ini**: begitu Workspace jadi nested, user biasa (terutama yang non-IT) mendarat di `/desk` generik begitu login -- harus tahu dulu nama Workspace-nya sendiri buat pindah manual, padahal sebelumnya (waktu masih 7 Workspace role flat) ini juga sudah jadi masalah, cuma baru ketauan sekarang. **Fix**: hook `get_website_user_home_page` baru (`starlab_customizations/install.py::get_home_page`) mengarahkan tiap role langsung ke Workspace ROLE spesifiknya begitu login (bukan ke Workspace domain hasil nesting) -- Direksi→`/desk/direksi`, Marketing→`/desk/marketing`, dst. **Bug kedua ditemukan saat implementasi**: mekanisme bawaan Frappe (dict `role_home_page`) iterate role user tanpa kontrol urutan, dan `Administrator` secara sintetis punya SEMUA role sekaligus (`frappe.permissions.get_roles()`) -- kalau dipakai apa adanya, Administrator ke-redirect ke Workspace role PERTAMA yang match secara acak (kejadian: ke-redirect ke "Laboratorium" pas ditest), bukan tetap di `/desk` generik seperti semestinya. Diganti pakai hook function custom yang eksplisit mengecualikan user `Administrator`.
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -602,6 +604,8 @@ Total 54 test lolos (44 + 2 + 4 + 4). File baru/terisi: `doctype/kaji_ulang_tend
 6. Buka Workspace "Marketing" (lewat nested di bawah CRM) → cek section "Ringkasan" (Number Card) sudah TIDAK ADA lagi (dihapus karena semua card-nya dobel sama CRM) -- yang tersisa cuma section "Tren" (chart) dan "Pintasan" (shortcut). Sama buat Workspace "Finance" (nested di bawah Keuangan).
 7. Buka Workspace "Laboratorium" (nested di bawah LIMS) → cek Number Card yang tampil sekarang cuma "WO Draft Menunggu Approval" (1 card, bukan 4 seperti sebelumnya) -- 3 card lain (Sample Belum Diuji/Sedang Diuji, LHU Draft Menunggu Diterbitkan) sudah dihapus karena dobel sama LIMS.
 8. Login sebagai Administrator → buka Workspace "Keuangan" dan "Kualitas" langsung → cek Number Card & shortcut-nya sesuai daftar di Bagian 3.28.
+9. **Login-landing per role**: login sebagai `direksi.test@example.com` → begitu berhasil login, TANPA klik apa-apa, cek URL browser langsung `/desk/direksi` (bukan `/desk` polos) dan halaman yang muncul persis Workspace Direksi. Ulangi buat akun role lain (`marketing.test@example.com` → `/desk/marketing`, `manajerteknis.test@example.com` → `/desk/manajer-teknis`, dst -- 7 role, masing-masing ke Workspace role-nya sendiri, BUKAN ke Workspace domain CRM/LIMS/Keuangan/Kualitas).
+10. Login sebagai `Administrator` → cek TETAP mendarat di `/desk` generik seperti biasa (bukan ke salah satu Workspace role tertentu).
 
 ---
 

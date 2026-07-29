@@ -1,5 +1,39 @@
 import frappe
 
+# hooks.py::get_website_user_home_page -- landing page per role begitu
+# login, supaya user non-IT tidak harus tahu dulu nama Workspace-nya
+# sendiri buat pindah manual dari /desk generik. Diarahkan ke Workspace
+# ROLE spesifik (bukan Workspace domain CRM/LIMS/Keuangan/Kualitas hasil
+# nesting di Bagian 3.28) karena itu yang paling relevan buat kerja
+# sehari-hari; domain overview tetap bisa diakses lewat expand Workspace
+# picker.
+ROLE_HOME_WORKSPACE = {
+	"Direksi": "direksi",
+	"Marketing": "marketing",
+	"Administrasi": "administrasi",
+	"Finance": "finance",
+	"Laboratorium": "laboratorium",
+	"Manajer Teknis": "manajer-teknis",
+	"Manajer Mutu": "manajer-mutu",
+}
+
+
+def get_home_page(user):
+	# Administrator secara sintetis punya SEMUA role (lihat
+	# frappe.permissions.get_roles()) -- kalau tidak dikecualikan, bakal
+	# ke-redirect ke Workspace role PERTAMA yang match secara acak/tidak
+	# terduga, alih-alih tetap di /desk generik seperti user admin
+	# semestinya.
+	if user == "Administrator":
+		return None
+
+	for role in frappe.get_roles(user):
+		if role in ROLE_HOME_WORKSPACE:
+			return ROLE_HOME_WORKSPACE[role]
+
+	return None
+
+
 # TSD Bagian 9: "Aging Piutang" dan "Rekonsiliasi Bank" sudah tercakup oleh
 # report native ERPNext (Accounts Receivable, Bank Reconciliation Statement)
 # -- tidak perlu report custom. Satu-satunya yang kurang: keduanya default

@@ -65,10 +65,22 @@ doctype_js = {
 # application home page (will override Website Settings)
 # home_page = "login"
 
-# website user home page (by Role)
-# role_home_page = {
-# 	"Role": "home_page"
-# }
+# Landing page per role begitu login -- tanpa ini, semua user (apa pun
+# role-nya) mendarat di /desk generik, harus tahu dulu nama Workspace-nya
+# sendiri buat pindah manual (masalah nyata buat user non-IT). Diarahkan ke
+# Workspace ROLE spesifik masing-masing (bukan Workspace domain
+# CRM/LIMS/Keuangan/Kualitas hasil nesting di Bagian 3.28), karena itu yang
+# paling relevan buat kerja sehari-hari user itu -- domain overview tetap
+# bisa diakses lewat expand Workspace picker.
+#
+# Pakai hook function (get_website_user_home_page), BUKAN dict
+# role_home_page bawaan -- dict itu iterate frappe.get_roles() tanpa
+# kontrol urutan, dan Administrator secara sintetis punya SEMUA role (lihat
+# frappe.permissions.get_roles()), jadi bakal ke-redirect ke role PERTAMA
+# yang match secara acak/tidak terduga alih-alih ke /desk generik seperti
+# semestinya. install.get_home_page mengecualikan Administrator secara
+# eksplisit.
+get_website_user_home_page = "starlab_customizations.install.get_home_page"
 
 # Generators
 # ----------
