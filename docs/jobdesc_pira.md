@@ -1,0 +1,94 @@
+# Jobdesc: Developer (Backend/Full-Stack) — Pira
+
+Dokumen ini berisi tanggung jawab teknis untuk anggota tim yang ikut coding, menyesuaikan kondisi project ERP SAI saat ini (per `docs/ringkasan-seluruh-sprint.md` versi terbaru).
+
+---
+
+## Ringkasan Peran
+
+Fokus utama: menutup technical debt yang sudah teridentifikasi, jadi penanggung jawab perbaikan bug begitu UAT mulai berjalan, dan mengeksekusi keputusan bisnis begitu turun dari stakeholder terkait.
+
+---
+
+## Tanggung Jawab Utama
+
+### 1. Tutup gap test coverage
+
+4 DocType di `starlab_customizations` masih stub kosong (`IntegrationTestCase` tanpa method `test_*`, jadi 0 test yang benar-benar jalan):
+
+- `kaji_ulang_tender`
+- `tnc_master_template`
+- `client_inquiry`
+- `petty_cash_entry`
+
+Bisa langsung dikerjakan tanpa menunggu keputusan siapa pun. Pakai test yang sudah ada sebagai pola referensi:
+- `starlab_customizations/starlab_customizations/starlab_customizations/tests/test_quotation_workflow_permission.py`
+- `starlab_quality/starlab_quality/starlab_quality/doctype/document_master/test_document_master.py`
+
+Jalankan dengan:
+```bash
+bench --site <NAMA_SITE> run-tests --app starlab_customizations
+```
+
+### 2. Penanggung jawab bug dari UAT
+
+7 akun test per role (Direksi, Marketing, Administrasi, Finance, Laboratorium, Manajer Teknis, Manajer Mutu — lihat `starlab_lab_ops/README.md`) sudah bisa dipakai di semua device. Begitu anggota tim non-coding mulai eksplorasi/nulis buku panduan pakai akun-akun itu, laporan bug atau perilaku yang gak sesuai ekspektasi ditampung dan diperbaiki di sini.
+
+### 3. Eksekusi keputusan bisnis begitu dikonfirmasi
+
+Item-item ini masih menunggu jawaban dari stakeholder (lihat `docs/PRD_v8.md` Bagian 10 dan `docs/BRA_v2.md`) — **jangan diimplementasikan berdasarkan tebakan sebelum ada konfirmasi eksplisit**:
+
+| Keputusan yang ditunggu | Lokasi kode yang kena dampak |
+|---|---|
+| Posisi Rush Fee — sebelum/sesudah Discount dihitung | `starlab_customizations/starlab_customizations/quotation_hooks.py::_calculate_price_summary` |
+| Alur kerja Subkontraktor (status "Subkon") | `starlab_lab_ops/.../doctype/wo_parameter_detail/wo_parameter_detail.json` (field `status_pengujian`) |
+| Masa retensi Sample sebelum dimusnahkan | `starlab_lab_ops/.../doctype/sample/sample.json` (field `retensi`, `tanggal_musnah`) |
+| Arah approval Work Order: MT ↔ Administrasi (Fase 0 F0-1) | Workflow `Work Order Pengujian` |
+| Mapping Item master ke Quotation/Invoice | `Quotation Parameter Detail`, tombol "Buat Invoice" di LHU |
+| Integrasi Accurate — API otomatis atau input manual Finance | Belum ada kode sama sekali, tunggu kejelasan cakupan dulu |
+
+### 4. WhatsApp Gateway — penyambungan akhir
+
+Kerangka sudah siap di `starlab_integrations` (WhatsApp Settings, provider Fonnte/Twilio/WhatsApp Business API). Begitu provider dipilih dan kredensial asli tersedia: isi WhatsApp Settings, aktifkan, dan uji kirim pesan sungguhan.
+
+### 5. Sinkronisasi branch `app-starlab-*` ke Docker/CI
+
+**Ini bagian yang paling sering kelewat** — `docker/apps.json` dan CI (`.github/workflows/ci.yml`) tidak membangun langsung dari `develop`, tapi dari branch terpisah per app (`app-starlab-lab-ops`, `app-starlab-customizations`, `app-starlab-quality`, `app-starlab-integrations`). Tiap kali ada commit di `develop` yang menyentuh salah satu app, branch itu harus di-update manual:
+
+```bash
+git subtree split --prefix=<nama_app> -b <nama_app>-new
+git branch -f app-<nama_app> <nama_app>-new
+git branch -D <nama_app>-new
+git push --force origin app-<nama_app>
+```
+
+Kalau ini kelewat, device/CI lain akan build dari kode versi lama tanpa ada error yang jelas — sudah beberapa kali kejadian. Perlu disepakati eksplisit siapa yang pegang tanggung jawab ini di tiap sesi kerja.
+
+### 6. (Opsional, prioritas rendah) Query Report custom untuk Dashboard
+
+Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histori order per klien) sengaja belum dibuatkan Number Card karena butuh Query Report custom biar angkanya gak menyesatkan. Nice-to-have kalau semua di atas sudah beres.
+
+---
+
+## Alur Kerja & Referensi
+
+- **Dokumen acuan wajib dibaca**: `docs/BRA_v2.md`, `docs/PRD_v8.md`, `docs/TSD_v3.md`, `docs/ringkasan-seluruh-sprint.md`. Kalau mengerjakan sesuatu yang mengubah keputusan/asumsi kerja sebelumnya, update juga dokumen ini biar histori keputusan gak hilang.
+- **Sebelum push**: jalankan test app yang disentuh (`bench --site <NAMA_SITE> run-tests --app <nama_app>`), pastikan lolos.
+- **Sebelum implementasi item di Bagian 3**: pastikan ada konfirmasi eksplisit tertulis dari stakeholder terkait, bukan asumsi sendiri — kalau perlu, catat dulu di dokumen PRD/BRA sebagai keputusan resmi sebelum mulai coding.
+
+---
+
+## Koordinasi
+
+- **Pemegang repo utama**: eskalasi buat keputusan yang butuh persetujuan atau tidak jelas arahnya.
+- **2 anggota tim non-coding**: sumber laporan bug & feedback UAT — lihat `jobdesc-pembuat-buku-panduan.md` di root repo untuk peran salah satunya.
+- **Stakeholder bisnis** (Direksi, Finance, Laboratorium, Manajer Mutu, Manajer Teknis): sumber jawaban untuk item Bagian 3 dan Open Questions di `PRD_v8.md`.
+
+---
+
+## Ukuran Keberhasilan
+
+- 4 DocType di Bagian 1 punya test yang beneran jalan & lolos.
+- Laporan bug dari UAT direspon & diperbaiki dalam waktu wajar, bukan menumpuk.
+- Begitu ada keputusan bisnis baru turun, implementasinya jalan tanpa banyak delay — dan dokumen PRD/BRA ikut diupdate.
+- Branch `app-starlab-*` tidak pernah tertinggal lebih dari beberapa hari dari `develop`.
