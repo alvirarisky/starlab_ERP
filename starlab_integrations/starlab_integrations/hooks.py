@@ -111,7 +111,11 @@ standard_portal_menu_items = [
 # ------------
 
 # before_install = "starlab_integrations.install.before_install"
-# after_install = "starlab_integrations.install.after_install"
+
+# starlab_integrations app terakhir yang di-install (lihat docker/start.sh) --
+# lihat komentar di seed_test_users.py buat alasan lengkap kenapa seed akun
+# test per-role hidup di sini, bukan di app yang lebih "cocok" isinya.
+after_install = "starlab_integrations.seed_test_users.after_install"
 
 # Uninstallation
 # ------------
