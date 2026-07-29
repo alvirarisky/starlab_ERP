@@ -209,6 +209,22 @@ fixtures = [
 		],
 	},
 	{
+		# Page (core Frappe DocType, dipakai internal buat resolusi route Desk)
+		# defaultnya cuma bisa dibaca Administrator/System Manager -- role
+		# custom manapun di project ini (Direksi, Marketing, Laboratorium,
+		# dst) jadi kena 403 "No permission for Page" begitu SPA Desk coba
+		# resolve route Workspace apapun (termasuk 7 Workspace role lama,
+		# bukan cuma CRM/LIMS), bikin seluruh render Desk gagal buat mereka.
+		# Fix: read-only ke role "All" (built-in, otomatis dipegang semua
+		# user) -- bukan doctype data bisnis, aman dibuka lebar buat semua
+		# user internal yang login.
+		"dt": "Custom DocPerm",
+		"filters": [
+			["parent", "=", "Page"],
+			["role", "=", "All"],
+		],
+	},
+	{
 		"dt": "Number Card",
 		"filters": [
 			["name", "in", [
