@@ -12,18 +12,16 @@ Fokus utama: menutup technical debt yang sudah teridentifikasi, jadi penanggung 
 
 ## Tanggung Jawab Utama
 
-### 1. Tutup gap test coverage
+### 1. Tutup gap test coverage — ✅ selesai (lihat `docs/ringkasan-seluruh-sprint.md` Bagian 3.26)
 
-4 DocType di `starlab_customizations` masih stub kosong (`IntegrationTestCase` tanpa method `test_*`, jadi 0 test yang benar-benar jalan):
+4 DocType di `starlab_customizations` yang tadinya stub kosong (`IntegrationTestCase` tanpa method `test_*`) sekarang punya 17 test beneran, semua lolos:
 
-- `kaji_ulang_tender`
-- `tnc_master_template`
-- `client_inquiry`
-- `petty_cash_entry`
+- `kaji_ulang_tender` (6 test)
+- `tnc_master_template` (3 test)
+- `client_inquiry` (4 test)
+- `petty_cash_entry` (4 test)
 
-Bisa langsung dikerjakan tanpa menunggu keputusan siapa pun. Pakai test yang sudah ada sebagai pola referensi:
-- `starlab_customizations/starlab_customizations/starlab_customizations/tests/test_quotation_workflow_permission.py`
-- `starlab_quality/starlab_quality/starlab_quality/doctype/document_master/test_document_master.py`
+Satu temuan penting muncul saat menulis test `kaji_ulang_tender`: auto-create Quotation Draft (`client_inquiry_hooks._create_quotation_draft`) ternyata **selalu gagal secara graceful** saat ini, bukan cuma untuk kasus Customer belum tertaut — karena belum ada mapping Item master (ini item yang SAMA dengan baris "Mapping Item master ke Quotation/Invoice" di Bagian 3 di bawah, masih menunggu keputusan PO). Test-nya sengaja MENGUNCI perilaku degradasi anggun ini sebagai baseline, bukan memperbaikinya sendiri tanpa konfirmasi.
 
 Jalankan dengan:
 ```bash
@@ -88,7 +86,7 @@ Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histor
 
 ## Ukuran Keberhasilan
 
-- 4 DocType di Bagian 1 punya test yang beneran jalan & lolos.
+- ✅ 4 DocType di Bagian 1 punya test yang beneran jalan & lolos.
 - Laporan bug dari UAT direspon & diperbaiki dalam waktu wajar, bukan menumpuk.
 - Begitu ada keputusan bisnis baru turun, implementasinya jalan tanpa banyak delay — dan dokumen PRD/BRA ikut diupdate.
 - Branch `app-starlab-*` tidak pernah tertinggal lebih dari beberapa hari dari `develop`.

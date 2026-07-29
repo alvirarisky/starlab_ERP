@@ -187,7 +187,7 @@ Semua 4 perubahan sudah di-migrate & functional test lewat `bench execute`/`benc
 - **`starlab_lab_ops`**: `test_sanity.py` (2 test) dipindah dari lokasi salah (`starlab_lab_ops/tests/`, di luar `frappe.get_app_path`) ke lokasi yang benar-benar ke-discover `bench run-tests` (`starlab_lab_ops/starlab_lab_ops/starlab_lab_ops/tests/`, sejajar dengan folder `doctype/`) — bug yang sama persis dengan yang sempat ditemukan & dicatat di Bagian 6 untuk app ini sebelumnya, sekarang benar-benar difix.
 - **`starlab_quality`**: stub kosong `IntegrationTestDocumentMaster` (0 test method) sekarang berisi 4 test nyata: siklus Draft→Menunggu Approval MM→Menunggu Approval Direksi→Aktif, tolak di tahap MM (dengan & tanpa `catatan_revisi` — harus divalidasi wajib), dan satu test yang **mengunci temuan penting**: opsi Status "Usang" memang ada di field (`document_master.json`), tapi TIDAK ADA jalur Workflow otomatis mana pun yang menujunya — sesuai keputusan PO eksplisit yang sudah didokumentasikan di description field DocType-nya sendiri (1 record berputar lewat status, bukan 2 record lama/baru — lihat Bagian 4 baris 7). **Lihat catatan penting di bawah** soal ini.
 - **`starlab_integrations`**: `test_tracking.py` (4 test, baru) untuk `track_order()` — guest bisa akses tanpa login (divalidasi lewat `frappe.is_whitelisted()`, jalur pemeriksaan yang sama persis dipakai `frappe.handler` untuk request HTTP asli), response tidak pernah membocorkan field harga/finansial (pengecekan rekursif ke seluruh struktur response terhadap daftar kata kunci harga), dan rate-limiting (`@rate_limit(limit=30, seconds=60)`) benar-benar memblokir permintaan ke-31 dalam window yang sama (disimulasikan dengan mengisi `frappe.local.request` — di luar konteks HTTP asli, decorator ini no-op).
-- **Masih 0 test**: `kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry` (stub `starlab_customizations`) — di luar scope task ini, lihat Bagian 6.
+- **[Update Bagian 3.26]** `kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry` — waktu itu masih 0 test (di luar scope task ini), sekarang sudah ditutup (17 test baru).
 
 > ⚠️ **Perlu keputusan PO/user**: instruksi task ini juga meminta test yang membuktikan "dokumen Document Master lama otomatis jadi Usang saat versi baru Aktif" — tapi behavior itu **tidak ada di kode saat ini** dan justru bertentangan dengan keputusan PO yang sudah didokumentasikan eksplisit (Bagian 4 baris 7 & description `document_master.json`): modelnya sengaja 1 record yang berputar lewat status-nya sendiri per edisi (bukan 2 record lama/baru), dan "Usang" sengaja TIDAK dapat transisi otomatis. Daripada membangun ulang logika production baru yang membalik keputusan itu tanpa konfirmasi, test yang ditulis (`test_status_option_usang_exists_but_has_no_automatic_transition`) justru MENGUNCI perilaku "tidak ada auto-transition" sebagai baseline yang terverifikasi. Kalau PO memang mau mengubah keputusan lama itu, butuh instruksi eksplisit dulu sebelum diimplementasikan.
 
@@ -226,6 +226,19 @@ Selain 7 Workspace per-role yang sudah ada (Bagian 2-3.20-3.21), sekarang ada 2 
 >
 > ⚠️ **Bug pra-existing kedua, juga ditemukan & difix saat testing manual** — nyangkut Workspace **Laboratorium** yang lama juga, bukan cuma LIMS: 2 dari 8 Number Card `starlab_lab_ops` ("Sample Belum Diuji", "Sample Sedang Diuji") disimpan dengan `filters_json` berformat dict (`{"status": "Diterima"}`), beda dari 6 Number Card lain yang formatnya benar (list-of-lists, `[["status", "=", "..."]]`). Frappe core's `get_percentage_difference` (dipicu otomatis oleh `show_percentage_stats: 1`, badge kecil naik/turun % di sebelah angka Number Card) melakukan `filters.append(...)` pada hasil parse `filters_json` -- meledak `AttributeError: 'dict' object has no attribute 'append'` karena dict tidak punya method itu. **Fix**: perbaiki `filters_json` kedua card itu ke format list-of-lists yang benar di `starlab_lab_ops/fixtures/number_card.json`. Diverifikasi lewat `bench execute frappe.desk.doctype.number_card.number_card.get_percentage_difference` langsung (bukan cuma baca kode) untuk kedua card, exit 0 tanpa traceback.
 
+### 3.26 Tutup gap test coverage 4 DocType terakhir yang masih stub — `starlab_customizations`
+
+Item 1 jobdesc Pira (`docs/jobdesc_pira.md`) — 4 DocType yang dari awal sesi berkali-kali dicatat sebagai "0 test jalan" (stub `IntegrationTestCase` tanpa method `test_*`) sekarang punya test beneran, total 17 test baru:
+
+- **`kaji_ulang_tender`** (6 test) — siklus `sync_client_inquiry_from_kaji_ulang`: rekomendasi Layak/Layak dengan Catatan menyetujui Client Inquiry, Tidak Layak menolak, resave pasca-resolusi tidak retrigger. **Temuan penting saat menulis test ini** (bukan bug baru, cuma pertama kali beneran diverifikasi): auto-create Quotation Draft dari `_create_quotation_draft` **SELALU gagal secara graceful** untuk skenario apa pun saat ini (bukan cuma kasus tanpa Customer) -- karena fungsi itu tidak pernah mengisi tabel `items` standar Quotation (SAI menyimpan baris harga di `parameter_detail` sendiri), dan ERPNext core butuh `items` terisi untuk kalkulasi total (`TypeError: bad operand type for abs(): 'NoneType'` di `set_total_in_words`). Ini SUDAH terdokumentasi sebagai keputusan bisnis yang masih menunggu PO (Bagian 5 placeholder "Item master untuk Quotation/Invoice" / item 3 jobdesc Pira) -- bukan sesuatu yang diperbaiki sendiri tanpa konfirmasi. Test yang ditulis (`test_quotation_draft_auto_create_currently_fails_gracefully`) MENGUNCI perilaku degradasi anggun ini (approval Client Inquiry tetap sukses, ada catatan di timeline, TIDAK ada exception yang membatalkan approval) sebagai baseline -- begitu keputusan Item master turun dan fungsi ini mulai berhasil, assertion di test ini perlu disesuaikan.
+- **`tnc_master_template`** (3 test) — autoname dari `versi_template`, penolakan duplikat, `konten_tnc` wajib.
+- **`client_inquiry`** (4 test) — default status Draft, transisi Ajukan, field wajib (`alamat`), child table `parameter_diminta` wajib minimal 1 baris.
+- **`petty_cash_entry`** (4 test) — validasi nominal > 0, siklus penuh Draft→Ajukan→Setujui yang benar-benar membuat Journal Entry (diverifikasi sampai ke akun debit/kredit & jumlahnya, bukan cuma cek field `journal_entry` terisi), field terkunci pasca-Disetujui, siklus Tolak→Revisi→edit ulang.
+
+> **Catatan lingkungan berulang**: ke-4 DocType ini semuanya punya Link field ke `Employee` (langsung atau lewat child) dan/atau `Customer`/`Journal Entry` -- semuanya kena bug bootstrap Department yang sama seperti Document Master (Bagian 3.23), tapi lewat rute BARU yang belum pernah ketemu sebelumnya: `IGNORE_TEST_RECORD_DEPENDENCIES` di module Frappe cuma berlaku untuk doctype yang SEDANG diproses, bukan untuk seluruh rantai rekursif -- jadi `Client Inquiry` (dependency dari `Kaji Ulang Tender`) perlu daftar ignore-nya SENDIRI (bukan cuma warisan dari `Kaji Ulang Tender`), begitu juga `Petty Cash Entry` lewat `Journal Entry` (yang celakanya mengimpor `test_customer.py`/`test_account.py` ERPNext, dan modul-modul itu menjalankan `erpnext.tests.utils.BootStrapTestData()` sebagai *side effect level-modul* saat di-import -- bukan cuma saat test-nya benar-benar dijalankan). Ditemukan dengan trace manual `get_missing_records_doctypes()` langsung, bukan tebakan.
+
+Total test `starlab_customizations` sekarang 44 (naik dari 27), total keseluruhan 4 app: **54** (44 + 2 `starlab_lab_ops` + 4 `starlab_quality` + 4 `starlab_integrations`).
+
 ---
 
 ## 4. Keputusan yang Sudah Ditentukan (PO Decisions)
@@ -261,7 +274,7 @@ Selain 7 Workspace per-role yang sudah ada (Bagian 2-3.20-3.21), sekarang ada 2 
 ## 6. Catatan / PR untuk Kita (Follow-up)
 
 - **Sprint 10 TSD asli (Migrasi Data, UAT, Go-Live)** — tidak bisa dikerjakan lewat sesi coding. Butuh: file data historis (Excel/Google Drive lama), staf yang benar-benar melakukan UAT per role, keputusan go-live bertahap (Quotation/WO dulu → Sample/QC → sisanya).
-- **Hampir tidak ada test otomatis yang beneran jalan** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. **[Update Bagian 3.23c]** Ditutup sebagian: `starlab_lab_ops` (2 test), `starlab_quality` (4 test, Document Master), `starlab_integrations` (4 test, `track_order`) sekarang punya test nyata yang lolos. `test_*.py` di `kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry` (folder DocType di `starlab_customizations`) masih stub kosong (class `IntegrationTestCase` tanpa method `test_*`, jadi 0 test jalan) — belum tersentuh. Total test yang beneran lolos di seluruh 4 app sekarang: 37 (27 `starlab_customizations` + 2 `starlab_lab_ops` + 4 `starlab_quality` + 4 `starlab_integrations`). Regresi ke DocType lama (Quotation/Work Order/Sample) sebagian besar masih TIDAK akan kedeteksi otomatis di luar yang sudah ditest.
+- **Hampir tidak ada test otomatis yang beneran jalan** — audit awal berkali-kali nge-flag ini sebagai risiko nomor satu. **[Update Bagian 3.23c & 3.26]** Ditutup: `starlab_lab_ops` (2 test), `starlab_quality` (4 test, Document Master), `starlab_integrations` (4 test, `track_order`) punya test nyata yang lolos, dan 4 stub terakhir di `starlab_customizations` (`kaji_ulang_tender`, `tnc_master_template`, `client_inquiry`, `petty_cash_entry`) sudah ditutup juga (17 test baru). Total test yang beneran lolos di seluruh 4 app sekarang: **54** (44 `starlab_customizations` + 2 `starlab_lab_ops` + 4 `starlab_quality` + 4 `starlab_integrations`). Regresi ke DocType lama (Quotation/Work Order/Sample) sebagian besar masih TIDAK akan kedeteksi otomatis di luar yang sudah ditest.
   - **[Selesai]** `starlab_lab_ops/tests/test_sanity.py` yang dulu diletakkan di folder salah (di luar `frappe.get_app_path`, jadi tidak pernah ke-discover `bench run-tests`) sudah dipindah ke `starlab_lab_ops/starlab_lab_ops/starlab_lab_ops/tests/` dan sekarang benar-benar jalan (lihat Bagian 3.23c).
 - **Dashboard**: beberapa metrik TSD (saldo kas real-time, conversion rate, histori klien) butuh Query Report custom kalau mau benar-benar akurat — saat ini sengaja tidak dibuatkan Number Card supaya tidak menampilkan angka yang menyesatkan.
 - **`docker/apps.json`**: URL untuk `starlab_lab_ops` masih pakai repo lama (`alvirarisky/starlab_lab_ops.git`) yang menurut GitHub sendiri sudah "moved" ke `starlab_ERP.git`. Masih jalan (GitHub redirect otomatis), tapi lebih rapi kalau nanti diarahkan langsung ke URL kanonik.
@@ -495,7 +508,7 @@ bench --site <NAMA_SITE> run-tests --app starlab_lab_ops
 bench --site <NAMA_SITE> run-tests --app starlab_quality
 bench --site <NAMA_SITE> run-tests --app starlab_integrations
 ```
-Total 37 test lolos (27 + 2 + 4 + 4).
+Saat ditulis, total 37 test lolos (27 + 2 + 4 + 4). Lihat Bagian 7.18 untuk angka terbaru (54 test, setelah 4 stub DocType terakhir ditutup di Bagian 3.26).
 
 ### 7.16 Polish Client Dashboard + branding (lihat Bagian 3.24)
 1. Setelah `bench migrate` (patch `set_sai_branding` jalan otomatis), login ke Desk → cek logo di pojok kiri atas navbar sekarang logo SAI (ikon bintang+LAB), bukan logo Frappe default.
@@ -532,6 +545,15 @@ after_install()
 3. Klik pintasan "Work Order Pengujian — Kanban" → sama, harus langsung ke Kanban View board "Work Order Pengujian per Status".
 4. Klik 5 pintasan biasa di bagian "Pintasan" (Work Order Pengujian, Sample, Test Result, Test Parameter, LHU) → semua harus membuka List View normal.
 5. Cek icon Workspace LIMS di sidebar picker beda dari icon Workspace Laboratorium (LIMS pakai `clipboard-check`, Laboratorium pakai `flask-conical`) — supaya kelihatan jelas ini dua Workspace yang berbeda, bukan duplikat.
+
+### 7.18 Test coverage 4 DocType terakhir (lihat Bagian 3.26)
+```
+bench --site <NAMA_SITE> run-tests --app starlab_customizations
+bench --site <NAMA_SITE> run-tests --app starlab_lab_ops
+bench --site <NAMA_SITE> run-tests --app starlab_quality
+bench --site <NAMA_SITE> run-tests --app starlab_integrations
+```
+Total 54 test lolos (44 + 2 + 4 + 4). File baru/terisi: `doctype/kaji_ulang_tender/test_kaji_ulang_tender.py`, `doctype/tnc_master_template/test_tnc_master_template.py`, `doctype/client_inquiry/test_client_inquiry.py`, `doctype/petty_cash_entry/test_petty_cash_entry.py` (semua di `starlab_customizations`).
 
 ---
 
