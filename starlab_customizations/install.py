@@ -7,14 +7,24 @@ import frappe
 # nesting di Bagian 3.28) karena itu yang paling relevan buat kerja
 # sehari-hari; domain overview tetap bisa diakses lewat expand Workspace
 # picker.
+#
+# Nilai HARUS diawali "desk/" (bukan slug polos) -- login.js melakukan
+# `window.location.href = data.home_page` dari halaman /login (path 1
+# segmen), jadi resolusi URL relatif browser memperlakukan slug polos
+# (mis. "manajer-teknis") sebagai SIBLING dari /login, mendarat di
+# localhost:8000/manajer-teknis (404 "Page not found") alih-alih
+# localhost:8000/desk/manajer-teknis yang benar. "desk/<slug>" (relatif,
+# dua segmen) resolve dengan benar ke "/desk/<slug>" -- pola yang sama
+# persis dipakai core Frappe sendiri untuk kasus System User default
+# ("desk" polos, bukan "/desk", lihat frappe.website.utils.get_home_page).
 ROLE_HOME_WORKSPACE = {
-	"Direksi": "direksi",
-	"Marketing": "marketing",
-	"Administrasi": "administrasi",
-	"Finance": "finance",
-	"Laboratorium": "laboratorium",
-	"Manajer Teknis": "manajer-teknis",
-	"Manajer Mutu": "manajer-mutu",
+	"Direksi": "desk/direksi",
+	"Marketing": "desk/marketing",
+	"Administrasi": "desk/administrasi",
+	"Finance": "desk/finance",
+	"Laboratorium": "desk/laboratorium",
+	"Manajer Teknis": "desk/manajer-teknis",
+	"Manajer Mutu": "desk/manajer-mutu",
 }
 
 

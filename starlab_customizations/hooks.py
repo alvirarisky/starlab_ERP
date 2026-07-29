@@ -31,8 +31,18 @@ required_apps = ["starlab_lab_ops"]
 # app_include_js = "/assets/starlab_customizations/js/starlab_customizations.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/starlab_customizations/css/starlab_customizations.css"
-# web_include_js = "/assets/starlab_customizations/js/starlab_customizations.js"
+#
+# Aksen tombol brand SAI -- static CSS biasa, BUKAN lewat Website Theme
+# custom_scss (lihat public/css/starlab_branding.css untuk kenapa; ringkas:
+# Website Theme custom di versi Frappe ini kena bug kompilasi @import .css
+# yang bikin ~25 asset 500 di setiap halaman website).
+web_include_css = "/assets/starlab_customizations/css/starlab_branding.css"
+#
+# Lihat komentar di public/js/strip_generic_login_redirect.js -- perlu di
+# SEMUA halaman website (bukan cuma /login) karena web_include_js dimuat
+# lewat base template templates/web.html yang sama; script-nya sendiri
+# early-return kalau bukan /login jadi aman/no-op di halaman lain.
+web_include_js = "/assets/starlab_customizations/js/strip_generic_login_redirect.js"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "starlab_customizations/public/scss/website"
