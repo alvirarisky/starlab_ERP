@@ -103,6 +103,42 @@ else
     --set-default
 fi
 
+echo "==> Checking site's installed_apps against app code actually present in this container"
+# A site's database remembers which apps are "installed" independently of
+# whether their code is still on disk. This drifts whenever a container is
+# recreated from an image that was never rebuilt to match (e.g. after
+# `bench install-app` was run by hand inside a now-discarded container for
+# a quick test, or after docker/apps.json changed without deleting the old
+# image) -- every page then 500s with `ModuleNotFoundError`, since the DB
+# still lists an app whose package no longer exists. Self-heal it here on
+# every run instead of leaving it to reappear and get debugged from scratch
+# each time.
+docker compose -p frappe -f compose.custom.yaml exec -T backend \
+  bash -c 'cd sites && /home/frappe/frappe-bench/env/bin/python3 -' <<'PYEOF'
+import importlib.util
+import json
+
+import frappe
+
+frappe.init(site="starlab.local")
+frappe.connect()
+
+installed = frappe.get_installed_apps()
+missing = [a for a in installed if not importlib.util.find_spec(a)]
+
+if missing:
+    fixed = [a for a in installed if a not in missing]
+    frappe.db.set_global("installed_apps", json.dumps(fixed))
+    frappe.db.commit()
+    print(f"    WARNING: database listed {missing} as installed, but the code isn't present")
+    print("    in this container -- removed from installed_apps so the site loads again.")
+    print(f"    If {missing} should really be active: delete the starlab-lab-ops:latest image")
+    print("    to force a real rebuild (don't just `bench install-app` inside a running")
+    print("    container -- that container is thrown away on restart, the database isn't).")
+else:
+    print("    OK -- installed_apps matches the app code present in this container.")
+PYEOF
+
 echo ""
 echo "============================================================"
 echo " Ready! Open http://localhost:8080 in your browser."
