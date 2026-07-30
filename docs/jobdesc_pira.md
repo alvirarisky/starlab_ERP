@@ -94,3 +94,20 @@ Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histor
 - Laporan bug dari UAT direspon & diperbaiki dalam waktu wajar, bukan menumpuk.
 - Begitu ada keputusan bisnis baru turun, implementasinya jalan tanpa banyak delay — dan dokumen PRD/BRA ikut diupdate.
 - Branch `app-starlab-*` tidak pernah tertinggal lebih dari beberapa hari dari `develop`.
+
+---
+
+## Tambahan (2026-07-30)
+
+### 7. Eksekusi restrukturisasi menu Desk (Penambahan & Pengurangan Fitur)
+
+Catatan review manual soal menu Desk (`docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md`) sudah diperjelas lewat diskusi — semua poin yang tadinya ambigu sudah dikonfirmasi, jadi **sudah siap dieksekusi**, gak perlu nunggu keputusan apa-apa lagi:
+
+- **Organisasi**: shortcut Branch dihapus, diganti shortcut Daftar Karyawan (Employee List).
+- **Selling**: hapus POS, Price List, Coupon Code, Blanket dari menu. Item → label tampilan diganti "Parameter" (murni ganti label, DocType & fungsinya tetap Item seperti biasa). Item Groups → label tampilan diganti "Matriks" (sama, murni label). Pricing Rules disembunyikan dari menu tapi **jangan dimatikan fungsinya** (Promotional Scheme bergantung ke situ di belakang layar).
+- **Project**: tidak ada perubahan (catatan "Task = approval" di draf sebelumnya sudah diklarifikasi diabaikan — approval yang dimaksud sudah ada lewat Workflow terpisah).
+- **Assets**: dipindahkan jadi bagian dari grup menu Accounting, bukan grup menu sendiri.
+- **Manufacturing, Quality (bawaan ERPNext), Subcontract (bawaan ERPNext)**: dihapus total dari menu. *(Bukan `starlab_quality` custom app — itu tetap ada, tidak tersentuh. Juga bukan status "Subkon" di Work Order Pengujian — itu masih Open Question terpisah F0-5, tidak tersentuh.)*
+- **Stock**: dihapus total dari menu (bukan ganti nama) — kebutuhan consumable/alat gelas sudah tercakup lewat menu LIMS yang sudah ada.
+
+Detail lengkap & alasan tiap poin ada di `docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md` itu sendiri — baca dulu sebelum mulai, supaya konteksnya jelas dan tidak salah eksekusi.
