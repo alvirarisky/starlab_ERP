@@ -99,7 +99,7 @@ Beberapa metrik TSD (saldo kas real-time, conversion rate Quotation→WO, histor
 
 ## Tambahan (2026-07-30)
 
-### 7. Eksekusi restrukturisasi menu Desk (Penambahan & Pengurangan Fitur)
+### 7. Eksekusi restrukturisasi menu Desk (Penambahan & Pengurangan Fitur) — ✅ selesai (lihat `docs/ringkasan-seluruh-sprint.md` Bagian 3.29)
 
 Catatan review manual soal menu Desk (`docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md`) sudah diperjelas lewat diskusi — semua poin yang tadinya ambigu sudah dikonfirmasi, jadi **sudah siap dieksekusi**, gak perlu nunggu keputusan apa-apa lagi:
 
