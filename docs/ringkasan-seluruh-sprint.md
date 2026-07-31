@@ -317,13 +317,13 @@ Diverifikasi: 50 test tetap lolos di 3 app (`starlab_customizations`/`starlab_la
 
 | Item | Lokasi | Yang perlu dilakukan |
 |---|---|---|
-| Akun GL Journal Entry Petty Cash | `starlab_customizations/petty_cash_hooks.py` — `"Kas Kecil - {abbr}"` / `"Beban Operasional Kantor - {abbr}"` | Finance konfirmasi nama akun COA asli, sesuaikan kode kalau beda |
+| Akun GL Journal Entry Petty Cash | `starlab_customizations/petty_cash_hooks.py` — `"Kas Kecil - {abbr}"` / `"Beban Operasional Kantor - {abbr}"` | **[Sebagian terjawab, 2026-07-30]** Nama akun "Kas Kecil" dikonfirmasi Finance. Akun pasangan sisi pengeluaran (placeholder "Beban Operasional Kantor") belum dikonfirmasi ulang — lihat `docs/keputusan_bisnis_terbaru.md` poin 11 |
 | Cost Center default Company | Company Setup | Pastikan Company punya Cost Center default terisi (biasanya otomatis dari Setup Wizard) |
-| Rush fee Quotation | **[Sebagian terjawab]** Sekarang sudah masuk kalkulasi Total Invoice (`rush_fee_amount`, lihat Bagian 3.23a) — tapi posisi di urutan kalkulasi (ditambahkan sebelum Discount, jadi ikut terdiskon) masih ASUMSI kerja | PRD v6 Open Question #10 — bagian "apakah rush fee masuk kalkulasi" sudah terjawab (ya), bagian "di mana posisinya relatif ke Discount" masih perlu konfirmasi eksplisit ke PO |
+| Rush fee Quotation | **[RESOLVED, 2026-07-30]** Sudah masuk kalkulasi Total Invoice (`rush_fee_amount`, lihat Bagian 3.23a). Posisi di kalkulasi dikonfirmasi: Discount hanya boleh mengurangi bagian pengujian, Rush Fee TIDAK ikut terdiskon — base perhitungan Discount di `_calculate_price_summary` perlu diganti dari `base_after_rush_fee` balik ke `doc.sub_total`. Lihat `docs/keputusan_bisnis_terbaru.md` poin 1 | Siap dieksekusi, belum dikerjakan |
 | Target eskalasi SLA Quotation | `starlab_customizations/tasks.py::check_quotation_sla` | PRD v6 Open Question #1 — sekarang default "reminder ulang ke approver yang sama", ganti kalau ternyata harus ke atasan |
 | WhatsApp Settings | Desk → cari "WhatsApp Settings" | Isi provider, API URL, API Key, Nomor Pengirim begitu sudah pilih & daftar provider (Fonnte/Twilio/WhatsApp Business API), lalu centang "Aktifkan" |
-| Item master untuk Quotation/Invoice | `Quotation Parameter Detail`, tombol "Buat Invoice" di LHU | Test Parameter belum ditautkan ke Item master ERPNext — auto-create Quotation/Invoice sengaja TIDAK isi tabel `items` standar karena ini. Kalau mau full-otomatis, perlu diputuskan dulu: bikin 1 Item generik "Jasa Pengujian" atau mapping per parameter |
-| LHU: status custom vs native submit | `starlab_lab_ops` — LHU sudah punya Custom DocPerm submit/cancel/amend yang nganggur (DocType belum `is_submittable`) | Diputuskan dulu: pindah ke native submit (buang status custom Draft/Issued/Revised/Superseded) atau hapus DocPerm yang nganggur |
+| Item master untuk Quotation/Invoice | `Quotation Parameter Detail`, tombol "Buat Invoice" di LHU | **[RESOLVED, 2026-07-30]** Rinci per parameter (bukan 1 Item generik), mengikuti format Quotation/Invoice yang sudah dibuat Astri — harus memuat matriks, parameter, dan regulasi acuan. Mapping Test Parameter → Item masih perlu dirancang & diimplementasi, lihat `docs/keputusan_bisnis_terbaru.md` poin 6 | Siap dieksekusi, belum dikerjakan |
+| LHU: status custom vs native submit | `starlab_lab_ops` | **[RESOLVED]** `is_submittable` sudah diaktifkan, LHU sekarang pakai native submit/cancel/amend (status custom Draft/Issued/Revised/Superseded dikontrol otomatis lewat hook, bukan diisi manual lagi) |
 
 ---
 

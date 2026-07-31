@@ -111,3 +111,18 @@ Catatan review manual soal menu Desk (`docs/Penambahan_Pengurangan_Fitur_ERP_SAI
 - **Stock**: dihapus total dari menu (bukan ganti nama) — kebutuhan consumable/alat gelas sudah tercakup lewat menu LIMS yang sudah ada.
 
 Detail lengkap & alasan tiap poin ada di `docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md` itu sendiri — baca dulu sebelum mulai, supaya konteksnya jelas dan tidak salah eksekusi.
+
+### 8. Update: 6 keputusan bisnis di Bagian 3 sudah terjawab semua
+
+Semua item di tabel "Eksekusi keputusan bisnis" (Bagian 3 di atas) sekarang sudah ada jawaban resmi dari stakeholder — **siap dieksekusi, tidak perlu menunggu konfirmasi lagi**. Detail lengkap tiap jawaban + lokasi kode yang kena dampak ada di `docs/keputusan_bisnis_terbaru.md` — baca dulu sebelum mulai.
+
+Ringkasan per item (detail lengkap ada di dokumen itu):
+
+- **Posisi Rush Fee** — Discount cuma boleh mengurangi bagian pengujian, Rush Fee TIDAK ikut terdiskon. Prioritas tinggi karena soal duit.
+- **Alur Subkontraktor** — sudah ada alur approval-nya (Manajer Teknis → Administrasi buat form → disetujui Manajer Mutu & Direktur, monitoring lewat estimasi hari kerja lab eksternal + follow up Administrasi), tapi masih perlu dirancang jadi fitur beneran, bukan cuma status penanda seperti sekarang.
+- **Masa retensi Sample** — 1 bulan setelah LHU terbit, bisa diotomatisasi (`tanggal_musnah` dihitung otomatis, tidak perlu diisi manual lagi).
+- **Arah approval Work Order** — ternyata bercabang tergantung jenis kerjaan (teknis harian, pengadaan/kalibrasi, LHU, subkon), bukan satu aturan tunggal — perlu direview dulu kesesuaiannya terhadap Workflow "Work Order Pengujian" yang sudah berjalan sebelum memutuskan perlu perubahan atau tidak.
+- **Mapping Item master** — rinci per parameter (harus memuat matriks, parameter, regulasi acuan), bukan 1 Item generik. Acuan formatnya: contoh Quotation/Invoice yang sudah dibuat Astri.
+- **Integrasi Accurate** — dikonfirmasi otomatis (API), bukan input manual. Ini scope pengembangan baru, belum ada kode sama sekali — perlu digali lebih lanjut soal akses API yang tersedia.
+
+Satu catatan tambahan di luar Bagian 3: nama akun GL "Kas Kecil" juga sudah dikonfirmasi Finance, tapi akun pasangannya (placeholder "Beban Operasional Kantor") belum — lihat `docs/keputusan_bisnis_terbaru.md` poin 11.

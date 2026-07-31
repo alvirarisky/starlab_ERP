@@ -329,17 +329,38 @@ Detail desain awal ada di Technical Solution Design Bagian 4.13. Frekuensi kalib
 
 ### 14.6 Gap yang Masih Terbuka
 
-Poin-poin berikut di Bagian 8 dan Bagian 12 masih belum terklarifikasi dan tetap perlu ditindaklanjuti ke stakeholder terkait:
+Poin 1, 2, 3, dan 5 di Bagian 8 sudah terjawab per 2026-07-30 — lihat Bagian 14.8–14.11. Yang masih belum terklarifikasi dan tetap perlu ditindaklanjuti:
 
-- Poin 1: Arah approval MT ↔ Administrasi untuk Work Order (berbeda dari topik approval Quotation di atas yang sudah selesai).
-- Poin 2: Matriks akses data finansial secara luas (rekening koran/mutasi bank), di luar akses Quotation yang sudah diperjelas.
-- Poin 3: RACI resmi dokumen "List Work Order".
-- Poin 5: Alur kerja subkontraktor pengujian.
 - Wawancara langsung ke Direksi dan pemegang fungsi Marketing untuk melengkapi requirement gathering awal.
 
 ### 14.7 Keputusan Operasional Tambahan
 
 Rangkaian klarifikasi lanjutan ke Product Owner menghasilkan sejumlah keputusan operasional konkret yang melengkapi Bagian 3 dan 4: masa berlaku quotation menjadi 45 hari (dapat diaktifkan kembali bila kedaluwarsa), revisi quotation setelah sebagian disetujui mengharuskan pengulangan approval dari awal, pencatatan awal (Form A) wajib untuk seluruh quotation, tarif biaya percepatan (rush fee) mengikuti dua tingkatan tetap, dan syarat pelunasan invoice adalah 7 hari kalender setelah invoice terbit. Field "Accurate" yang sempat ambigu dikonfirmasi merujuk pada sistem akuntansi Finance. Detail lengkap ada di PRD Quotation & Master Data v8 dan TSD v4.
+
+### 14.8 Arah Approval Work Order — RESOLVED
+
+Gap Bagian 8 Poin 1 (arah approval MT vs Administrasi, kontradiksi antar narasumber) sudah terjawab: bukan satu aturan tunggal, tergantung jenis approval-nya.
+
+- Kerjaan teknis harian (raw data, hasil hitung) — tidak ada approval sampai manajemen puncak, cukup dari Penyelia ke Manajer Teknis.
+- Pengadaan barang / kalibrasi — approval ke Manajer Mutu.
+- LHU — pengesahan ke Direktur.
+- Work Order ke subkontraktor eksternal — approval ke Manajer Mutu dan Direktur (lihat Bagian 14.9).
+- Ada audit tahunan silang antara Teknis dan Mutu (Teknis audit Mutu, Mutu audit Teknis) — ini audit kepatuhan berkala, bukan approval per-transaksi.
+- Kerjaan harian secara umum tidak butuh approval atasan, cuma beberapa form tertentu saja.
+
+Perlu direview terhadap Workflow "Work Order Pengujian" yang sudah berjalan, apakah state/transition yang ada sekarang sudah sesuai pembagian ini.
+
+### 14.9 Alur Kerja Subkontraktor Pengujian — RESOLVED
+
+Gap Bagian 8 Poin 5 (F0-5) sudah terjawab: Manajer Teknis meminta ke Administrasi untuk membuatkan form Work Order ke laboratorium subkontraktor. Form disetujui oleh Manajer Mutu dan Direktur. Pemantauan progress mengacu ke estimasi hari kerja lab penguji eksternal; hasilnya di-follow up oleh Administrasi.
+
+### 14.10 RACI Dokumen "List Work Order" — RESOLVED
+
+Gap Bagian 8 Poin 3 sudah terjawab: divisi yang terlibat adalah Administrasi dan Manajer Teknis.
+
+### 14.11 Matriks Akses Data Finansial — RESOLVED
+
+Gap Bagian 8 Poin 2 sudah terjawab: akses data finansial sensitif (Rekening Koran, Mutasi Kas) dibatasi hanya untuk Finance dan Direksi, bukan seluruh divisi seperti kondisi sekarang.
 
 ---
 
