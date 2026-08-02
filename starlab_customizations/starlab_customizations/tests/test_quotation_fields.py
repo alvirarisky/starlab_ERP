@@ -79,8 +79,8 @@ class IntegrationTestQuotationTingkatPercepatan(IntegrationTestCase):
 
 class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 	"""PRD v8 Sprint 12, TUGAS 1: rush_fee_amount (Sub Total x Rush Fee %)
-	harus ikut mempengaruhi total_invoice. Posisi urutan kalkulasi (Rush Fee
-	sebelum Discount) masih ASUMSI kerja -- lihat catatan di
+	harus ikut mempengaruhi total_invoice. Rush Fee TIDAK ikut kena Discount
+	(docs/keputusan_bisnis_terbaru.md #1, 2026-07-30) -- lihat catatan di
 	quotation_hooks._calculate_price_summary."""
 
 	def setUp(self):
@@ -109,7 +109,7 @@ class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 		expected_total = doc.dpp + (doc.dpp * flt(doc.ppn_percent) / 100) + flt(doc.biaya_kirim)
 		self.assertEqual(doc.total_invoice, expected_total)
 
-	def test_total_invoice_matches_rush_fee_before_discount_formula(self):
+	def test_discount_does_not_apply_to_rush_fee(self):
 		doc = make_quotation(parameter_detail=self.parameter_detail)
 		doc = frappe.get_doc("Quotation", doc.name)
 		doc.tingkat_percepatan = "7 Hari Kerja (+80%)"
@@ -117,8 +117,8 @@ class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 		doc.save(ignore_permissions=True)
 		reloaded = frappe.get_doc("Quotation", doc.name)
 
-		base_after_rush_fee = reloaded.sub_total + reloaded.rush_fee_amount
-		expected_dpp = base_after_rush_fee - (base_after_rush_fee * flt(reloaded.discount_percent) / 100)
+		discounted_sub_total = reloaded.sub_total - (reloaded.sub_total * flt(reloaded.discount_percent) / 100)
+		expected_dpp = discounted_sub_total + reloaded.rush_fee_amount
 		expected_total = expected_dpp + (expected_dpp * flt(reloaded.ppn_percent) / 100) + flt(reloaded.biaya_kirim)
 
 		self.assertEqual(reloaded.dpp, expected_dpp)

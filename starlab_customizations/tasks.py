@@ -46,19 +46,34 @@ def check_quotation_sla():
 		},
 		fields=["name", "workflow_state"],
 	)
+	role_users_cache = {}
 	for row in quotations:
-		_notify_pending_approver(row.name, row.workflow_state)
+		_notify_pending_approver(row.name, row.workflow_state, role_users_cache)
 		frappe.db.set_value("Quotation", row.name, "eskalasi_terkirim", 1)
 
 
-def _notify_pending_approver(quotation, workflow_state):
+HAS_ROLE_DOCTYPE = "Has Role"
+
+
+def _get_role_users(role, cache):
+	# Dipanggil di dalam loop per-baris (check_quotation_sla/
+	# check_invoice_due/check_invoice_overdue) -- role peserta approval/
+	# reminder biasanya sama untuk banyak baris sekaligus dalam satu run
+	# scheduled job, jadi cache per-role di sini menghindari query "Has Role"
+	# berulang untuk role yang sama dalam satu eksekusi.
+	if role not in cache:
+		cache[role] = frappe.get_all(
+			HAS_ROLE_DOCTYPE, filters={"role": role, "parenttype": "User"}, pluck="parent"
+		)
+	return cache[role]
+
+
+def _notify_pending_approver(quotation, workflow_state, role_users_cache):
 	role = ROLE_BY_STATE.get(workflow_state)
 	if not role:
 		return
 
-	users = frappe.get_all(
-		"Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent"
-	)
+	users = _get_role_users(role, role_users_cache)
 	if not users:
 		return
 
@@ -99,7 +114,7 @@ def check_quotation_expiry():
 		return
 
 	users = frappe.get_all(
-		"Has Role", filters={"role": "Administrasi", "parenttype": "User"}, pluck="parent"
+		HAS_ROLE_DOCTYPE, filters={"role": "Administrasi", "parenttype": "User"}, pluck="parent"
 	)
 
 	for row in quotations:
@@ -126,8 +141,12 @@ def check_quotation_expiry():
 		frappe.db.set_value("Quotation", row.name, "kedaluwarsa_notif_terkirim", 1)
 
 
-def _notify_role(role, subject, message):
-	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+def _notify_role(role, subject, message, role_users_cache=None):
+	users = (
+		_get_role_users(role, role_users_cache)
+		if role_users_cache is not None
+		else frappe.get_all(HAS_ROLE_DOCTYPE, filters={"role": role, "parenttype": "User"}, pluck="parent")
+	)
 	if not users:
 		return
 	_safe_sendmail(users, subject, message)
@@ -140,7 +159,7 @@ def _notify_role_whatsapp(role, message):
 	# terinstall/terkonfigurasi), jadi ini benar-benar no-op kalau app-nya
 	# tidak ada atau WhatsApp Settings belum diisi (lihat whatsapp.py).
 	try:
-		frappe.get_attr("starlab_integrations.whatsapp.notify_role_via_whatsapp")(role, message)
+		frappe.get_attr("starlab_integrations.whatsapp._notify_role_via_whatsapp")(role, message)
 	except Exception:
 		pass
 
@@ -158,12 +177,14 @@ def check_invoice_due():
 		},
 		fields=["name", "due_date", "outstanding_amount"],
 	)
+	role_users_cache = {}
 	for inv in invoices:
 		message = frappe._("Invoice {0}: jatuh tempo {1}, outstanding {2}.").format(
 			inv.name, inv.due_date, inv.outstanding_amount
 		)
-		_notify_role("Finance", frappe._("Invoice jatuh tempo H-3: {0}").format(inv.name), message)
-		_notify_role("Administrasi", frappe._("Invoice jatuh tempo H-3: {0}").format(inv.name), message)
+		subject = frappe._("Invoice jatuh tempo H-3: {0}").format(inv.name)
+		_notify_role("Finance", subject, message, role_users_cache)
+		_notify_role("Administrasi", subject, message, role_users_cache)
 
 
 def check_invoice_overdue():
@@ -180,9 +201,11 @@ def check_invoice_overdue():
 		},
 		fields=["name", "due_date", "outstanding_amount"],
 	)
+	role_users_cache = {}
 	for inv in invoices:
 		message = frappe._("Invoice {0}: sudah melewati jatuh tempo {1}, outstanding {2}.").format(
 			inv.name, inv.due_date, inv.outstanding_amount
 		)
-		_notify_role("Finance", frappe._("Invoice Overdue: {0}").format(inv.name), message)
-		_notify_role("Direksi", frappe._("Invoice Overdue: {0}").format(inv.name), message)
+		subject = frappe._("Invoice Overdue: {0}").format(inv.name)
+		_notify_role("Finance", subject, message, role_users_cache)
+		_notify_role("Direksi", subject, message, role_users_cache)

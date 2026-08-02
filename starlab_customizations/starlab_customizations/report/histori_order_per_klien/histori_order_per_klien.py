@@ -50,6 +50,7 @@ def get_data(filters):
 		WHERE {where_clause}
 		GROUP BY q.party_name
 		ORDER BY order_terakhir DESC
+		LIMIT 5000
 		""",
 		values,
 		as_dict=1,

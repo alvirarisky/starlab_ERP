@@ -115,19 +115,15 @@ def _calculate_price_summary(doc):
 	# Urutan ringkasan harga (PRD v8 Sprint 12, TUGAS 1): Sub Total -> Rush Fee
 	# -> Discount (%) -> DPP -> PPN (%) -> Biaya Kirim -> Total Invoice.
 	#
-	# ASUMSI KERJA -- BELUM DIKONFIRMASI EKSPLISIT KE PO: rush_fee_amount
-	# ditambahkan ke Sub Total SEBELUM Discount dihitung, sehingga Discount %
-	# ikut memotong nominal Rush Fee juga (bukan cuma Sub Total murni). Ini
-	# interpretasi kerja dari instruksi "tambahkan baris baru setelah
-	# sub_total, sebelum discount" -- posisinya di urutan kalkulasi ini masih
-	# perlu divalidasi ke PO sebelum dipakai untuk Quotation produksi beneran.
-	# Kalau PO memutuskan Discount seharusnya cuma memotong Sub Total (Rush
-	# Fee tidak didiskon), ganti base discount di bawah dari
-	# `base_after_rush_fee` balik ke `doc.sub_total` saja.
+	# KEPUTUSAN RESMI PO (docs/keputusan_bisnis_terbaru.md #1, 2026-07-30):
+	# Discount cuma boleh memotong bagian pengujian (Sub Total) -- Rush Fee
+	# TIDAK ikut kena diskon. Rush Fee karena itu dihitung terpisah dan
+	# ditambahkan SETELAH Discount, bukan digabung ke basis Discount seperti
+	# asumsi kerja sebelumnya.
 	doc.sub_total = sum(flt(row.harga_total) for row in (doc.get("parameter_detail") or []))
 	doc.rush_fee_amount = doc.sub_total * flt(doc.rush_fee_percent) / 100
-	base_after_rush_fee = doc.sub_total + doc.rush_fee_amount
-	doc.dpp = base_after_rush_fee - (base_after_rush_fee * flt(doc.discount_percent) / 100)
+	discounted_sub_total = doc.sub_total - (doc.sub_total * flt(doc.discount_percent) / 100)
+	doc.dpp = discounted_sub_total + doc.rush_fee_amount
 	doc.total_invoice = doc.dpp + (doc.dpp * flt(doc.ppn_percent) / 100) + flt(doc.biaya_kirim)
 
 

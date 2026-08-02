@@ -46,6 +46,7 @@ def get_data(filters):
 		WHERE {where_clause}
 		GROUP BY bulan
 		ORDER BY bulan DESC
+		LIMIT 1200
 		""",
 		values,
 		as_dict=1,

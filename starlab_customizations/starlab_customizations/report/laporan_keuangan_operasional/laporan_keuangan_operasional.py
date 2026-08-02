@@ -40,6 +40,8 @@ def get_data(filters):
 			SELECT name, tanggal, item, nominal, status
 			FROM `tabPetty Cash Entry`
 			WHERE 1=1 {where_clause}
+			ORDER BY tanggal DESC
+			LIMIT 5000
 			""",
 			values,
 			as_dict=1,
@@ -69,11 +71,18 @@ def get_data(filters):
 			conditions.append("posting_date <= %(to_date)s")
 			values["to_date"] = filters["to_date"]
 		where_clause = " AND ".join(conditions)
+		# ORDER BY + LIMIT di sini mengambil jendela transaksi TERBARU (bukan
+		# terlama) -- aman untuk kalkulasi saldo berjalan di
+		# _attach_saldo_kas_kecil, karena "opening" balance-nya dihitung dari
+		# SUM seluruh GL Entry SEBELUM tanggal baris tertua di jendela ini,
+		# bukan diasumsikan 0.
 		journal_entries = frappe.db.sql(
 			f"""
 			SELECT name, posting_date, user_remark, total_debit
 			FROM `tabJournal Entry`
 			WHERE {where_clause}
+			ORDER BY posting_date DESC
+			LIMIT 5000
 			""",
 			values,
 			as_dict=1,
