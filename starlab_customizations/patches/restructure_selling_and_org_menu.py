@@ -14,6 +14,17 @@ import frappe
 # "ERPNext Settings" (Company/Letter Head/Department/Branch/User/Role Permissions/
 # Email Account) -- BUKAN Workspace terpisah bernama "Organization" (tidak ada di versi
 # ERPNext ini).
+#
+# Catatan koreksi: versi awal fungsi-fungsi di bawah ini juga memutasi
+# `workspace.sidebar_items` -- field itu TIDAK ADA di skema DocType Workspace pada
+# versi Frappe yang benar-benar ke-install di project ini (cuma ada number_cards,
+# charts, shortcuts, links, quick_lists, custom_blocks, roles), jadi selalu
+# AttributeError sejak awal ditulis, sebelum sempat menyimpan apa pun. Sidebar
+# switcher antar-Workspace di versi ini dibangun dari daftar dokumen Workspace itu
+# sendiri (parent_page/public/roles), bukan dari child table per-Workspace terpisah
+# -- jadi memutasi `links` saja (yang mengisi grid konten "Reports & Masters" di
+# dalam halaman Workspace) sudah cukup buat capai maksud aslinya, tanpa perlu
+# rekayasa "sidebar" terpisah yang memang tidak ada mekanismenya di versi ini.
 
 
 def execute():
@@ -58,30 +69,6 @@ def _restructure_selling():
 		new_links.append(link)
 	selling.links = new_links
 
-	# --- sidebar_items (nav kiri) -- section "POS" dibuang total (Section Break +
-	# semua child-nya), Price List/Coupon Code/Blanket Order/Pricing Rule dibuang dari
-	# section "Items & Pricing" (sidebar tidak punya flag "hidden" per-item seperti
-	# links, jadi buang = cara satu-satunya buat "sembunyikan" di sini), label Item &
-	# Item Group ikut diganti biar konsisten dengan links di atas.
-	new_sidebar = []
-	in_pos_section = False
-	for item in selling.sidebar_items:
-		if item.type == "Section Break":
-			in_pos_section = item.label == "POS"
-			if in_pos_section:
-				continue
-		elif in_pos_section:
-			continue
-
-		if item.label in ("Price List", "Coupon Code", "Blanket Order", "Pricing Rule"):
-			continue
-		if item.label == "Item" and item.link_to == "Item":
-			item.label = "Parameter"
-		elif item.label == "Item Group":
-			item.label = "Matriks"
-		new_sidebar.append(item)
-	selling.sidebar_items = new_sidebar
-
 	selling.save(ignore_permissions=True)
 
 
@@ -90,14 +77,23 @@ def _swap_branch_for_employee_list():
 		return
 	settings = frappe.get_doc("Workspace", "ERPNext Settings")
 
-	found_branch = False
-	for item in settings.sidebar_items:
-		if item.label == "Branch" and item.link_to == "Branch":
-			item.label = "Daftar Karyawan"
-			item.link_to = "Employee"
-			item.icon = "users-round"
-			found_branch = True
-			break
+	# Tidak ada entri "Branch" sama sekali di links Workspace ini pada versi
+	# Frappe/ERPNext yang ke-install di sini (dicek langsung ke data live, bukan
+	# diasumsikan) -- jadi tidak ada yang bisa "ditukar". Cukup tambahkan link ke
+	# Employee List kalau belum ada, sesuai maksud aslinya (shortcut ke Daftar
+	# Karyawan tersedia di section ini).
+	already_present = any(link.link_to == "Employee" for link in settings.links)
+	if already_present:
+		return
 
-	if found_branch:
-		settings.save(ignore_permissions=True)
+	settings.append(
+		"links",
+		{
+			"type": "Link",
+			"label": "Daftar Karyawan",
+			"icon": "users-round",
+			"link_type": "DocType",
+			"link_to": "Employee",
+		},
+	)
+	settings.save(ignore_permissions=True)
