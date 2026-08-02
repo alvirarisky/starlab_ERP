@@ -28,6 +28,19 @@ ROLE_HOME_WORKSPACE = {
 }
 
 
+@frappe.whitelist()
+def get_my_workspace_route():
+	# Dipanggil dari public/js/redirect_to_role_workspace.js -- get_home_page()
+	# di bawah cuma dipakai Frappe core untuk redirect SEKALI seusai submit
+	# form /login (lihat komentar di ROLE_HOME_WORKSPACE di atas). Kalau
+	# session sudah aktif (cookie belum di-clear) dan user buka /app atau
+	# /desk langsung tanpa lewat form login lagi, redirect itu tidak pernah
+	# kepanggil sama sekali -- SPA cuma nampilin Workspace publik default
+	# apa adanya. Endpoint ini dipanggil dari client tiap kali Desk baru
+	# dibuka supaya perilakunya konsisten juga untuk kasus itu.
+	return get_home_page(frappe.session.user)
+
+
 def get_home_page(user):
 	# Administrator secara sintetis punya SEMUA role (lihat
 	# frappe.permissions.get_roles()) -- kalau tidak dikecualikan, bakal
@@ -61,7 +74,57 @@ def get_home_page(user):
 FINANCE_REPORT_ACCESS = ["Accounts Receivable", "Bank Reconciliation Statement"]
 
 
+# 2026-08-02: ditemukan role bisnis (Marketing, Laboratorium, dkk) bisa lihat
+# sejumlah Workspace bawaan ERPNext/Frappe yang murni buat admin teknis (Build
+# = DocType/Workflow builder, Users = manajemen user & permission, dst) --
+# ini semua Workspace `roles: []` (tidak dibatasi sama sekali) sejak awal.
+# Dibatasi ke System Manager saja di sini (bukan `is_hidden`, supaya System
+# Manager/Administrator tetap bisa akses) -- dijalankan di after_migrate
+# (bukan patch sekali-jalan) karena Workspace bawaan ERPNext/Frappe ini
+# ke-reload/reset tiap `bench migrate` menjalankan sync module app
+# masing-masing, beda dari Workspace milik app kita sendiri yang aman dari
+# re-sync begitu `modified` ke-bump lewat save().
+SYSTEM_MANAGER_ONLY_WORKSPACES = [
+	"Build", "Users", "Website", "Support", "Integrations",
+	"Selling", "Invoicing", "Financial Reports",
+]
+
+
+def _restrict_admin_workspaces_to_system_manager():
+	for workspace in SYSTEM_MANAGER_ONLY_WORKSPACES:
+		if not frappe.db.exists("Workspace", workspace):
+			continue
+		doc = frappe.get_doc("Workspace", workspace)
+		if any(r.role == "System Manager" for r in doc.roles) and len(doc.roles) == 1:
+			continue
+		doc.roles = []
+		doc.append("roles", {"role": "System Manager"})
+		doc.save(ignore_permissions=True)
+
+
+# docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md -- keputusan resmi "dihapus
+# total dari menu" untuk 3 Workspace bawaan ini (SAI tidak manufaktur).
+# Re-assert di sini juga (bukan cuma di patch restructure_desk_modules) untuk
+# alasan yang sama seperti di atas -- ketahuan ke-reset balik ke is_hidden=0
+# setelah beberapa kali migrate, kemungkinan besar sync module erpnext
+# menimpanya lagi.
+FULLY_HIDDEN_WORKSPACES = ["Manufacturing", "Quality", "Stock"]
+
+
+def _rehide_manufacturing_quality_stock():
+	for workspace in FULLY_HIDDEN_WORKSPACES:
+		if not frappe.db.exists("Workspace", workspace):
+			continue
+		doc = frappe.get_doc("Workspace", workspace)
+		if not doc.is_hidden:
+			doc.is_hidden = 1
+			doc.save(ignore_permissions=True)
+
+
 def after_migrate():
+	_restrict_admin_workspaces_to_system_manager()
+	_rehide_manufacturing_quality_stock()
+
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):
 			continue
