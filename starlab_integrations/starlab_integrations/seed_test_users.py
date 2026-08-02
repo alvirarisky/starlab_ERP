@@ -41,16 +41,21 @@ def after_install():
 			continue
 
 		try:
-			frappe.get_doc(
-				{
-					"doctype": "User",
-					"email": email,
-					"first_name": full_name,
-					"send_welcome_email": 0,
-					"new_password": TEST_PASSWORD,
-					"roles": [{"role": role}],
-				}
-			).insert(ignore_permissions=True)
+			user_dict = {
+				"doctype": "User",
+				"email": email,
+				"first_name": full_name,
+				"send_welcome_email": 0,
+				"new_password": TEST_PASSWORD,
+				"roles": [{"role": role}],
+			}
+			# Nama Workspace per-role sama persis dengan nama role-nya sendiri
+			# (starlab_customizations/starlab_customizations/workspace/). Tanpa
+			# ini, login jatuh ke grid modul generik alih-alih Workspace role
+			# yang bersangkutan -- pernah kejadian di beberapa device.
+			if frappe.db.exists("Workspace", role):
+				user_dict["default_workspace"] = role
+			frappe.get_doc(user_dict).insert(ignore_permissions=True)
 		except Exception:
 			frappe.log_error(title="seed_test_users: gagal membuat user test")
 
