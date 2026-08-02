@@ -12,7 +12,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-29 09:00:00.000000",
+ "modified": "2026-08-02 18:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Histori Order per Klien",
@@ -30,6 +30,9 @@
   },
   {
    "role": "Marketing"
+  },
+  {
+   "role": "Administrasi"
   }
  ],
  "snapshot_report": 0,
