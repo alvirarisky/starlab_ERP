@@ -32,10 +32,17 @@ cd "$FD_DIR"
 # Windows checkouts of frappe_docker often get CRLF line endings on these
 # scripts (via core.autocrlf), which breaks their shebang inside the Linux
 # image (`exec ...: no such file or directory`). Normalize defensively.
-sed -i 's/\r$//' \
+# Note: -i.bak (suffix attached, no space) is the one in-place form that
+# GNU sed (Linux/Windows Git Bash) and BSD sed (macOS) both parse the same
+# way -- a bare `-i` needs a following arg on BSD sed, which silently eats
+# the script instead and corrupts the whole invocation.
+sed -i.bak 's/\r$//' \
   resources/core/main-entrypoint.sh \
   resources/core/nginx/nginx-entrypoint.sh \
   resources/core/start.sh
+rm -f resources/core/main-entrypoint.sh.bak \
+  resources/core/nginx/nginx-entrypoint.sh.bak \
+  resources/core/start.sh.bak
 
 if ! docker image inspect starlab-lab-ops:latest >/dev/null 2>&1; then
   echo "==> Building starlab-lab-ops image (first run only, this takes a while)"
