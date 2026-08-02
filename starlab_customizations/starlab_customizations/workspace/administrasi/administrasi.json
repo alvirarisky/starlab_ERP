@@ -6,7 +6,7 @@
    "label": "Tren Quotation Dibuat"
   }
  ],
- "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Selesai\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Menunggu Approval\", \"col\": 4}}, {\"id\": \"spacer-4\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-5\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-6\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Quotation Dibuat\", \"col\": 12}}, {\"id\": \"spacer-7\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-8\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Petty Cash Entry\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Client Inquiry\", \"col\": 3}}]",
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Selesai\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Petty Cash Menunggu Approval\", \"col\": 4}}, {\"id\": \"spacer-4\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-5\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-6\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Quotation Dibuat\", \"col\": 12}}, {\"id\": \"spacer-7\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-8\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-9\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-10\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Petty Cash Entry\", \"col\": 3}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Client Inquiry\", \"col\": 3}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sales Invoice\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample\", \"col\": 3}}, {\"id\": \"shortcut-15\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Rekap Work Order\", \"col\": 3}}, {\"id\": \"shortcut-16\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Histori Order per Klien\", \"col\": 3}}]",
  "creation": "2026-07-27 09:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -20,7 +20,7 @@
  "label": "Administrasi",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-07-29 09:00:00.000000",
+ "modified": "2026-08-02 18:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Customizations",
  "name": "Administrasi",
@@ -66,6 +66,28 @@
    "label": "Client Inquiry",
    "link_to": "Client Inquiry",
    "type": "DocType"
+  },
+  {
+   "label": "Sales Invoice",
+   "link_to": "Sales Invoice",
+   "type": "DocType"
+  },
+  {
+   "label": "Sample",
+   "link_to": "Sample",
+   "type": "DocType"
+  },
+  {
+   "label": "Rekap Work Order",
+   "link_to": "Rekap Work Order",
+   "report_ref_doctype": "Work Order Pengujian",
+   "type": "Report"
+  },
+  {
+   "label": "Histori Order per Klien",
+   "link_to": "Histori Order per Klien",
+   "report_ref_doctype": "Quotation",
+   "type": "Report"
   }
  ],
  "sidebar_items": [
