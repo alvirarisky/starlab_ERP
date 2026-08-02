@@ -49,6 +49,7 @@ def get_data(filters):
 		FROM `tabTest Result`
 		WHERE 1=1 {where_clause}
 		ORDER BY creation DESC
+		LIMIT 5000
 		""",
 		values,
 		as_dict=1,

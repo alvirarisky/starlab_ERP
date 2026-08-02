@@ -147,13 +147,17 @@ required_apps = ["erpnext", "starlab_quality"]
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+# Client Portal (starlab_integrations) memberi role Customer akses "read"
+# doctype-level ke LHU (lihat lhu.json permissions) supaya /status-klien
+# tidak PermissionError -- hook di bawah menutup row-level, supaya Customer
+# cuma bisa baca LHU milik company-nya sendiri, bukan LHU company lain.
+permission_query_conditions = {
+	"LHU": "starlab_lab_ops.lhu_hooks.get_permission_query_conditions",
+}
+
+has_permission = {
+	"LHU": "starlab_lab_ops.lhu_hooks.has_permission",
+}
 
 # Document Events
 # ---------------
@@ -208,7 +212,7 @@ fixtures = [
 		"dt": "Custom DocPerm",
 		"filters": [
 			["parent", "in", ["Work Order Pengujian", "Sample", "Test Result", "LHU"]],
-			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance", "Manajer Mutu"]],
+			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance", "Manajer Mutu", "Customer"]],
 		],
 	},
 	{

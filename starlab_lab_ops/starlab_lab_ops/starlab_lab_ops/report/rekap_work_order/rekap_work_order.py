@@ -60,6 +60,7 @@ def get_data(filters):
 		INNER JOIN `tabWO Parameter Detail` d ON d.parent = wo.name
 		WHERE 1=1 {where_clause}
 		ORDER BY wo.tanggal_wo DESC, wo.name
+		LIMIT 5000
 		""",
 		values,
 		as_dict=1,

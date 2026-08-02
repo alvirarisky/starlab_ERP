@@ -12,19 +12,25 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-23 16:52:23.829896",
+ "modified": "2026-08-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Lab Ops",
  "name": "Rekap Stok Reagen dan Consumable",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "\nSELECT\n\ti.item_code as \"Kode Item:Link/Item:120\",\n\ti.item_name as \"Nama Item::200\",\n\ti.item_group as \"Item Group::120\",\n\tr.warehouse as \"Warehouse:Link/Warehouse:150\",\n\tIFNULL(b.actual_qty, 0) as \"Stok Saat Ini:Float:110\",\n\tr.warehouse_reorder_level as \"Reorder Level:Float:110\",\n\ti.stock_uom as \"UOM::80\"\nFROM `tabItem` i\nINNER JOIN `tabItem Reorder` r ON r.parent = i.name\nLEFT JOIN `tabBin` b ON b.item_code = i.item_code AND b.warehouse = r.warehouse\nWHERE\n\t(%(item_group)s = '' OR i.item_group = %(item_group)s)\n\tAND (%(warehouse)s = '' OR r.warehouse = %(warehouse)s)\nORDER BY i.item_code\n",
+ "query": "\nSELECT\n\ti.item_code as \"Kode Item:Link/Item:120\",\n\ti.item_name as \"Nama Item::200\",\n\ti.item_group as \"Item Group::120\",\n\tr.warehouse as \"Warehouse:Link/Warehouse:150\",\n\tIFNULL(b.actual_qty, 0) as \"Stok Saat Ini:Float:110\",\n\tr.warehouse_reorder_level as \"Reorder Level:Float:110\",\n\ti.stock_uom as \"UOM::80\"\nFROM `tabItem` i\nINNER JOIN `tabItem Reorder` r ON r.parent = i.name\nLEFT JOIN `tabBin` b ON b.item_code = i.item_code AND b.warehouse = r.warehouse\nWHERE\n\t(%(item_group)s = '' OR i.item_group = %(item_group)s)\n\tAND (%(warehouse)s = '' OR r.warehouse = %(warehouse)s)\nORDER BY i.item_code\nLIMIT 5000\n",
  "ref_doctype": "Item",
  "report_name": "Rekap Stok Reagen dan Consumable",
  "report_type": "Query Report",
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "Laboratorium"
+  },
+  {
+   "role": "Manajer Teknis"
   }
  ],
  "snapshot_report": 0,

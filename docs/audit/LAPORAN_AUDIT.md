@@ -6,6 +6,8 @@
 **Metode:** Static review (kode, DocType JSON, fixtures, workflow) **dikombinasikan** dengan verifikasi fungsional langsung ke instance yang benar-benar hidup — permission disimulasikan per-role lewat `frappe.has_permission()` untuk 7 role custom x 26 DocType, workflow state-machine dibaca langsung dari DB, dan satu skenario bypass-workflow dicoba dieksekusi langsung di console.
 **Pembanding:** Audit internal sebelumnya (`docs/audit-sebelum-sprint-5.md`, 2026-07-26) dan `docs/keputusan_bisnis_terbaru.md` (jawaban stakeholder, dikumpulkan 2026-07-30).
 
+> **Update 2026-08-02 malam:** Semua temuan kode di bawah ini (Critical/High/Medium yang bukan soal keputusan bisnis/UX manual) **sudah diperbaiki, di-migrate, dan diverifikasi ulang live** terhadap instance yang sama. Status per-item ada di `docs/audit/CHECKLIST_TESTING.md` (ditandai ✅). Laporan di bawah ini dibiarkan apa adanya sebagai catatan kondisi SEBELUM perbaikan — untuk status terkini, rujuk checklist tersebut.
+
 > Catatan metodologi: environment ini tidak punya browser/UI automation yang tersedia untuk saya, jadi "functional review" di sini berarti login disimulasikan lewat session Frappe asli (`frappe.set_user(...)` + `has_permission`/`get_all` dengan permission check aktif, BUKAN `ignore_permissions`) terhadap data yang benar-benar ada di database instance ini — bukan tebakan dari baca kode saja. ​Untuk verifikasi visual (layout rusak, print PDF terlihat rapi, dsb.), silakan tim tetap lakukan pengecekan mata langsung di browser besok; itu di luar apa yang bisa saya konfirmasi dari sini.
 
 ---
