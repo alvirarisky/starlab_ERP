@@ -74,13 +74,15 @@ def send_whatsapp_message(mobile_no: str, message: str) -> bool:
 		return False
 
 
-@frappe.whitelist()
-def notify_role_via_whatsapp(role: str, message: str) -> None:
-	"""Dipanggil dari app lain (starlab_customizations/starlab_lab_ops/
-	starlab_quality) sebagai channel TAMBAHAN di samping Email/Notification
-	Log yang sudah ada -- lihat masing-masing _notify_role di app tersebut.
-	Nomor tujuan diambil dari mobile_no Employee milik user yang pegang
-	role tsb (TSD Bagian 11)."""
+def _notify_role_via_whatsapp(role: str, message: str) -> None:
+	"""Logika inti -- dipanggil LANGSUNG (bukan lewat HTTP) oleh kode
+	server-side lain (mis. starlab_customizations.tasks._notify_role) yang
+	sudah menentukan sendiri role/isi pesannya sebagai bagian dari alur
+	bisnis normal (approval pending, SLA, dst.). Nomor tujuan diambil dari
+	mobile_no Employee milik user yang pegang role tsb (TSD Bagian 11).
+	Tidak ada pengecekan permission di sini dengan sengaja -- pemanggil
+	server-side ini sudah trusted by design. Untuk endpoint yang bisa
+	dipanggil user dari luar, lihat notify_role_via_whatsapp di bawah."""
 	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
 	if not users:
 		return
@@ -91,3 +93,16 @@ def notify_role_via_whatsapp(role: str, message: str) -> None:
 	for mobile_no in mobile_numbers:
 		if mobile_no:
 			send_whatsapp_message(mobile_no, message)
+
+
+@frappe.whitelist()
+def notify_role_via_whatsapp(role: str, message: str) -> None:
+	"""Endpoint HTTP untuk trigger broadcast WhatsApp manual ke seluruh
+	pemegang suatu role, dengan role & isi pesan bebas dari pemanggil --
+	dibatasi ke role yang memang berwenang broadcast manual, supaya user
+	biasa yang sekadar login tidak bisa memicu pengiriman WhatsApp berbayar
+	ke role manapun dengan pesan bebas. Notifikasi OTOMATIS dari alur bisnis
+	(approval pending, SLA, dst.) tidak lewat sini -- itu memanggil
+	_notify_role_via_whatsapp langsung, lihat starlab_customizations.tasks."""
+	frappe.only_for(["System Manager", "Direksi", "Manajer Mutu"])
+	_notify_role_via_whatsapp(role, message)
