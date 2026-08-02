@@ -12,8 +12,21 @@ def _safe_sendmail(recipients, subject, message):
 		frappe.log_error(title="Gagal mengirim notifikasi email", message=frappe.get_traceback())
 
 
-def _notify_role(role, subject, message):
-	users = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+def _get_role_users(role, cache):
+	# Cache per-role dalam satu eksekusi scheduled job -- menghindari query
+	# "Has Role" berulang untuk role yang sama di setiap baris loop
+	# (check_sample_deadline_mendekat/terlewat, check_sample_retensi).
+	if role not in cache:
+		cache[role] = frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+	return cache[role]
+
+
+def _notify_role(role, subject, message, role_users_cache=None):
+	users = (
+		_get_role_users(role, role_users_cache)
+		if role_users_cache is not None
+		else frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent")
+	)
 	if not users:
 		return
 	_safe_sendmail(users, subject, message)
@@ -33,15 +46,30 @@ def check_sample_deadline_mendekat():
 		},
 		fields=["parent", "parameter", "pj_analis", "target_pengujian"],
 	)
+	if not rows:
+		return
+
+	# Batch-fetch Employee->user_id sekali untuk semua PJ Analis yang muncul,
+	# alih-alih satu query get_value per baris.
+	pj_analis_names = {row.pj_analis for row in rows if row.pj_analis}
+	user_id_by_employee = (
+		{
+			e.name: e.user_id
+			for e in frappe.get_all(
+				"Employee", filters={"name": ["in", list(pj_analis_names)]}, fields=["name", "user_id"]
+			)
+		}
+		if pj_analis_names
+		else {}
+	)
+	role_users_cache = {}
+	manajer_teknis_users = _get_role_users("Manajer Teknis", role_users_cache)
+
 	for row in rows:
-		users = []
-		if row.pj_analis:
-			user_id = frappe.db.get_value("Employee", row.pj_analis, "user_id")
-			if user_id:
-				users.append(user_id)
-		users += frappe.get_all(
-			"Has Role", filters={"role": "Manajer Teknis", "parenttype": "User"}, pluck="parent"
-		)
+		users = list(manajer_teknis_users)
+		user_id = user_id_by_employee.get(row.pj_analis)
+		if user_id:
+			users.append(user_id)
 		if not users:
 			continue
 		_safe_sendmail(
@@ -66,6 +94,7 @@ def check_sample_deadline_terlewat():
 	)
 	if not rows:
 		return
+	role_users_cache = {}
 	for row in rows:
 		_notify_role(
 			"Manajer Teknis",
@@ -73,6 +102,7 @@ def check_sample_deadline_terlewat():
 			frappe._(
 				"Work Order {0}, parameter {1}: target pengujian {2} sudah terlewat dan belum selesai."
 			).format(row.parent, row.parameter, row.target_pengujian),
+			role_users_cache,
 		)
 		_notify_role(
 			"Direksi",
@@ -80,6 +110,7 @@ def check_sample_deadline_terlewat():
 			frappe._(
 				"Work Order {0}, parameter {1}: target pengujian {2} sudah terlewat dan belum selesai."
 			).format(row.parent, row.parameter, row.target_pengujian),
+			role_users_cache,
 		)
 
 
@@ -94,9 +125,14 @@ def check_sample_retensi():
 	)
 	if not samples:
 		return
+	role_users_cache = {}
 	for sample in samples:
 		message = frappe._(
 			"Sample {0}: retensi sudah jatuh tempo sejak {1}, siap diproses pemusnahan."
 		).format(sample.name, sample.tanggal_musnah)
-		_notify_role("Laboratorium", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message)
-		_notify_role("Manajer Teknis", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message)
+		_notify_role(
+			"Laboratorium", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message, role_users_cache
+		)
+		_notify_role(
+			"Manajer Teknis", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message, role_users_cache
+		)

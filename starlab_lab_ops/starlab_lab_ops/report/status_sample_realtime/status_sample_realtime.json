@@ -12,19 +12,28 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-23 16:45:30.836849",
+ "modified": "2026-08-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Lab Ops",
  "name": "Status Sample Realtime",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "\nSELECT\n\tname as \"Sample:Link/Sample:120\",\n\twork_order as \"Work Order:Link/Work Order Pengujian:150\",\n\tmatriks as \"Matriks::120\",\n\ttanggal_terima as \"Tanggal Terima:Date:110\",\n\tstatus as \"Status::110\",\n\tretensi as \"Retensi::100\",\n\ttanggal_musnah as \"Tanggal Musnah:Date:110\"\nFROM `tabSample`\nWHERE\n\t(%(status)s = '' OR status = %(status)s)\n\tAND (%(matriks)s = '' OR matriks = %(matriks)s)\n\tAND (%(work_order)s = '' OR work_order = %(work_order)s)\nORDER BY tanggal_terima DESC\n",
+ "query": "\nSELECT\n\tname as \"Sample:Link/Sample:120\",\n\twork_order as \"Work Order:Link/Work Order Pengujian:150\",\n\tmatriks as \"Matriks::120\",\n\ttanggal_terima as \"Tanggal Terima:Date:110\",\n\tstatus as \"Status::110\",\n\tretensi as \"Retensi::100\",\n\ttanggal_musnah as \"Tanggal Musnah:Date:110\"\nFROM `tabSample`\nWHERE\n\t(%(status)s = '' OR status = %(status)s)\n\tAND (%(matriks)s = '' OR matriks = %(matriks)s)\n\tAND (%(work_order)s = '' OR work_order = %(work_order)s)\nORDER BY tanggal_terima DESC\nLIMIT 5000\n",
  "ref_doctype": "Sample",
  "report_name": "Status Sample Realtime",
  "report_type": "Query Report",
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "Laboratorium"
+  },
+  {
+   "role": "Manajer Teknis"
+  },
+  {
+   "role": "Administrasi"
   }
  ],
  "snapshot_report": 0,

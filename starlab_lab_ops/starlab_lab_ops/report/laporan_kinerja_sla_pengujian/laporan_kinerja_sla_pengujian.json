@@ -12,7 +12,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-23 16:53:15.332560",
+ "modified": "2026-08-02 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Lab Ops",
  "name": "Laporan Kinerja SLA Pengujian",
@@ -24,6 +24,12 @@
  "roles": [
   {
    "role": "System Manager"
+  },
+  {
+   "role": "Manajer Teknis"
+  },
+  {
+   "role": "Direksi"
   }
  ],
  "snapshot_report": 0,

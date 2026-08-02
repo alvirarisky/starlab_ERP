@@ -48,23 +48,33 @@ def get_data(filters):
 		FROM `tabWO Parameter Detail` d
 		WHERE 1=1 {where_clause}
 		ORDER BY d.target_pengujian DESC
+		LIMIT 5000
 		""",
 		values,
 		as_dict=1,
 	)
+	if not rows:
+		return []
+
+	# Tanggal selesai aktual per (work_order, parameter) di-batch sekali di
+	# sini, bukan satu query MIN(creation) per baris WO Parameter Detail --
+	# sebelumnya N+1 (satu query Test Result per baris hasil).
+	work_orders = list({row["work_order"] for row in rows})
+	selesai_rows = frappe.db.sql(
+		"""
+		SELECT work_order, parameter, MIN(creation) AS selesai
+		FROM `tabTest Result`
+		WHERE work_order IN %(work_orders)s
+		GROUP BY work_order, parameter
+		""",
+		{"work_orders": work_orders},
+		as_dict=1,
+	)
+	selesai_by_wo_parameter = {(r.work_order, r.parameter): r.selesai for r in selesai_rows}
 
 	result = []
 	for row in rows:
-		actual = frappe.db.sql(
-			"""
-			SELECT MIN(tr.creation) AS selesai
-			FROM `tabTest Result` tr
-			WHERE tr.work_order = %(work_order)s AND tr.parameter = %(parameter)s
-			""",
-			{"work_order": row["work_order"], "parameter": row["parameter"]},
-			as_dict=1,
-		)
-		selesai = actual[0]["selesai"] if actual else None
+		selesai = selesai_by_wo_parameter.get((row["work_order"], row["parameter"]))
 		tanggal_selesai_aktual = selesai.date() if selesai else None
 
 		if not tanggal_selesai_aktual:
