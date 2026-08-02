@@ -28,7 +28,12 @@ required_apps = ["starlab_lab_ops"]
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/starlab_customizations/css/starlab_customizations.css"
-# app_include_js = "/assets/starlab_customizations/js/starlab_customizations.js"
+#
+# Lihat komentar di public/js/redirect_to_role_workspace.js -- install.py's
+# get_home_page cuma nyala sekali seusai submit form /login; kalau session
+# masih aktif dan Desk dibuka langsung tanpa lewat login lagi, redirect itu
+# tidak pernah kepanggil. Skrip ini menutup celah itu di app_ready.
+app_include_js = "/assets/starlab_customizations/js/redirect_to_role_workspace.js"
 
 # include js, css files in header of web template
 #
@@ -243,6 +248,25 @@ fixtures = [
 		"dt": "Custom DocPerm",
 		"filters": [
 			["parent", "=", "Page"],
+			["role", "=", "All"],
+		],
+	},
+	{
+		# User doctype defaultnya cuma "read" ke System Manager di instance ini
+		# (bukan default Frappe/ERPNext standar) -- hampir semua data seed
+		# dimiliki (owner) "Administrator", jadi widget apapun yang coba
+		# resolve identitas user LAIN (Assign To, "Dibuat oleh"/"Diubah oleh"
+		# di timeline & list view, dst.) kena 403 "No permission for User"
+		# untuk role custom manapun begitu mereka lihat dokumen bukan
+		# buatannya sendiri -- baca profil sendiri tetap selalu boleh (Frappe
+		# core punya exception bawaan untuk itu), yang gak boleh cuma profil
+		# ORANG LAIN. Fix: read-only ke role "All", persis default Frappe
+		# stock -- field sensitif (API key dkk) tetap terkunci System
+		# Manager karena ada di permlevel 1 terpisah, tidak tersentuh baris
+		# ini (permlevel 0).
+		"dt": "Custom DocPerm",
+		"filters": [
+			["parent", "=", "User"],
 			["role", "=", "All"],
 		],
 	},
