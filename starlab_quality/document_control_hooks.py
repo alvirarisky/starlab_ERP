@@ -93,9 +93,9 @@ def _notify_distribution(doc):
 	if not roles:
 		return
 
-	users = set()
-	for role in roles:
-		users.update(frappe.get_all("Has Role", filters={"role": role, "parenttype": "User"}, pluck="parent"))
+	users = set(
+		frappe.get_all("Has Role", filters={"role": ["in", list(roles)], "parenttype": "User"}, pluck="parent")
+	)
 	users.discard("Administrator")
 	users.discard("Guest")
 	if not users:
