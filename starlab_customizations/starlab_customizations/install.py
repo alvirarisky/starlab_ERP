@@ -22,7 +22,13 @@ ROLE_HOME_WORKSPACE = {
 	"Marketing": "desk/marketing",
 	"Administrasi": "desk/administrasi",
 	"Finance": "desk/finance",
-	"Laboratorium": "desk/laboratorium",
+	# 2026-08-03: Workspace "Laboratorium" dihapus, digabung ke "LIMS" --
+	# kontennya sudah nyaris superset Laboratorium dari awal (Work Order,
+	# Sample, Test Result, LHU semua sudah ada di sana), jadi role Laboratorium
+	# diarahkan langsung ke LIMS alih-alih punya Workspace kosong terpisah.
+	# LIMS sendiri sekarang dibatasi roles ke Laboratorium + Manajer Teknis
+	# saja (sebelumnya publik/tanpa batasan role sebagai "domain overview").
+	"Laboratorium": "desk/lims",
 	"Manajer Teknis": "desk/manajer-teknis",
 	"Manajer Mutu": "desk/manajer-mutu",
 }

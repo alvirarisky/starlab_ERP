@@ -8,6 +8,15 @@ import frappe
 # jadi taruh di app manapun sebelum starlab_customizations bakal kepanggil
 # sebelum role-role custom itu ada. Taruh di app terakhir = satu-satunya cara
 # mastiin semua Role dari app lain sudah pasti ke-sync duluan.
+# 2026-08-03: Workspace "Laboratorium" dihapus (digabung ke "LIMS", lihat
+# starlab_customizations/install.py::ROLE_HOME_WORKSPACE) -- nama Workspace-nya
+# gak lagi sama persis dengan nama role utk kasus ini, jadi butuh pengecualian
+# eksplisit di sini juga (lookup di bawah defaultnya asumsi nama Workspace ==
+# nama Role, lihat komentar di dalam loop).
+DEFAULT_WORKSPACE_OVERRIDE = {
+	"Laboratorium": "LIMS",
+}
+
 TEST_PASSWORD = "Test@12345"
 TEST_USERS = [
 	("direksi.test@example.com", "Direksi Test", "Direksi"),
@@ -49,12 +58,14 @@ def after_install():
 				"new_password": TEST_PASSWORD,
 				"roles": [{"role": role}],
 			}
-			# Nama Workspace per-role sama persis dengan nama role-nya sendiri
-			# (starlab_customizations/starlab_customizations/workspace/). Tanpa
-			# ini, login jatuh ke grid modul generik alih-alih Workspace role
-			# yang bersangkutan -- pernah kejadian di beberapa device.
-			if frappe.db.exists("Workspace", role):
-				user_dict["default_workspace"] = role
+			# Nama Workspace per-role biasanya sama persis dengan nama role-nya
+			# sendiri (starlab_customizations/starlab_customizations/workspace/),
+			# kecuali yang eksplisit di-override di DEFAULT_WORKSPACE_OVERRIDE.
+			# Tanpa ini, login jatuh ke grid modul generik alih-alih Workspace
+			# role yang bersangkutan -- pernah kejadian di beberapa device.
+			workspace_name = DEFAULT_WORKSPACE_OVERRIDE.get(role, role)
+			if frappe.db.exists("Workspace", workspace_name):
+				user_dict["default_workspace"] = workspace_name
 			frappe.get_doc(user_dict).insert(ignore_permissions=True)
 		except Exception:
 			frappe.log_error(title="seed_test_users: gagal membuat user test")
