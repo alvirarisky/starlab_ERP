@@ -31,6 +31,7 @@ ROLE_HOME_WORKSPACE = {
 	"Laboratorium": "desk/lims",
 	"Manajer Teknis": "desk/manajer-teknis",
 	"Manajer Mutu": "desk/manajer-mutu",
+	"HR": "desk/hr",
 }
 
 
@@ -93,6 +94,25 @@ FINANCE_REPORT_ACCESS = ["Accounts Receivable", "Bank Reconciliation Statement"]
 SYSTEM_MANAGER_ONLY_WORKSPACES = [
 	"Build", "Users", "Website", "Support", "Integrations",
 	"Selling", "Invoicing", "Financial Reports",
+	# 2026-08-03: 8 Workspace bawaan app `hrms` (github.com/frappe/hrms) --
+	# sama seperti Workspace bawaan ERPNext di atas, ini juga `roles: []`
+	# (tidak dibatasi) begitu di-install, jadi kelihatan ke SEMUA role
+	# termasuk yang non-HR. Kita pakai 1 Workspace "HR" custom sendiri
+	# (starlab_customizations/.../workspace/hr/) sebagai satu-satunya
+	# dashboard HR, konsisten dengan pola role lain di project ini --
+	# 8 Workspace bawaan ini didisain ulang cakupannya ke System Manager
+	# saja, bukan dihapus/is_hidden, supaya tetap bisa dibuka manual kalau
+	# ada kebutuhan admin/debug yang butuh tampilan asli hrms.
+	"Expenses", "HR Setup", "Leaves", "Recruitment",
+	"Shift & Attendance", "Payroll", "Tax & Benefits",
+	# "Performance" & "Tenure" TIDAK di sini -- 2026-08-03 dikonfirmasi gak
+	# kepake sama sekali, jadi disembunyikan total lewat is_hidden (lihat
+	# FULLY_HIDDEN_WORKSPACES di bawah), bukan cuma dibatasi ke System Manager.
+	# "Home"/"ERPNext Settings" (module "Setup") baru kelihatan bocor sejak
+	# role "HR" ditambahkan -- role HR ini yang pertama dari 7 role bisnis
+	# yang punya akses ke DocType bermodule "Setup" (Employee), jadi baru
+	# sekarang celah modul "Setup" ini kena.
+	"Home", "ERPNext Settings",
 ]
 
 
@@ -109,15 +129,17 @@ def _restrict_admin_workspaces_to_system_manager():
 
 
 # docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md -- keputusan resmi "dihapus
-# total dari menu" untuk 3 Workspace bawaan ini (SAI tidak manufaktur).
-# Re-assert di sini juga (bukan cuma di patch restructure_desk_modules) untuk
-# alasan yang sama seperti di atas -- ketahuan ke-reset balik ke is_hidden=0
-# setelah beberapa kali migrate, kemungkinan besar sync module erpnext
-# menimpanya lagi.
-FULLY_HIDDEN_WORKSPACES = ["Manufacturing", "Quality", "Stock"]
+# total dari menu" untuk 3 Workspace bawaan ERPNext ini (SAI tidak manufaktur).
+# "Performance"/"Tenure" (bawaan app hrms) ditambahkan 2026-08-03 dengan
+# alasan sama -- dikonfirmasi gak kepake sama sekali. Re-assert di sini juga
+# (bukan cuma di patch restructure_desk_modules untuk 3 yang pertama) untuk
+# alasan yang sama seperti SYSTEM_MANAGER_ONLY_WORKSPACES di atas -- ketahuan
+# ke-reset balik ke is_hidden=0 setelah beberapa kali migrate, kemungkinan
+# besar sync module app masing-masing (erpnext/hrms) menimpanya lagi.
+FULLY_HIDDEN_WORKSPACES = ["Manufacturing", "Quality", "Stock", "Performance", "Tenure"]
 
 
-def _rehide_manufacturing_quality_stock():
+def _rehide_unused_workspaces():
 	for workspace in FULLY_HIDDEN_WORKSPACES:
 		if not frappe.db.exists("Workspace", workspace):
 			continue
@@ -129,7 +151,7 @@ def _rehide_manufacturing_quality_stock():
 
 def after_migrate():
 	_restrict_admin_workspaces_to_system_manager()
-	_rehide_manufacturing_quality_stock()
+	_rehide_unused_workspaces()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):

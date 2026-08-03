@@ -205,7 +205,7 @@ fixtures = [
 	{
 		"dt": "Role",
 		"filters": [
-			["name", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi", "Laboratorium"]]
+			["name", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi", "Laboratorium", "HR"]]
 		],
 	},
 	{
@@ -268,6 +268,29 @@ fixtures = [
 		"filters": [
 			["parent", "=", "User"],
 			["role", "=", "All"],
+		],
+	},
+	{
+		# Role "HR" -- akses ke DocType modul HR/Payroll bawaan app `hrms`
+		# (github.com/frappe/hrms, required_apps erpnext), BUKAN DocType custom
+		# project ini sendiri. Dipisah dari entry Custom DocPerm business-doctype
+		# di atas (yang isinya DocType starlab_customizations) supaya gak
+		# nyampur dua kategori DocType yang beda sumbernya. Payroll sengaja
+		# cuma akses menu/CRUD DocType -- TIDAK ada Salary Structure/pemetaan
+		# akun GL (butuh Chart of Account riil dari Finance dulu, sama seperti
+		# kasus akun "Beban Operasional Kantor" placeholder di Petty Cash).
+		# Approval pakai mekanisme bawaan hrms (Leave Application.leave_approver,
+		# Payroll Entry submit/cancel biasa) -- bukan Frappe Workflow custom.
+		"dt": "Custom DocPerm",
+		"filters": [
+			["parent", "in", [
+				"Employee", "Attendance",
+				"Leave Application", "Leave Type", "Leave Allocation",
+				"Payroll Entry", "Salary Slip", "Salary Structure", "Salary Structure Assignment", "Salary Component",
+				"Training Event", "Training Program", "Training Result", "Training Feedback",
+				"Appraisal", "Appraisal Template", "Goal",
+			]],
+			["role", "=", "HR"],
 		],
 	},
 	{
