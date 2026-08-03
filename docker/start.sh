@@ -23,6 +23,30 @@ if [ ! -f "$DOCKER_DIR/custom.env" ]; then
   cp "$DOCKER_DIR/custom.env.example" "$DOCKER_DIR/custom.env"
 fi
 
+# docker/apps.json points our 4 custom apps at separate GitHub branches
+# (app-starlab-lab-ops, app-starlab-customizations, app-starlab-quality,
+# app-starlab-integrations) instead of `develop` directly -- bench get-app
+# (called via apps.json during the image build below) needs each custom app
+# as its own standalone repo/branch, but these apps are just subdirectories
+# of this monorepo, so they have to be split out. Without re-splitting them
+# from the CURRENT develop on every run, those branches silently go stale --
+# a `git pull` on this repo never touches them, so a device building the
+# image from scratch would install old app code no matter how up to date
+# their local checkout is. Re-split + force-push them here, every run, so
+# the image build a few steps down always matches what's actually in this
+# working tree right now.
+echo "==> Re-syncing app-starlab-* branches with current $(git -C "$APP_ROOT" rev-parse --abbrev-ref HEAD)"
+SUBTREE_PAIRS="starlab_lab_ops:app-starlab-lab-ops starlab_customizations:app-starlab-customizations starlab_quality:app-starlab-quality starlab_integrations:app-starlab-integrations"
+for pair in $SUBTREE_PAIRS; do
+  dir="${pair%%:*}"
+  branch="${pair##*:}"
+  echo "    - $dir -> origin/$branch"
+  git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null 2>&1 || true
+  git -C "$APP_ROOT" subtree split --prefix="$dir" -b _subtree_sync_tmp >/dev/null
+  git -C "$APP_ROOT" push origin _subtree_sync_tmp:refs/heads/"$branch" --force
+  git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null
+done
+
 echo "==> Syncing apps.json / custom.env into the frappe_docker checkout"
 cp "$DOCKER_DIR/apps.json" "$FD_DIR/apps.json"
 cp "$DOCKER_DIR/custom.env" "$FD_DIR/custom.env"
@@ -44,19 +68,21 @@ rm -f resources/core/main-entrypoint.sh.bak \
   resources/core/nginx/nginx-entrypoint.sh.bak \
   resources/core/start.sh.bak
 
-if ! docker image inspect starlab-lab-ops:latest >/dev/null 2>&1; then
-  echo "==> Building starlab-lab-ops image (first run only, this takes a while)"
-  docker build \
-    --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
-    --build-arg=FRAPPE_BRANCH=version-16 \
-    --build-arg=CACHE_BUST="$(date +%s)" \
-    --secret=id=apps_json,src=apps.json \
-    --tag=starlab-lab-ops:latest \
-    --file=images/layered/Containerfile .
-else
-  echo "==> starlab-lab-ops image already built, skipping build"
-  echo "    (edit docker/apps.json and delete the image manually to force a rebuild)"
-fi
+# Always rebuilt (no more "skip if image already exists") -- the whole point
+# of the subtree re-sync above is that the image must always reflect the
+# CURRENT repo state. Skipping the build whenever a same-tagged image already
+# existed was exactly how devices ended up running stale app code despite
+# `git pull`. CACHE_BUST forces bench get-app to re-clone every app fresh
+# from the branches just pushed above; `docker compose up -d` further down
+# recreates any container whose image actually changed.
+echo "==> Building starlab-lab-ops image (always rebuilt, to guarantee it matches the repo right now)"
+docker build \
+  --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
+  --build-arg=FRAPPE_BRANCH=version-16 \
+  --build-arg=CACHE_BUST="$(date +%s)" \
+  --secret=id=apps_json,src=apps.json \
+  --tag=starlab-lab-ops:latest \
+  --file=images/layered/Containerfile .
 
 echo "==> Generating compose.custom.yaml"
 docker compose --env-file custom.env \
