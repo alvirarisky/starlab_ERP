@@ -8,7 +8,23 @@ def _ensure_designation(name):
 		frappe.get_doc({"doctype": "Designation", "designation_name": name}).insert(ignore_permissions=True)
 
 
+def _ensure_territory(name):
+	# Site baru dari `bench new-site` tanpa Setup Wizard tidak otomatis
+	# membuat Territory per-negara (itu bagian dari Setup Wizard, bukan
+	# `new-site` -- lihat juga catatan Company/Setup Wizard di panduan
+	# setup). Tanpa ini, seed_customers() gagal dengan
+	# "Could not find Territory: Indonesia" begitu Setup Wizard dilewati.
+	if not frappe.db.exists("Territory", name):
+		frappe.get_doc({
+			"doctype": "Territory",
+			"territory_name": name,
+			"parent_territory": "All Territories",
+			"is_group": 0,
+		}).insert(ignore_permissions=True)
+
+
 def seed_customers():
+	_ensure_territory("Indonesia")
 	customers = [
 		"PT Enviro Jaya Lestari",
 		"PT Tirta Bening Nusantara",
@@ -38,6 +54,10 @@ def seed_employees():
 		("Administrasi", "Administrasi", "Rina Marlina", "Female", "1993-09-30"),
 		("Finance", "Finance", "Hendra Gunawan", "Male", "1988-05-17"),
 		("Marketing", "Marketing", "Fajar Nugroho", "Male", "1991-12-01"),
+		# 2026-08-03: pasangan Employee utk role "HR" (lihat starlab_customizations
+		# ROLE_HOME_WORKSPACE + seed_test_users.py) -- tanpa ini hr.test@example.com
+		# tidak bisa ditautkan ke Employee manapun di Langkah linking akun test.
+		("HR", "HR", "Yuni Astuti", "Female", "1987-04-22"),
 	]
 	for designation, _role_label, full_name, gender, dob in roles:
 		_ensure_designation(designation)
