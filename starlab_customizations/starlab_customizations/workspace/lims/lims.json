@@ -1,7 +1,12 @@
 {
  "app": "starlab_customizations",
- "charts": [],
- "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Belum Diuji\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Sedang Diuji\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Test Result Menunggu Validasi\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"LHU Draft Menunggu Diterbitkan\", \"col\": 4}}, {\"id\": \"spacer-5\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-6\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Papan Kanban</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample \\u2014 Kanban\", \"col\": 4}}, {\"id\": \"shortcut-8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian \\u2014 Kanban\", \"col\": 4}}, {\"id\": \"spacer-9\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-10\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample\", \"col\": 3}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Result\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Parameter\", \"col\": 3}}, {\"id\": \"shortcut-15\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"LHU\", \"col\": 3}}]",
+ "charts": [
+  {
+   "chart_name": "Tren Sample Diterima",
+   "label": "Tren Sample Diterima"
+  }
+ ],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Belum Diuji\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Sample Sedang Diuji\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Test Result Menunggu Validasi\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"LHU Draft Menunggu Diterbitkan\", \"col\": 4}}, {\"id\": \"number_card-lab1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"WO Draft Menunggu Approval\", \"col\": 4}}, {\"id\": \"spacer-5\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-lab1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Tren</b></span>\", \"col\": 12}}, {\"id\": \"chart-lab1\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Tren Sample Diterima\", \"col\": 12}}, {\"id\": \"header-6\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Papan Kanban</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-7\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample \\u2014 Kanban\", \"col\": 4}}, {\"id\": \"shortcut-8\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian \\u2014 Kanban\", \"col\": 4}}, {\"id\": \"spacer-9\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-10\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-11\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Work Order Pengujian\", \"col\": 3}}, {\"id\": \"shortcut-12\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Sample\", \"col\": 3}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Result\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Test Parameter\", \"col\": 3}}, {\"id\": \"shortcut-15\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"LHU\", \"col\": 3}}, {\"id\": \"shortcut-lab1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Rekap Stok Reagen dan Consumable\", \"col\": 3}}, {\"id\": \"shortcut-lab2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Status Sample Realtime\", \"col\": 3}}]",
  "creation": "2026-07-29 09:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -15,7 +20,7 @@
  "label": "LIMS",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-08-03 00:00:00.000000",
+ "modified": "2026-08-03 01:00:00.000000",
  "modified_by": "Administrator",
  "module": "Starlab Lab Ops",
  "name": "LIMS",
@@ -35,13 +40,24 @@
   {
    "label": "LHU Draft Menunggu Diterbitkan",
    "number_card_name": "LHU Draft Menunggu Diterbitkan"
+  },
+  {
+   "label": "WO Draft Menunggu Approval",
+   "number_card_name": "WO Draft Menunggu Approval"
   }
  ],
  "owner": "Administrator",
  "parent_page": "",
  "public": 1,
  "quick_lists": [],
- "roles": [],
+ "roles": [
+  {
+   "role": "Laboratorium"
+  },
+  {
+   "role": "Manajer Teknis"
+  }
+ ],
  "sequence_id": 2.0,
  "shortcuts": [
   {
@@ -72,16 +88,28 @@
   {
    "doc_view": "Kanban",
    "kanban_board": "Sample per Status",
-   "label": "Sample \u2014 Kanban",
+   "label": "Sample — Kanban",
    "link_to": "Sample",
    "type": "DocType"
   },
   {
    "doc_view": "Kanban",
    "kanban_board": "Work Order Pengujian per Status",
-   "label": "Work Order Pengujian \u2014 Kanban",
+   "label": "Work Order Pengujian — Kanban",
    "link_to": "Work Order Pengujian",
    "type": "DocType"
+  },
+  {
+   "label": "Rekap Stok Reagen dan Consumable",
+   "link_to": "Rekap Stok Reagen dan Consumable",
+   "report_ref_doctype": "Item",
+   "type": "Report"
+  },
+  {
+   "label": "Status Sample Realtime",
+   "link_to": "Status Sample Realtime",
+   "report_ref_doctype": "Sample",
+   "type": "Report"
   }
  ],
  "sidebar_items": [
