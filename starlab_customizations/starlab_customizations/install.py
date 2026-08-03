@@ -117,15 +117,27 @@ SYSTEM_MANAGER_ONLY_WORKSPACES = [
 
 
 def _restrict_admin_workspaces_to_system_manager():
-	for workspace in SYSTEM_MANAGER_ONLY_WORKSPACES:
-		if not frappe.db.exists("Workspace", workspace):
-			continue
-		doc = frappe.get_doc("Workspace", workspace)
-		if any(r.role == "System Manager" for r in doc.roles) and len(doc.roles) == 1:
-			continue
-		doc.roles = []
-		doc.append("roles", {"role": "System Manager"})
-		doc.save(ignore_permissions=True)
+	# 2026-08-03: ketahuan Workspace `roles`/`is_hidden` di bawah TIDAK cukup
+	# -- ada mekanisme grid ikon terpisah, DocType "Desktop Icon" (dulu
+	# "modules"), yang punya `roles`/`hidden` SENDIRI, independen dari
+	# Workspace meski nama record-nya sama persis. Selama ini fix di atas
+	# cuma nutup switcher Workspace (sidebar/API get_workspaces), grid ikon
+	# klasik ini tetap kebuka lebar ke semua role -- makanya dibenerin dua
+	# doctype sekaligus di sini, bukan cuma Workspace.
+	for name in SYSTEM_MANAGER_ONLY_WORKSPACES:
+		if frappe.db.exists("Workspace", name):
+			doc = frappe.get_doc("Workspace", name)
+			if not (any(r.role == "System Manager" for r in doc.roles) and len(doc.roles) == 1):
+				doc.roles = []
+				doc.append("roles", {"role": "System Manager"})
+				doc.save(ignore_permissions=True)
+
+		if frappe.db.exists("Desktop Icon", name):
+			icon = frappe.get_doc("Desktop Icon", name)
+			if not (any(r.role == "System Manager" for r in icon.roles) and len(icon.roles) == 1):
+				icon.roles = []
+				icon.append("roles", {"role": "System Manager"})
+				icon.save(ignore_permissions=True)
 
 
 # docs/Penambahan_Pengurangan_Fitur_ERP_SAI.md -- keputusan resmi "dihapus
@@ -140,18 +152,82 @@ FULLY_HIDDEN_WORKSPACES = ["Manufacturing", "Quality", "Stock", "Performance", "
 
 
 def _rehide_unused_workspaces():
-	for workspace in FULLY_HIDDEN_WORKSPACES:
-		if not frappe.db.exists("Workspace", workspace):
+	# Sama seperti _restrict_admin_workspaces_to_system_manager di atas --
+	# Workspace.is_hidden sendirian tidak cukup, Desktop Icon (grid ikon)
+	# punya field `hidden` + `roles` terpisah yang juga harus disentuh.
+	for name in FULLY_HIDDEN_WORKSPACES:
+		if frappe.db.exists("Workspace", name):
+			doc = frappe.get_doc("Workspace", name)
+			if not doc.is_hidden:
+				doc.is_hidden = 1
+				doc.save(ignore_permissions=True)
+
+		if frappe.db.exists("Desktop Icon", name):
+			icon = frappe.get_doc("Desktop Icon", name)
+			changed = False
+			if not icon.hidden:
+				icon.hidden = 1
+				changed = True
+			if not (any(r.role == "System Manager" for r in icon.roles) and len(icon.roles) == 1):
+				icon.roles = []
+				icon.append("roles", {"role": "System Manager"})
+				changed = True
+			if changed:
+				icon.save(ignore_permissions=True)
+
+
+# 2026-08-03: sidebar kiri (panel navigasi di dalam halaman Workspace, BUKAN
+# rail ikon app) TERNYATA dirender dari DocType terpisah "Workspace Sidebar"
+# (+ child "Workspace Sidebar Item"), bukan dari field `sidebar_items` di
+# JSON Workspace (field itu ada di schema tapi tidak dipakai render sama
+# sekali di versi Frappe ini -- field mati). Role lain (Finance/Direksi/dst)
+# punya record ini karena entah auto-generated atau dibuat manual oleh
+# developer sebelumnya lewat UI -- BUKAN via fixture/file (`standard: 0`,
+# tidak ada file sumbernya sama sekali), jadi "HR" yang baru dibuat hari ini
+# tidak otomatis dapat. Dibuat idempoten di sini (bukan fixture) meniru pola
+# yang sama seperti Workspace Sidebar role lain, supaya sidebar kiri
+# Workspace "HR" tidak kosong.
+HR_SIDEBAR_ITEMS = [
+	("Home", "Workspace", "HR"),
+	("Employee", "DocType", "Employee"),
+	("Attendance", "DocType", "Attendance"),
+	("Leave", "DocType", "Leave Application"),
+	("Payroll", "DocType", "Payroll Entry"),
+	("Training", "DocType", "Training Event"),
+	("Performance", "DocType", "Appraisal"),
+]
+
+
+def _ensure_hr_workspace_sidebar():
+	if not frappe.db.exists("Workspace", "HR"):
+		return
+
+	if frappe.db.exists("Workspace Sidebar", "HR"):
+		sidebar = frappe.get_doc("Workspace Sidebar", "HR")
+		existing_links = {item.link_to for item in sidebar.items}
+	else:
+		sidebar = frappe.new_doc("Workspace Sidebar")
+		sidebar.title = "HR"
+		existing_links = set()
+
+	changed = not frappe.db.exists("Workspace Sidebar", "HR")
+	for label, link_type, link_to in HR_SIDEBAR_ITEMS:
+		if link_to in existing_links:
 			continue
-		doc = frappe.get_doc("Workspace", workspace)
-		if not doc.is_hidden:
-			doc.is_hidden = 1
-			doc.save(ignore_permissions=True)
+		sidebar.append(
+			"items",
+			{"label": label, "type": "Link", "link_type": link_type, "link_to": link_to, "collapsible": 1},
+		)
+		changed = True
+
+	if changed:
+		sidebar.save(ignore_permissions=True)
 
 
 def after_migrate():
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
+	_ensure_hr_workspace_sidebar()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):
