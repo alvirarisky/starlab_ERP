@@ -34,18 +34,25 @@ def _set_disetujui_oleh(doc):
 
 
 def _create_journal_entry(doc):
-	# TODO(Finance SAI): nama akun di bawah ini masih placeholder -- belum ada
-	# Chart of Accounts riil dari Finance yang dikonfirmasi. Sesuaikan
-	# "Kas Kecil - {abbr}" / "Beban Operasional Kantor - {abbr}" begitu Finance
-	# memastikan nama akun yang benar dipakai di COA produksi.
+	# 2026-08-03: dulu ini "Kas Kecil - {abbr}" / "Beban Operasional Kantor -
+	# {abbr}" -- nama akun custom yang diasumsikan bakal ada di COA final dari
+	# Finance, tapi belum pernah dikonfirmasi/dibuat. Dicek langsung ke instance
+	# live: Company di sini pakai template Chart of Accounts default ERPNext
+	# (bukan template Indonesia berkode angka), jadi akun dengan nama itu
+	# memang tidak akan pernah ada -- fitur ini selalu gagal silent sebelum
+	# perbaikan ini. Diganti ke akun default ERPNext yang SELALU ada di setiap
+	# Company baru ("Cash" ada di grup Cash-in-Hand, "Office Maintenance
+	# Expenses" ada di grup Indirect Expenses), supaya jalan out-of-the-box.
+	# Kalau Finance nanti mau pakai akun Kas Kecil khusus/terpisah, tinggal
+	# ganti dua nama di bawah ini.
 	company = frappe.defaults.get_global_default("company")
 	if not company:
 		_log_je_skip(doc, frappe._("tidak ada Company default yang terkonfigurasi di site ini"))
 		return
 
 	abbr = frappe.get_cached_value("Company", company, "abbr")
-	credit_account = f"Kas Kecil - {abbr}"
-	debit_account = f"Beban Operasional Kantor - {abbr}"
+	credit_account = f"Cash - {abbr}"
+	debit_account = f"Office Maintenance Expenses - {abbr}"
 
 	if not frappe.db.exists("Account", credit_account) or not frappe.db.exists("Account", debit_account):
 		_log_je_skip(
