@@ -39,7 +39,13 @@ def seed_document_masters():
 			"edisi_revisi": edisi,
 			"tanggal_efektif": add_days(nowdate(), -200),
 			"owner_division": owner_div,
-			"status": status,
+			# Document Master punya Frappe Workflow aktif (Draft -> ... -> Aktif
+			# -> Dalam Revisi); insert langsung dengan status akhir kena tolak
+			# WorkflowPermissionError karena bukan initial state. Insert selalu
+			# sebagai Draft dulu (state awal yang valid), baru dipaksa ke status
+			# akhir lewat db_set di bawah (bypass workflow -- wajar utk data
+			# dummy historis yang "sudah lama begitu", bukan lagi diklik manual).
+			"status": "Draft",
 			"file_dokumen": "/files/placeholder_dokumen.pdf",
 			"distribusi": [
 				{"divisi": "Laboratorium", "tanggal_distribusi": add_days(nowdate(), -190), "acknowledged": 1, "acknowledged_on": add_days(nowdate(), -185)},
@@ -48,6 +54,8 @@ def seed_document_masters():
 			],
 		})
 		doc.insert(ignore_permissions=True)
+		if status != "Draft":
+			doc.db_set("status", status, notify=False)
 	print(f"Document Master: {frappe.db.count('Document Master')}")
 
 
@@ -86,11 +94,16 @@ def seed_work_orders():
 			"customer": customers[i % len(customers)],
 			"kegiatan": kegiatan_list[i % len(kegiatan_list)],
 			"tanggal_wo": wo_date,
-			"status": status,
+			# Work Order Pengujian punya Frappe Workflow aktif -- insert langsung
+			# dengan status akhir kena WorkflowPermissionError (lihat catatan
+			# sama di seed_document_masters). "Draft" adalah initial state-nya.
+			"status": "Draft",
 			"penerimaan_sampel": _employee(ADMIN),
 			"wo_parameter_detail": rows,
 		})
 		doc.insert(ignore_permissions=True)
+		if status != "Draft":
+			doc.db_set("status", status, notify=False)
 		wo_names.append(doc.name)
 	print(f"Work Order Pengujian: {frappe.db.count('Work Order Pengujian')}")
 	return wo_names
@@ -119,11 +132,15 @@ def seed_samples(wo_names):
 			"work_order": wo,
 			"matriks": MATRIKS_LIST[i % len(MATRIKS_LIST)],
 			"tanggal_terima": add_days(wo_doc_date, 1),
-			"status": status,
+			# Sample juga punya Frappe Workflow aktif; "Diterima" adalah
+			# initial state-nya (bukan status akhir yang mau di-seed).
+			"status": "Diterima",
 			"retensi": retensi,
 			"tanggal_musnah": tanggal_musnah,
 		})
 		doc.insert(ignore_permissions=True)
+		if status != "Diterima":
+			doc.db_set("status", status, notify=False)
 		sample_names.append(doc.name)
 	print(f"Sample: {frappe.db.count('Sample')}")
 	return sample_names
@@ -162,7 +179,9 @@ def seed_test_results(sample_names):
 			"hasil_uji": round(random.uniform(0.5, 200), 2),
 			"satuan": param["satuan"],
 			"qc_detail": qc_rows,
-			"status": status,
+			# Test Result juga punya Frappe Workflow aktif; "Draft" adalah
+			# initial state-nya.
+			"status": "Draft",
 		})
 		if status in ("Divalidasi", "Ditolak"):
 			doc.validated_by = _employee(MM)
@@ -170,6 +189,8 @@ def seed_test_results(sample_names):
 			if status == "Ditolak":
 				doc.catatan_validasi = "Hasil di luar rentang QC, perlu uji ulang."
 		doc.insert(ignore_permissions=True)
+		if status != "Draft":
+			doc.db_set("status", status, notify=False)
 	print(f"Test Result: {frappe.db.count('Test Result')}")
 
 
@@ -232,17 +253,28 @@ def seed_petty_cash_and_journal_entries():
 				"nominal": nominal,
 				"bukti": "/files/placeholder_bukti.jpg",
 				"keterangan": f"Pengeluaran operasional harian - {item}",
-				"status": status,
+				# Petty Cash Entry juga punya Frappe Workflow aktif; "Draft"
+				# adalah initial state-nya. db_set di bawah bypass workflow
+				# SEKALIGUS tidak memicu on_update_petty_cash_entry (db_set
+				# tidak menjalankan hook doc_events) -- ini yang diharapkan
+				# utk data seed histori, bukan simulasi klik approve
+				# sungguhan (itu ditest manual di Langkah verifikasi akhir).
+				"status": "Draft",
 				"disetujui_oleh": _employee(FINANCE) if status == "Disetujui" else None,
 			})
 			doc.insert(ignore_permissions=True)
+			if status != "Draft":
+				doc.db_set("status", status, notify=False)
 		print(f"Petty Cash Entry: {frappe.db.count('Petty Cash Entry')}")
 
 	if frappe.db.count("Journal Entry", filters={"user_remark": ["like", "%SAI dummy%"]}) >= 2:
 		print("Journal Entry (dummy) already seeded, skipping.")
 		return
-	expense_account = "5510.001 - Beban Adm Bank - SAI"
-	cash_account = "1111.001 - Kas Kecil - SAI"
+	# 2026-08-03: nama akun disamakan dengan COA default ERPNext yang beneran
+	# ter-generate di Company instance ini (bukan template Indonesia berkode
+	# angka yang diasumsikan sebelumnya -- lihat catatan di petty_cash_hooks.py).
+	expense_account = "Bank Charges - SAI"
+	cash_account = "Cash - SAI"
 	for i in range(2):
 		je = frappe.get_doc({
 			"doctype": "Journal Entry",
@@ -282,7 +314,7 @@ def seed_sales_invoices():
 				"qty": 1,
 				"rate": 500000 + i * 50000,
 				"cost_center": "Main - SAI",
-				"income_account": "4110.000 - Penjualan - SAI",
+				"income_account": "Sales - SAI",
 			}],
 		})
 		si.insert(ignore_permissions=True)
@@ -300,7 +332,7 @@ def seed_bank_reconciliation_data():
 		acc = frappe.get_doc({
 			"doctype": "Account",
 			"account_name": "Bank BCA",
-			"parent_account": "1121.000 - Bank Rupiah - SAI",
+			"parent_account": "Bank Accounts - SAI",
 			"account_type": "Bank",
 			"company": COMPANY,
 			"account_currency": "IDR",
@@ -399,7 +431,14 @@ def seed_critical_stock():
 			"doctype": "Stock Reconciliation",
 			"company": COMPANY,
 			"purpose": "Stock Reconciliation",
-			"expense_account": "1141.000 - Persediaan Barang - SAI",
+			# 2026-08-03: item-item ini belum pernah punya Stock Ledger Entry
+			# sama sekali, jadi ERPNext otomatis memperlakukan reconciliation
+			# ini sebagai "Opening Entry" dan MEWAJIBKAN Difference Account
+			# bertipe Asset/Liability (menolak akun Expense seperti "Stock
+			# Adjustment - SAI" yang dipakai sebelumnya, lihat
+			# OpeningEntryAccountError). "Temporary Opening" adalah akun
+			# Asset bawaan ERPNext yang memang dipakai khusus utk kasus ini.
+			"expense_account": "Temporary Opening - SAI",
 			"items": [{
 				"item_code": item_code,
 				"warehouse": "Stores - SAI",
