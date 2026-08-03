@@ -32,20 +32,41 @@ fi
 # from the CURRENT develop on every run, those branches silently go stale --
 # a `git pull` on this repo never touches them, so a device building the
 # image from scratch would install old app code no matter how up to date
-# their local checkout is. Re-split + force-push them here, every run, so
-# the image build a few steps down always matches what's actually in this
-# working tree right now.
-echo "==> Re-syncing app-starlab-* branches with current $(git -C "$APP_ROOT" rev-parse --abbrev-ref HEAD)"
-SUBTREE_PAIRS="starlab_lab_ops:app-starlab-lab-ops starlab_customizations:app-starlab-customizations starlab_quality:app-starlab-quality starlab_integrations:app-starlab-integrations"
-for pair in $SUBTREE_PAIRS; do
-  dir="${pair%%:*}"
-  branch="${pair##*:}"
-  echo "    - $dir -> origin/$branch"
-  git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null 2>&1 || true
-  git -C "$APP_ROOT" subtree split --prefix="$dir" -b _subtree_sync_tmp >/dev/null
-  git -C "$APP_ROOT" push origin _subtree_sync_tmp:refs/heads/"$branch" --force
-  git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null
-done
+# their local checkout is.
+#
+# REPO_STATE_HASH below is the concatenation of the current HEAD's tree hash
+# for exactly the paths bench get-app actually reads (the 4 app dirs +
+# apps.json) -- NOT a timestamp. It's identical across runs as long as none
+# of those paths changed since the last run, and changes the moment any of
+# them do. That single value drives BOTH decisions below: whether the
+# subtree branches need re-splitting/pushing at all, and (further down) the
+# image's CACHE_BUST -- so an unchanged repo skips the git push entirely
+# and lets Docker reuse its build cache instead of re-cloning every app from
+# scratch on every single run, while an actual change still forces both a
+# fresh push and a fresh build automatically, with nothing to remember to
+# do by hand.
+REPO_STATE_HASH="$(git -C "$APP_ROOT" rev-parse \
+  HEAD:starlab_lab_ops HEAD:starlab_customizations HEAD:starlab_quality HEAD:starlab_integrations HEAD:docker/apps.json \
+  | tr '\n' '-')"
+SYNC_MARKER="$APP_ROOT/.build/last_synced_apps_state"
+mkdir -p "$APP_ROOT/.build"
+
+if [ -f "$SYNC_MARKER" ] && [ "$(cat "$SYNC_MARKER")" = "$REPO_STATE_HASH" ]; then
+  echo "==> app-starlab-* branches already match the current repo state, skipping re-sync"
+else
+  echo "==> Re-syncing app-starlab-* branches with current $(git -C "$APP_ROOT" rev-parse --abbrev-ref HEAD)"
+  SUBTREE_PAIRS="starlab_lab_ops:app-starlab-lab-ops starlab_customizations:app-starlab-customizations starlab_quality:app-starlab-quality starlab_integrations:app-starlab-integrations"
+  for pair in $SUBTREE_PAIRS; do
+    dir="${pair%%:*}"
+    branch="${pair##*:}"
+    echo "    - $dir -> origin/$branch"
+    git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null 2>&1 || true
+    git -C "$APP_ROOT" subtree split --prefix="$dir" -b _subtree_sync_tmp >/dev/null
+    git -C "$APP_ROOT" push origin _subtree_sync_tmp:refs/heads/"$branch" --force
+    git -C "$APP_ROOT" branch -D _subtree_sync_tmp >/dev/null
+  done
+  echo "$REPO_STATE_HASH" > "$SYNC_MARKER"
+fi
 
 echo "==> Syncing apps.json / custom.env into the frappe_docker checkout"
 cp "$DOCKER_DIR/apps.json" "$FD_DIR/apps.json"
@@ -68,18 +89,21 @@ rm -f resources/core/main-entrypoint.sh.bak \
   resources/core/nginx/nginx-entrypoint.sh.bak \
   resources/core/start.sh.bak
 
-# Always rebuilt (no more "skip if image already exists") -- the whole point
-# of the subtree re-sync above is that the image must always reflect the
-# CURRENT repo state. Skipping the build whenever a same-tagged image already
-# existed was exactly how devices ended up running stale app code despite
-# `git pull`. CACHE_BUST forces bench get-app to re-clone every app fresh
-# from the branches just pushed above; `docker compose up -d` further down
+# No more "skip if image already exists" -- that shortcut was exactly how
+# devices ended up running stale app code despite `git pull`. Instead,
+# CACHE_BUST is now REPO_STATE_HASH (content-based, computed above), not a
+# timestamp: identical value in -> identical Docker layer reused, so a run
+# where nothing in the 4 app dirs changed hits Docker's build cache and
+# finishes in seconds instead of re-cloning every app from scratch. The
+# instant any of them change, the hash changes too, which invalidates
+# exactly that layer and forces a real rebuild -- automatically, no image
+# to remember to `docker rmi` by hand. `docker compose up -d` further down
 # recreates any container whose image actually changed.
-echo "==> Building starlab-lab-ops image (always rebuilt, to guarantee it matches the repo right now)"
+echo "==> Building starlab-lab-ops image (rebuilds only what actually changed, via content-hash cache busting)"
 docker build \
   --build-arg=FRAPPE_PATH=https://github.com/frappe/frappe \
   --build-arg=FRAPPE_BRANCH=version-16 \
-  --build-arg=CACHE_BUST="$(date +%s)" \
+  --build-arg=CACHE_BUST="$REPO_STATE_HASH" \
   --secret=id=apps_json,src=apps.json \
   --tag=starlab-lab-ops:latest \
   --file=images/layered/Containerfile .
@@ -139,6 +163,16 @@ else
     --install-app starlab_integrations \
     --set-default
 fi
+
+echo "==> Running bench migrate (picks up any new Custom DocPerm/Workspace/field fixtures on an already-existing site)"
+# The image is rebuilt fresh every run now, but for a site that already
+# existed, that alone doesn't apply anything new -- fixtures/schema changes
+# baked into the refreshed code only actually reach the site's database via
+# migrate. Skipping this would leave the "code is always in sync" guarantee
+# above half-true: fresh code, stale database. Safe/idempotent to run even
+# right after a brand-new bench new-site (which already migrates once).
+docker compose -p frappe -f compose.custom.yaml exec -T backend \
+  bench --site "$SITE_NAME" migrate
 
 echo "==> Checking site's installed_apps against app code actually present in this container"
 # A site's database remembers which apps are "installed" independently of
