@@ -16,7 +16,8 @@
       "Bash(\"/c/Program Files/Git/mingw64/bin/pdftotext.exe\" \"docs/Project_Plan_ERP_Starlab_Narasi.pdf\" \"/tmp/plan.txt\")",
       "Read(//tmp/**)",
       "Bash(cp /tmp/bra.txt /tmp/plan.txt \"C:\\\\Users\\\\Nopir\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Kuliah-SMT6-KERJA-PRAKTIK-starlab-ERP\\\\ef039bc4-6c52-4e7d-b7ef-0fcb20df4b06\\\\scratchpad\\\\\" 2>&1 *)",
-      "Bash(docker ps *)"
+      "Bash(docker ps *)",
+      "Bash(docker rmi *)"
     ],
     "additionalDirectories": [
       "\\tmp"

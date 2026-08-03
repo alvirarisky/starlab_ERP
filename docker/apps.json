@@ -4,6 +4,10 @@
     "branch": "version-16"
   },
   {
+    "url": "https://github.com/frappe/hrms",
+    "branch": "version-16"
+  },
+  {
     "url": "https://github.com/alvirarisky/starlab_lab_ops.git",
     "branch": "app-starlab-lab-ops"
   },

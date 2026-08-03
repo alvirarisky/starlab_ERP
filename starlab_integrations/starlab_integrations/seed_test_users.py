@@ -26,6 +26,7 @@ TEST_USERS = [
 	("laboratorium.test@example.com", "Laboratorium Test", "Laboratorium"),
 	("manajerteknis.test@example.com", "Manajer Teknis Test", "Manajer Teknis"),
 	("manajermutu.test@example.com", "Manajer Mutu Test", "Manajer Mutu"),
+	("hr.test@example.com", "HR Test", "HR"),
 ]
 
 

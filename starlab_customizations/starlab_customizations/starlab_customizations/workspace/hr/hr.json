@@ -1,0 +1,161 @@
+{
+ "app": "starlab_customizations",
+ "charts": [],
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Employee\", \"col\": 4}}, {\"id\": \"shortcut-2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Attendance\", \"col\": 4}}, {\"id\": \"shortcut-3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Leave\", \"col\": 4}}, {\"id\": \"shortcut-4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Payroll\", \"col\": 4}}, {\"id\": \"shortcut-5\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Training\", \"col\": 4}}, {\"id\": \"shortcut-6\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Performance\", \"col\": 4}}]",
+ "creation": "2026-08-03 00:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "users-round",
+ "idx": 0,
+ "indicator_color": "purple",
+ "is_hidden": 0,
+ "label": "HR",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2026-08-03 02:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "HR",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "HR"
+  }
+ ],
+ "sequence_id": 8.0,
+ "shortcuts": [
+  {
+   "label": "Employee",
+   "link_to": "Employee",
+   "type": "DocType"
+  },
+  {
+   "label": "Attendance",
+   "link_to": "Attendance",
+   "type": "DocType"
+  },
+  {
+   "label": "Leave",
+   "link_to": "Leave Application",
+   "type": "DocType"
+  },
+  {
+   "label": "Payroll",
+   "link_to": "Payroll Entry",
+   "type": "DocType"
+  },
+  {
+   "label": "Training",
+   "link_to": "Training Event",
+   "type": "DocType"
+  },
+  {
+   "label": "Performance",
+   "link_to": "Appraisal",
+   "type": "DocType"
+  }
+ ],
+ "sidebar_items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "house",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "HR",
+   "link_type": "Workspace",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "user",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Employee",
+   "link_to": "Employee",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "calendar-check",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Attendance",
+   "link_to": "Attendance",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "plane",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Leave",
+   "link_to": "Leave Application",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "wallet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Payroll",
+   "link_to": "Payroll Entry",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "graduation-cap",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Training",
+   "link_to": "Training Event",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "trending-up",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Performance",
+   "link_to": "Appraisal",
+   "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "standard": 1,
+ "title": "HR",
+ "type": "Workspace"
+}
