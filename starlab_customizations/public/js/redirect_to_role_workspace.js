@@ -12,9 +12,22 @@
 	// dan pindah ke situ. Ada jeda render sekilas (flash) ke halaman default
 	// dulu sebelum redirect -- tidak ada hook resmi Frappe untuk intercept
 	// SEBELUM set_route() pertama jalan tanpa monkey-patch core.
+	//
+	// PENTING soal deteksi "rute kosong": frappe.router.parse() menghasilkan
+	// `[""]` (array isi SATU string kosong) untuk /desk polos, BUKAN `[]`
+	// (array kosong beneran) -- lihat convert_to_standard_route() di
+	// frappe/public/js/frappe/router.js, tidak ada satu pun cabang if yang
+	// match untuk route[0] === "", jadi balik apa adanya. Cek `.length !== 0`
+	// makanya SELALU gagal mendeteksi kondisi ini (route.length konsisten 1,
+	// bukan 0) -- redirect jadi TIDAK PERNAH kepanggil sama sekali sebelum
+	// perbaikan ini, persis root cause keluhan "sering banget ke /desk dulu".
+	function is_empty_route(route) {
+		return route.length === 0 || (route.length === 1 && !route[0]);
+	}
+
 	$(document).on("app_ready", function () {
 		if (frappe.session.user === "Guest") return;
-		if (frappe.get_route().length !== 0) return;
+		if (!is_empty_route(frappe.get_route())) return;
 
 		frappe.call({
 			method: "starlab_customizations.install.get_my_workspace_route",
