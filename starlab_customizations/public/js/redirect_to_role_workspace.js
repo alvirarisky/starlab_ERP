@@ -62,10 +62,20 @@
 		frappe.call({
 			method: "starlab_customizations.install.get_my_workspace_route",
 			callback: function (r) {
+				// 2026-08-04: install.py::get_home_page() balikin None untuk
+				// Administrator (dan siapa pun yang role-nya gak ada di
+				// ROLE_HOME_WORKSPACE) DENGAN SENGAJA -- bukan error, itu
+				// perilaku yang benar (lihat komentar di install.py). Tapi
+				// sebelumnya toggle_sidebar(true) di sini dipanggil TANPA
+				// SYARAT, jadi sidebar tetap dimunculin lagi walau redirect-nya
+				// gak kejadian -- persis keluhan "sidebar masih ada di halaman
+				// desktop [generik]". Sidebar cuma boleh nyala kalau kita
+				// BENERAN pindah ke Workspace role, bukan kalau tetap di rute
+				// kosong tanpa tujuan.
 				if (r.message) {
 					frappe.set_route(r.message);
+					toggle_sidebar(true);
 				}
-				toggle_sidebar(true);
 			},
 			error: function () {
 				toggle_sidebar(true);
