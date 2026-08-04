@@ -134,9 +134,28 @@ echo "==> Enabling developer mode (needed for Desk-created DocTypes/Workspaces t
 docker compose -p frappe -f compose.custom.yaml exec -T backend \
   bench set-config -g developer_mode 1
 
+MIGRATE_MARKER="$APP_ROOT/.build/last_migrated_apps_state"
+
 echo "==> Checking if site '$SITE_NAME' already exists"
 if docker compose -p frappe -f compose.custom.yaml exec -T backend test -f "sites/$SITE_NAME/site_config.json" 2>/dev/null; then
   echo "    site already exists, skipping creation"
+
+  # bench migrate re-syncs EVERY DocType across EVERY installed app (frappe +
+  # erpnext + hrms + our 4 apps -- several hundred DocTypes combined) on
+  # every single invocation, whether or not anything actually changed. That
+  # made it the real bottleneck once it started running unconditionally on
+  # every run -- worse than the image build itself, which the CACHE_BUST
+  # hash above already made near-instant when nothing changed. Same fix,
+  # same REPO_STATE_HASH: only actually run it when the repo state moved
+  # since the last time it ran.
+  if [ -f "$MIGRATE_MARKER" ] && [ "$(cat "$MIGRATE_MARKER")" = "$REPO_STATE_HASH" ]; then
+    echo "==> Site already migrated for the current repo state, skipping bench migrate"
+  else
+    echo "==> Running bench migrate (repo state changed since the last migrate)"
+    docker compose -p frappe -f compose.custom.yaml exec -T backend \
+      bench --site "$SITE_NAME" migrate
+    echo "$REPO_STATE_HASH" > "$MIGRATE_MARKER"
+  fi
 else
   echo "==> Creating site '$SITE_NAME' and installing erpnext + hrms + starlab_quality + starlab_lab_ops + starlab_customizations + starlab_integrations"
   # Order matters: starlab_lab_ops.required_apps includes starlab_quality
@@ -162,17 +181,10 @@ else
     --install-app starlab_customizations \
     --install-app starlab_integrations \
     --set-default
+  # --install-app already migrates each app in as it installs -- an
+  # immediate extra bench migrate here would just repeat that for nothing.
+  echo "$REPO_STATE_HASH" > "$MIGRATE_MARKER"
 fi
-
-echo "==> Running bench migrate (picks up any new Custom DocPerm/Workspace/field fixtures on an already-existing site)"
-# The image is rebuilt fresh every run now, but for a site that already
-# existed, that alone doesn't apply anything new -- fixtures/schema changes
-# baked into the refreshed code only actually reach the site's database via
-# migrate. Skipping this would leave the "code is always in sync" guarantee
-# above half-true: fresh code, stale database. Safe/idempotent to run even
-# right after a brand-new bench new-site (which already migrates once).
-docker compose -p frappe -f compose.custom.yaml exec -T backend \
-  bench --site "$SITE_NAME" migrate
 
 echo "==> Checking site's installed_apps against app code actually present in this container"
 # A site's database remembers which apps are "installed" independently of
