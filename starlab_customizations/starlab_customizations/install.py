@@ -240,7 +240,35 @@ def _ensure_hr_workspace_sidebar():
 		sidebar.save(ignore_permissions=True)
 
 
+def _ensure_setup_complete():
+	# 2026-08-04: root cause dari keluhan "sidebar kosong" DAN "kadang gak bisa
+	# klik apa-apa / halaman putih kosong / gak bisa logout" pas testing --
+	# bukan soal timing render, bukan soal redirect. frappe.ui.Sidebar
+	# (frappe/public/js/frappe/ui/sidebar/sidebar.js, constructor) return
+	# LANGSUNG tanpa pernah bikin this.wrapper sama sekali kalau
+	# frappe.boot.setup_complete falsy -- artinya seluruh sidebar Desk bawaan
+	# gak pernah ke-render buat SIAPAPUN di instance ini. Nilai itu dihitung
+	# server-side lewat frappe.is_setup_complete() (frappe/__init__.py): cek
+	# field is_setup_complete di Installed Application utk app "frappe" dan
+	# "erpnext" -- field itu CUMA keisi kalau Setup Wizard interaktif
+	# ERPNext dijalankan sampai selesai. Project ini sengaja skip Setup
+	# Wizard (Company dibikin manual, lihat panduan setup) supaya nama/negara
+	# Company bisa dikontrol persis -- konsekuensinya field itu gak pernah
+	# ke-set, jadi sidebar bawaan Frappe rusak buat SEMUA orang dari awal.
+	# Company yang sudah ada = sinyal paling jujur bahwa "setup" project ini
+	# sudah selesai (meski bukan lewat wizard), jadi tandai lengkap di sini.
+	if not frappe.db.exists("Company"):
+		return
+	for name in frappe.get_all(
+		"Installed Application",
+		filters={"app_name": ["in", ["frappe", "erpnext"]], "is_setup_complete": 0},
+		pluck="name",
+	):
+		frappe.db.set_value("Installed Application", name, "is_setup_complete", 1)
+
+
 def after_migrate():
+	_ensure_setup_complete()
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
 	_ensure_hr_workspace_sidebar()

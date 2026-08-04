@@ -34,8 +34,21 @@
 	// di desk.js/frappe.Application), jadi wajib di-toggle balik nyala
 	// setelah redirect kelar (baik berhasil dapat rute maupun tidak),
 	// kalau enggak dia bakal nyangkut ke-hide selamanya.
+	//
+	// PENTING: cek .wrapper eksplisit, bukan cuma .sidebar. Constructor
+	// Sidebar (frappe/public/js/frappe/ui/sidebar/sidebar.js) return LEBIH
+	// AWAL tanpa pernah bikin this.wrapper kalau frappe.boot.setup_complete
+	// falsy -- kejadian ini di instance kita karena Setup Wizard sengaja
+	// di-skip (lihat _ensure_setup_complete di install.py, yang sekarang
+	// menandai setup complete supaya .wrapper beneran kebentuk). Tanpa cek
+	// ini, .toggle() manggil this.wrapper.hide() pas wrapper masih
+	// undefined -> TypeError uncaught -> sisa proses boot Desk ikut macet
+	// (persis keluhan "gak bisa klik apa-apa" / "putih kosong" / "gak bisa
+	// logout" yang dilaporkan). Backend fix di atas menutup akar masalahnya,
+	// tapi cek ini tetap dipertahankan sebagai jaring pengaman kalau ada
+	// device yang boot info browsernya belum ke-refresh.
 	function toggle_sidebar(show) {
-		if (frappe.app && frappe.app.sidebar) {
+		if (frappe.app && frappe.app.sidebar && frappe.app.sidebar.wrapper) {
 			frappe.app.sidebar.toggle(!show);
 		}
 	}
