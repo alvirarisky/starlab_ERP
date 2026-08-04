@@ -181,8 +181,19 @@ else
     --install-app starlab_customizations \
     --install-app starlab_integrations \
     --set-default
-  # --install-app already migrates each app in as it installs -- an
-  # immediate extra bench migrate here would just repeat that for nothing.
+  # Each --install-app above already runs its own migrate-equivalent pass,
+  # but those happen mid-sequence -- an app's after_migrate hook can fire
+  # before a LATER app in this same list has synced its DocTypes yet (hit
+  # this for real: starlab_customizations's after_migrate builds a sidebar
+  # linking to hrms DocTypes, and even though hrms is installed earlier in
+  # this list, one Mac run crashed here because they weren't visible yet at
+  # that exact moment -- see the defensive fix in install.py). One clean
+  # final migrate once every app is actually in place is cheap here (site
+  # creation is a one-time event, not the repeated dev-loop case the
+  # skip-if-unchanged logic above is optimizing for) and guarantees nothing
+  # is left half-applied.
+  docker compose -p frappe -f compose.custom.yaml exec -T backend \
+    bench --site "$SITE_NAME" migrate
   echo "$REPO_STATE_HASH" > "$MIGRATE_MARKER"
 fi
 

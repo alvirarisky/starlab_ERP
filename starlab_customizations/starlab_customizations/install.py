@@ -214,6 +214,22 @@ def _ensure_hr_workspace_sidebar():
 	for label, link_type, link_to in HR_SIDEBAR_ITEMS:
 		if link_to in existing_links:
 			continue
+		# after_migrate ini jalan tiap ada `bench migrate` -- termasuk yang
+		# dipanggil di tengah-tengah `bench new-site --install-app erpnext
+		# --install-app hrms --install-app ... --install-app
+		# starlab_customizations ...` (satu perintah, banyak app). Kalau
+		# giliran ini kepanggil sebelum DocType dari hrms (Attendance, Leave
+		# Application, dst) benar-benar ke-sync ke database -- pernah
+		# kejadian di salah satu device -- link_type Workspace aman (Workspace
+		# "HR" sudah dicek di atas), tapi link_type DocType ke DocType yang
+		# belum ada bikin _validate_links() gagal dan menjatuhkan SELURUH
+		# `bench new-site`, bukan cuma langkah kecil ini. Lewati item yang
+		# DocType-nya belum ada sekarang -- ke-skip bukan permanen, karena
+		# fungsi ini idempoten dan jalan lagi di `bench migrate` berikutnya
+		# (termasuk yang saya panggil eksplisit di docker/start.sh), begitu
+		# DocType-nya sudah ada, item ini otomatis nyusul ditambahkan.
+		if link_type == "DocType" and not frappe.db.exists("DocType", link_to):
+			continue
 		sidebar.append(
 			"items",
 			{"label": label, "type": "Link", "link_type": link_type, "link_to": link_to, "collapsible": 1},
