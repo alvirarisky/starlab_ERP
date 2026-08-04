@@ -25,9 +25,26 @@
 		return route.length === 0 || (route.length === 1 && !route[0]);
 	}
 
+	// 2026-08-04: request user "sidebar-nya gaperlu ada kalo belum masuk
+	// dashboard masing-masing role" -- flash halaman default di atas juga
+	// nge-flash sidebar bawaan halaman itu (kosong/isi cuma "Getting
+	// Started", bukan menu role yang benar) selama jeda frappe.call ini.
+	// frappe.app.sidebar adalah SATU instance yang dipakai ulang lintas
+	// route (bukan dibuat baru tiap pindah halaman -- lihat make_sidebar()
+	// di desk.js/frappe.Application), jadi wajib di-toggle balik nyala
+	// setelah redirect kelar (baik berhasil dapat rute maupun tidak),
+	// kalau enggak dia bakal nyangkut ke-hide selamanya.
+	function toggle_sidebar(show) {
+		if (frappe.app && frappe.app.sidebar) {
+			frappe.app.sidebar.toggle(!show);
+		}
+	}
+
 	$(document).on("app_ready", function () {
 		if (frappe.session.user === "Guest") return;
 		if (!is_empty_route(frappe.get_route())) return;
+
+		toggle_sidebar(false);
 
 		frappe.call({
 			method: "starlab_customizations.install.get_my_workspace_route",
@@ -35,6 +52,10 @@
 				if (r.message) {
 					frappe.set_route(r.message);
 				}
+				toggle_sidebar(true);
+			},
+			error: function () {
+				toggle_sidebar(true);
 			},
 		});
 	});
