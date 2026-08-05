@@ -1,5 +1,7 @@
 import frappe
 
+from starlab_lab_ops.audit_log import log_system_field_change
+
 
 def get_permission_query_conditions(user=None):
 	# Client Portal (starlab_integrations/www/status-klien.py) query LHU
@@ -98,7 +100,9 @@ def before_insert(doc, method=None):
 
 
 def on_submit(doc, method=None):
+	old_status = doc.status
 	doc.db_set("status", "Issued")
+	log_system_field_change(doc.doctype, doc.name, {"status": (old_status, "Issued")})
 
 	# LHU lama yang di-amend baru resmi "Superseded" begitu LHU pengganti
 	# ini benar-benar terbit (submit), bukan langsung saat Cancel/Amend --
@@ -106,4 +110,11 @@ def on_submit(doc, method=None):
 	# pengganti belum tentu jadi diterbitkan. db_set (bukan .save()) karena
 	# LHU lama sudah docstatus=2 (cancelled), tidak bisa disimpan normal.
 	if doc.amended_from:
+		old_amended_status = frappe.db.get_value("LHU", doc.amended_from, "status")
 		frappe.db.set_value("LHU", doc.amended_from, "status", "Superseded")
+		log_system_field_change(
+			"LHU",
+			doc.amended_from,
+			{"status": (old_amended_status, "Superseded")},
+			frappe._("Status otomatis diubah ke Superseded oleh sistem karena digantikan oleh {0}.").format(doc.name),
+		)

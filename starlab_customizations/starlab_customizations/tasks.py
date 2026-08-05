@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import add_to_date, now_datetime, nowdate
 
+from starlab_customizations.audit_log import log_system_field_change
+
 
 def _safe_sendmail(recipients, subject, message):
 	# frappe.sendmail raises OutgoingEmailError immediately (not just a
@@ -99,7 +101,8 @@ def check_quotation_expiry():
 	# bukan apply_workflow(), karena ini transisi otomatis oleh sistem
 	# (scheduled job), bukan aksi user -- pola yang sama dipakai wo_hooks.py
 	# untuk transisi otomatis lain. db_set melewati Version log, jadi
-	# Comment manual ditambahkan supaya tetap ada jejak di timeline dokumen.
+	# log_system_field_change menulis Version + Comment manual supaya tetap
+	# ada jejak di timeline dokumen (lihat starlab_customizations/audit_log.py).
 	quotations = frappe.get_all(
 		"Quotation",
 		filters={
@@ -119,15 +122,6 @@ def check_quotation_expiry():
 
 	for row in quotations:
 		frappe.db.set_value("Quotation", row.name, "workflow_state", "Kedaluwarsa")
-		doc = frappe.get_doc("Quotation", row.name)
-		doc.add_comment(
-			"Info",
-			frappe._(
-				"Quotation ini otomatis dipindah ke status Kedaluwarsa oleh sistem karena melewati"
-				" tanggal kedaluwarsa tanpa respons client. Gunakan aksi \"Aktifkan Kembali\" untuk"
-				" memperpanjang tanpa membuat Quotation baru."
-			),
-		)
 
 		if users:
 			_safe_sendmail(
@@ -139,6 +133,20 @@ def check_quotation_expiry():
 				).format(row.name),
 			)
 		frappe.db.set_value("Quotation", row.name, "kedaluwarsa_notif_terkirim", 1)
+
+		log_system_field_change(
+			"Quotation",
+			row.name,
+			{
+				"workflow_state": ("Approved", "Kedaluwarsa"),
+				"kedaluwarsa_notif_terkirim": (0, 1),
+			},
+			frappe._(
+				"Quotation ini otomatis dipindah ke status Kedaluwarsa oleh sistem karena melewati"
+				" tanggal kedaluwarsa tanpa respons client. Gunakan aksi \"Aktifkan Kembali\" untuk"
+				" memperpanjang tanpa membuat Quotation baru."
+			),
+		)
 
 
 def _notify_role(role, subject, message, role_users_cache=None):

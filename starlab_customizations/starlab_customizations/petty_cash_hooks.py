@@ -1,6 +1,8 @@
 import frappe
 from frappe.utils import flt
 
+from starlab_customizations.audit_log import log_system_field_change
+
 
 def on_update_petty_cash_entry(doc, method=None):
 	before = doc.get_doc_before_save()
@@ -31,6 +33,7 @@ def _set_disetujui_oleh(doc):
 	employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
 	if employee:
 		doc.db_set("disetujui_oleh", employee, notify=True)
+		log_system_field_change(doc.doctype, doc.name, {"disetujui_oleh": (None, employee)})
 
 
 def _create_journal_entry(doc):
@@ -94,8 +97,10 @@ def _create_journal_entry(doc):
 		je.insert(ignore_permissions=True)
 		je.submit()
 		doc.db_set("journal_entry", je.name, notify=True)
-		doc.add_comment(
-			"Info",
+		log_system_field_change(
+			doc.doctype,
+			doc.name,
+			{"journal_entry": (None, je.name)},
 			frappe._("Journal Entry {0} dibuat otomatis oleh sistem karena Petty Cash Entry ini Disetujui.").format(
 				je.name
 			),

@@ -69,7 +69,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('repo/starlab_lab_ops/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('repo/*/pyproject.toml') }}
 
       - name: Install wkhtmltopdf
         run: |
@@ -79,13 +79,22 @@ jobs:
       - name: Install Bench CLI
         run: pip install frappe-bench
 
+      # Pinned to the exact release tags this project is actually developed
+      # and manually verified against (frappe v16.29.0 / erpnext v16.30.0 /
+      # hrms v16.15.0 -- confirmed live via `bench list-apps` on the dev
+      # instance), not the `version-16` branch. A branch is a moving target:
+      # every fresh `bench get-app` can silently pull different upstream
+      # code than the last build even though none of OUR code changed, which
+      # is indistinguishable from a real regression until you've spent time
+      # ruling it out. Bump these deliberately (and re-verify) rather than
+      # letting them drift on their own.
       - name: Init bench
         run: |
           bench init "$BENCH_DIR" \
             --skip-redis-config-generation \
             --skip-assets \
             --python "$(which python)" \
-            --frappe-branch version-16
+            --frappe-branch v16.29.0
 
       - name: Point bench at CI services
         working-directory: ${{ env.BENCH_DIR }}
@@ -113,21 +122,27 @@ jobs:
       # always tests the current commit rather than a possibly-stale branch.
       - name: Turn app subfolders into standalone git repos
         run: |
-          for app in starlab_quality starlab_lab_ops; do
+          for app in starlab_quality starlab_lab_ops starlab_customizations starlab_integrations; do
             cd "${{ github.workspace }}/repo/$app"
             git init -q
             git add -A
             git -c user.email=ci@localhost -c user.name=CI commit -q -m "CI snapshot"
           done
 
-      - name: Get ERPNext and this app
+      - name: Get ERPNext, HRMS and all 4 apps
         working-directory: ${{ env.BENCH_DIR }}
         run: |
-          bench get-app erpnext --branch version-16
-          # starlab_quality first: starlab_lab_ops declares it in required_apps
-          # (Test Parameter.metode_uji links to Document Master, owned by
-          # starlab_quality) -- bench get-app needs its code present on disk
-          # before installing starlab_lab_ops can cascade-install it.
+          bench get-app erpnext --branch v16.30.0
+          # hrms before starlab_customizations: its Role/Workspace "HR"
+          # fixtures reference hrms DocTypes (Employee, Attendance, Leave
+          # Application, dst) -- see docker/start.sh for the same ordering
+          # requirement on the Docker side.
+          bench get-app hrms --branch v16.15.0
+          # Install order below mirrors required_apps in each app's hooks.py
+          # (starlab_lab_ops needs starlab_quality; starlab_customizations
+          # and starlab_integrations need starlab_lab_ops) -- bench get-app
+          # needs each dependency's code present on disk before the app that
+          # declares it in required_apps can cascade-install it.
           #
           # bench get-app takes exactly one meaningful positional argument (a
           # git URL or local path); it derives the app's install name from
@@ -137,6 +152,8 @@ jobs:
           # were a URL -- exactly the previous CI failure.
           bench get-app "${{ github.workspace }}/repo/starlab_quality"
           bench get-app "${{ github.workspace }}/repo/starlab_lab_ops"
+          bench get-app "${{ github.workspace }}/repo/starlab_customizations"
+          bench get-app "${{ github.workspace }}/repo/starlab_integrations"
 
       - name: New site
         working-directory: ${{ env.BENCH_DIR }}
@@ -145,9 +162,32 @@ jobs:
             --mariadb-root-password root \
             --admin-password admin \
             --install-app erpnext \
+            --install-app hrms \
             --install-app starlab_quality \
-            --install-app starlab_lab_ops
+            --install-app starlab_lab_ops \
+            --install-app starlab_customizations \
+            --install-app starlab_integrations
+          bench --site test_site set-config allow_tests true
 
+      # Runs all 4 custom apps' test suites (previously only starlab_lab_ops
+      # was tested here -- the other 3 apps' tests, including the bulk of
+      # this project's actual business-logic coverage in
+      # starlab_customizations, were never run by CI at all). Every app runs
+      # even if an earlier one fails, so a single broken suite doesn't hide
+      # the results of the rest; the step still fails overall if any app had
+      # failures.
       - name: Run tests
         working-directory: ${{ env.BENCH_DIR }}
-        run: bench --site test_site run-tests --app starlab_lab_ops
+        run: |
+          failed=""
+          for app in starlab_quality starlab_lab_ops starlab_customizations starlab_integrations; do
+            echo "::group::Tests for $app"
+            if ! bench --site test_site run-tests --app "$app"; then
+              failed="$failed $app"
+            fi
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then
+            echo "Failing test suites:$failed"
+            exit 1
+          fi

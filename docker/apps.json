@@ -1,26 +1,10 @@
 [
   {
     "url": "https://github.com/frappe/erpnext",
-    "branch": "version-16"
+    "branch": "v16.30.0"
   },
   {
     "url": "https://github.com/frappe/hrms",
-    "branch": "version-16"
-  },
-  {
-    "url": "https://github.com/alvirarisky/starlab_lab_ops.git",
-    "branch": "app-starlab-lab-ops"
-  },
-  {
-    "url": "https://github.com/alvirarisky/starlab_ERP.git",
-    "branch": "app-starlab-customizations"
-  },
-  {
-    "url": "https://github.com/alvirarisky/Starlab_ERP.git",
-    "branch": "app-starlab-quality"
-  },
-  {
-    "url": "https://github.com/alvirarisky/starlab_ERP.git",
-    "branch": "app-starlab-integrations"
+    "branch": "v16.15.0"
   }
 ]

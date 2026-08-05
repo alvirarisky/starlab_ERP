@@ -58,7 +58,17 @@
  "parent_page": "",
  "public": 1,
  "quick_lists": [],
- "roles": [],
+ "roles": [
+  {
+   "role": "Marketing"
+  },
+  {
+   "role": "Administrasi"
+  },
+  {
+   "role": "Direksi"
+  }
+ ],
  "sequence_id": 1.0,
  "shortcuts": [
   {

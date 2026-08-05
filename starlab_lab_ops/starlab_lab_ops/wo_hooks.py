@@ -1,23 +1,14 @@
 import frappe
 from frappe.utils import flt, getdate, nowdate
 
+from starlab_lab_ops.audit_log import log_system_field_change
 
-def _log_system_transition(doctype, name, text):
-	# db_set()/frappe.db.set_value() below intentionally bypass the Workflow
-	# engine (see comments at each call site) and, as a side effect, also
-	# bypass Document.save_version() -- these auto-transitions never show up
-	# in the Version/Track Changes log. This helper adds a plain Comment so
-	# there is at least a human-readable trace of "system did X and why" in
-	# the document timeline, without changing the transition behaviour itself.
-	frappe.get_doc(
-		{
-			"doctype": "Comment",
-			"comment_type": "Info",
-			"reference_doctype": doctype,
-			"reference_name": name,
-			"content": text,
-		}
-	).insert(ignore_permissions=True)
+# db_set()/frappe.db.set_value() calls below intentionally bypass the
+# Workflow engine (see comments at each call site) for system-triggered
+# auto-transitions. log_system_field_change (starlab_lab_ops/audit_log.py)
+# writes the Version entry that Document.save_version() would have written
+# for an equivalent normal save, plus a human-readable Comment, so these
+# transitions still show up in the document's Track Changes/timeline.
 
 
 def validate_work_order(doc, method=None):
@@ -62,9 +53,12 @@ def on_update_work_order(doc, method=None):
 	if doc.status != "In Progress" or not doc.wo_parameter_detail:
 		return
 	if all(row.status_pengujian == "Done" for row in doc.wo_parameter_detail):
+		old_status = doc.status
 		doc.db_set("status", "Completed", notify=True)
-		doc.add_comment(
-			"Info",
+		log_system_field_change(
+			doc.doctype,
+			doc.name,
+			{"status": (old_status, "Completed")},
 			frappe._("Status otomatis diubah ke Completed oleh sistem karena seluruh parameter pengujian sudah Done."),
 		)
 
@@ -89,9 +83,10 @@ def validate_sample(doc, method=None):
 	wo_status = frappe.db.get_value("Work Order Pengujian", doc.work_order, "status")
 	if wo_status == "Approved":
 		frappe.db.set_value("Work Order Pengujian", doc.work_order, "status", "In Progress")
-		_log_system_transition(
+		log_system_field_change(
 			"Work Order Pengujian",
 			doc.work_order,
+			{"status": (wo_status, "In Progress")},
 			frappe._("Status otomatis diubah ke In Progress oleh sistem karena Sample {0} diterima.").format(doc.name),
 		)
 
@@ -159,8 +154,9 @@ def on_update_test_result(doc, method=None):
 		sample_status = frappe.db.get_value("Sample", doc.sample, "status")
 		if sample_status == "Sedang Diuji":
 			frappe.db.set_value("Sample", doc.sample, "status", "Divalidasi")
-			_log_system_transition(
+			log_system_field_change(
 				"Sample",
 				doc.sample,
+				{"status": (sample_status, "Divalidasi")},
 				frappe._("Status otomatis diubah ke Divalidasi oleh sistem karena seluruh Test Result sudah Divalidasi."),
 			)

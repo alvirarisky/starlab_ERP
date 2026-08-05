@@ -21,7 +21,17 @@
 	// makanya SELALU gagal mendeteksi kondisi ini (route.length konsisten 1,
 	// bukan 0) -- redirect jadi TIDAK PERNAH kepanggil sama sekali sebelum
 	// perbaikan ini, persis root cause keluhan "sering banget ke /desk dulu".
+	//
+	// 2026-08-05: frappe.get_route() juga bisa balikin `null` (bukan array
+	// sama sekali) -- kejadian nyata di app_ready SAAT LOGIN PERTAMA (login
+	// form submit -> full page load /desk/<slug>), sebelum frappe.router
+	// sempat parse route apa pun. route.length dipanggil langsung tanpa cek
+	// null sebelumnya bikin TypeError uncaught di SETIAP boot Desk (bukan
+	// cuma kasus "session lama buka /desk langsung" yang jadi target awal
+	// fix ini) -- diverifikasi lewat headless browser, stack trace persis
+	// nunjuk baris ini. Guard null di depan.
 	function is_empty_route(route) {
+		if (!route) return true;
 		return route.length === 0 || (route.length === 1 && !route[0]);
 	}
 

@@ -1,6 +1,8 @@
 import frappe
 from frappe.desk.doctype.notification_log.notification_log import enqueue_create_notification
 
+from starlab_quality.audit_log import log_system_field_change
+
 # owner_division / Document Distribution.divisi use short codes (Sprint 1
 # schema); everywhere else in this project "division" access control is
 # expressed as a Frappe Role. This maps one to the other so Workflow
@@ -84,7 +86,9 @@ def _append_revision_log(doc, before):
 		}
 	).insert(ignore_permissions=True)
 	if doc.catatan_revisi:
+		old_catatan_revisi = doc.catatan_revisi
 		doc.db_set("catatan_revisi", "", notify=False)
+		log_system_field_change(doc.doctype, doc.name, {"catatan_revisi": (old_catatan_revisi, "")})
 
 
 def _notify_distribution(doc):

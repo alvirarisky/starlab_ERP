@@ -2,6 +2,8 @@ import frappe
 from frappe.model.naming import make_autoname
 from frappe.utils import add_days, flt, getdate, nowdate
 
+from starlab_customizations.audit_log import log_system_field_change
+
 # Format dikonfirmasi dari dokumen Quotation asli SAI (Quo-SAI/V/2026/076,
 # Quo-SAI/V/2026/075 -- lihat docs/dokumen asli/): "Quo-SAI/[bulan
 # romawi]/[tahun]/[no urut 3 digit]". Nomor urut naik terus per TAHUN
@@ -186,14 +188,23 @@ def _revert_to_mt_if_content_changed_mid_approval(doc, before):
 	# mengizinkan lompat langsung dari MM/Direksi ke MT lewat field write
 	# biasa, karena tidak ada transition edge untuk itu) -- pola yang sama
 	# dipakai wo_hooks.py untuk transisi otomatis oleh sistem, bukan aksi
-	# user langsung. db_set melewati Version log, jadi Comment manual
-	# ditambahkan supaya tetap ada jejak di timeline dokumen.
+	# user langsung. db_set melewati Version log, jadi log_system_field_change
+	# menulis Version + Comment manual supaya tetap ada jejak di timeline
+	# dokumen (lihat starlab_customizations/audit_log.py).
 	previous_state = before.workflow_state
+	previous_since = before.workflow_state_since
+	previous_eskalasi = before.eskalasi_terkirim
 	doc.db_set("workflow_state", "Menunggu Approval MT", notify=True)
 	doc.db_set("workflow_state_since", frappe.utils.now_datetime())
 	doc.db_set("eskalasi_terkirim", 0)
-	doc.add_comment(
-		"Info",
+	log_system_field_change(
+		doc.doctype,
+		doc.name,
+		{
+			"workflow_state": (previous_state, "Menunggu Approval MT"),
+			"workflow_state_since": (previous_since, doc.workflow_state_since),
+			"eskalasi_terkirim": (previous_eskalasi, 0),
+		},
 		frappe._(
 			"Konten Quotation diubah saat berada di tahap {0} -- approval yang sudah didapat"
 			" direset, wajib mengulang persetujuan penuh dari Manajer Teknis."
@@ -222,10 +233,17 @@ def _extend_expiry_on_reactivation(doc, before):
 	if before.workflow_state != "Kedaluwarsa" or doc.workflow_state != "Approved":
 		return
 
+	previous_tanggal_kadaluwarsa = before.tanggal_kadaluwarsa
+	previous_notif = before.kedaluwarsa_notif_terkirim
 	doc.db_set("tanggal_kadaluwarsa", add_days(nowdate(), EXPIRY_DAYS))
 	doc.db_set("kedaluwarsa_notif_terkirim", 0)
-	doc.add_comment(
-		"Info",
+	log_system_field_change(
+		doc.doctype,
+		doc.name,
+		{
+			"tanggal_kadaluwarsa": (previous_tanggal_kadaluwarsa, doc.tanggal_kadaluwarsa),
+			"kedaluwarsa_notif_terkirim": (previous_notif, 0),
+		},
 		frappe._(
 			"Quotation diaktifkan kembali -- tanggal kedaluwarsa diperpanjang {0} hari dari hari ini."
 		).format(EXPIRY_DAYS),
