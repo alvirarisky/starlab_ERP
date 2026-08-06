@@ -57,23 +57,15 @@ for app in starlab_customizations starlab_integrations starlab_lab_ops starlab_q
 done
 find "$BUILD_CTX_APPS" -type d -name "__pycache__" -prune -exec rm -rf {} +
 
-# apps.json fed to the build (via --secret below) is generated fresh each
-# run: erpnext/hrms entries copied verbatim from the tracked docker/apps.json
-# (real URL + pinned tag), plus the 4 local paths the Containerfile COPYs
-# the build context into (/opt/starlab_apps/<name> -- see docker/Containerfile).
-# The tracked docker/apps.json itself no longer lists the 4 apps at all --
-# there is no meaningful remote URL for them anymore, so listing one there
-# would be misleading.
+# apps.json fed to the build's Phase 1 (via --secret below) is just the
+# tracked docker/apps.json as-is: erpnext + hrms, real URL + pinned tag.
+# Our own 4 apps are NOT part of this file anymore -- docker/Containerfile's
+# Phase 2 installs them itself via separate `bench get-app
+# /opt/starlab_apps/<name>` calls (the build-context copy above), so putting
+# them in apps.json too would just be redundant and re-couple the two phases
+# this whole restructure was meant to decouple.
 GENERATED_APPS_JSON="$APP_ROOT/.build/generated_apps.json"
-node -e '
-const fs = require("fs");
-const [src, dst] = process.argv.slice(1);
-const apps = JSON.parse(fs.readFileSync(src, "utf8"));
-for (const name of ["starlab_customizations", "starlab_integrations", "starlab_lab_ops", "starlab_quality"]) {
-  apps.push({ url: `/opt/starlab_apps/${name}` });
-}
-fs.writeFileSync(dst, JSON.stringify(apps, null, 2));
-' "$DOCKER_DIR/apps.json" "$GENERATED_APPS_JSON"
+cp "$DOCKER_DIR/apps.json" "$GENERATED_APPS_JSON"
 
 echo "==> Syncing custom.env into the frappe_docker checkout"
 cp "$DOCKER_DIR/custom.env" "$FD_DIR/custom.env"

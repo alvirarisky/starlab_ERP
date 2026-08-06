@@ -240,6 +240,78 @@ def _ensure_hr_workspace_sidebar():
 		sidebar.save(ignore_permissions=True)
 
 
+COMPANY = "Starlab Analitik Indonesia"
+COMPANY_ABBR = "SAI"
+
+
+def _ensure_warehouse_type(name):
+	# Company.on_update() (erpnext/setup/doctype/company/company.py,
+	# create_default_warehouses) always tries to create a "Goods In Transit"
+	# warehouse tagged with Warehouse Type "Transit" -- that Warehouse Type
+	# record is normally seeded by ERPNext's Setup Wizard fixture install
+	# (erpnext/setup/setup_wizard/operations/install_fixtures.py), which this
+	# project deliberately never runs. Without it, creating Company below
+	# fails with "Could not find Warehouse Type: Transit" (confirmed by
+	# actually creating a from-scratch site and hitting this live). Same
+	# pattern as _ensure_territory in starlab_lab_ops/setup/
+	# seed_fase1_master_data.py -- a Setup-Wizard-only fixture, pre-created
+	# by hand instead.
+	if not frappe.db.exists("Warehouse Type", name):
+		frappe.get_doc({"doctype": "Warehouse Type", "name": name}).insert(ignore_permissions=True)
+
+
+def _ensure_company():
+	# 2026-08-05: every other part of this project (patches, seed scripts,
+	# _ensure_setup_complete right below) assumes a Company already exists --
+	# but until this function, nothing in the codebase actually CREATED one.
+	# `bench new-site` (what docker/start.sh uses) does not create a Company
+	# at all -- that only happens via ERPNext's interactive Setup Wizard.
+	# Consequence: anyone opening the browser before a human manually creates
+	# the Company gets auto-redirected by Frappe core to /app/setup-wizard,
+	# and actually completing that wizard (rather than skipping it) trips an
+	# ERPNext bug of its own (install_fixtures.py's get_preset_records
+	# accesses country.replace(...) while country is None) -- exactly the
+	# error a tester ran into. Company is created here automatically instead,
+	# so Setup Wizard should never come up for anyone again.
+	if frappe.db.exists("Company", COMPANY):
+		return
+	_ensure_warehouse_type("Transit")
+	frappe.get_doc(
+		{
+			"doctype": "Company",
+			"company_name": COMPANY,
+			"abbr": COMPANY_ABBR,
+			"default_currency": "IDR",
+			"country": "Indonesia",
+			"chart_of_accounts": "Standard",
+		}
+	).insert(ignore_permissions=True)
+	frappe.db.set_default("company", COMPANY)
+	frappe.db.set_value("Global Defaults", None, "default_company", COMPANY)
+
+
+def _ensure_fiscal_year():
+	# ERPNext does NOT auto-create a Fiscal Year when a Company is created
+	# (unlike the Chart of Accounts, which Company.on_update generates on its
+	# own) -- without one, most transactions (Quotation, Sales Invoice, dst)
+	# fail validation with no Fiscal Year covering their date. Full calendar
+	# year (Jan 1 - Dec 31) of whatever year this instance happens to be set
+	# up in -- not a hardcoded year, so this stays correct whenever this
+	# project gets cloned/run.
+	year = frappe.utils.getdate(frappe.utils.nowdate()).year
+	fy_name = str(year)
+	if frappe.db.exists("Fiscal Year", fy_name):
+		return
+	frappe.get_doc(
+		{
+			"doctype": "Fiscal Year",
+			"year": fy_name,
+			"year_start_date": f"{year}-01-01",
+			"year_end_date": f"{year}-12-31",
+		}
+	).insert(ignore_permissions=True)
+
+
 def _ensure_setup_complete():
 	# 2026-08-04: root cause dari keluhan "sidebar kosong" DAN "kadang gak bisa
 	# klik apa-apa / halaman putih kosong / gak bisa logout" pas testing --
@@ -252,12 +324,22 @@ def _ensure_setup_complete():
 	# field is_setup_complete di Installed Application utk app "frappe" dan
 	# "erpnext" -- field itu CUMA keisi kalau Setup Wizard interaktif
 	# ERPNext dijalankan sampai selesai. Project ini sengaja skip Setup
-	# Wizard (Company dibikin manual, lihat panduan setup) supaya nama/negara
-	# Company bisa dikontrol persis -- konsekuensinya field itu gak pernah
-	# ke-set, jadi sidebar bawaan Frappe rusak buat SEMUA orang dari awal.
-	# Company yang sudah ada = sinyal paling jujur bahwa "setup" project ini
-	# sudah selesai (meski bukan lewat wizard), jadi tandai lengkap di sini.
-	if not frappe.db.exists("Company"):
+	# Wizard sepenuhnya (_ensure_company di atas bikin Company otomatis)
+	# supaya nama/negara Company bisa dikontrol persis -- konsekuensinya
+	# field itu gak pernah ke-set lewat jalur normal, jadi sidebar bawaan
+	# Frappe rusak buat SEMUA orang dari awal kalau tidak ditandai manual di
+	# sini. Company yang sudah ada = sinyal paling jujur bahwa "setup"
+	# project ini sudah selesai (meski bukan lewat wizard).
+	#
+	# 2026-08-05: was `frappe.db.exists("Company")` (no second arg) -- that
+	# does NOT mean "does any Company exist". frappe.db.exists(dt, dn=None)
+	# with dn omitted checks `dt == dn` as a name lookup, which is always
+	# false for a real doctype name like "Company" -- this function was a
+	# silent no-op from the moment it was written. Found by actually
+	# creating a from-scratch site and observing frappe.is_setup_complete()
+	# stay False even after a real Company existed.
+	# frappe.db.a_row_exists(doctype) is the real "does any row exist" check.
+	if not frappe.db.a_row_exists("Company"):
 		return
 	for name in frappe.get_all(
 		"Installed Application",
@@ -268,6 +350,8 @@ def _ensure_setup_complete():
 
 
 def after_migrate():
+	_ensure_company()
+	_ensure_fiscal_year()
 	_ensure_setup_complete()
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
