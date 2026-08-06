@@ -349,9 +349,29 @@ def _ensure_setup_complete():
 		frappe.db.set_value("Installed Application", name, "is_setup_complete", 1)
 
 
+def _ensure_indonesian_language():
+	# 2026-08-06: lihat docs/translation-activation.md -- terjemahan Bahasa
+	# Indonesia buat chrome bawaan Frappe/ERPNext (tombol, menu, pesan
+	# validasi bawaan) sudah tersedia (id.po/id.mo terkompilasi ada di
+	# sites/assets/locale/id/), tapi sebelumnya SENGAJA tidak diaktifkan lewat
+	# kode (dianggap keputusan sadar operator, bukan sesuatu yang harus
+	# dipaksakan satu custom app bisnis). Konsekuensinya di lapangan:
+	# System Settings.language site-wide balik ke default "en" tiap kali site
+	# dibuat ulang dari nol, karena tidak ada apa pun yang menjaganya --
+	# dikonfirmasi kejadian berulang. Dibalik keputusannya di sini supaya
+	# default-nya konsisten Bahasa Indonesia tanpa perlu diset ulang manual
+	# tiap kali site di-provision. User yang belum punya field `language`
+	# sendiri terisi (mayoritas -- tidak ada satu baris pun di codebase ini
+	# yang pernah mengisinya) otomatis ikut default site ini.
+	if frappe.db.get_single_value("System Settings", "language") == "id":
+		return
+	frappe.db.set_single_value("System Settings", "language", "id")
+
+
 def after_migrate():
 	_ensure_company()
 	_ensure_fiscal_year()
+	_ensure_indonesian_language()
 	_ensure_setup_complete()
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
