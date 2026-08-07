@@ -24,7 +24,7 @@
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "LHU-####-MM-YYYY",
+   "options": "LHU-.####.-.MM.-.YYYY.",
    "reqd": 1
   },
   {

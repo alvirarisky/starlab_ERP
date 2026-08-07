@@ -22,7 +22,7 @@ def get_data(filters):
 	# Sengaja Query Report, bukan Number Card -- histori per klien butuh
 	# JOIN lintas 3 DocType (Quotation/Work Order Pengujian/LHU) dan
 	# di-group per Customer, bukan agregat tunggal (lihat catatan di
-	# docs/ringkasan-seluruh-sprint.md Bagian 6 & jobdesc_pira.md item 6).
+	# docs/ringkasan-seluruh-sprint.md Bagian 6).
 	conditions = ["q.quotation_to = 'Customer'", "q.docstatus < 2"]
 	values = {}
 	if filters.get("customer"):

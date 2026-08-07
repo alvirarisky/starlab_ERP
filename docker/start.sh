@@ -137,6 +137,26 @@ echo "==> Enabling developer mode (needed for Desk-created DocTypes/Workspaces t
 docker compose -p frappe -f compose.custom.yaml exec -T backend \
   bench set-config -g developer_mode 1
 
+# PDF generation (wkhtmltopdf, used by any Print Format -- LHU, Quotation
+# Ringkasan Harga, dst) fails with "wkhtmltopdf reported an error: ...
+# HostNotFoundError" without this. Frappe embeds its own asset URLs
+# (print.bundle.*.css) as *relative* paths in the HTML it hands to
+# wkhtmltopdf, then resolves them against frappe.utils.get_url() to fetch
+# over HTTP -- which defaults to the site name ("http://starlab.local").
+# That hostname only means anything to the HOST's browser (via
+# FRAPPE_SITE_NAME_HEADER forcing the Host header at the nginx layer);
+# Docker's internal DNS has never heard of it, so wkhtmltopdf (running
+# inside the backend container, making its own fresh connection) can't
+# resolve it and the PDF request fails outright. `frontend` (the compose
+# service name for nginx) IS resolvable internally and proxies correctly
+# regardless of Host header thanks to that same FRAPPE_SITE_NAME_HEADER
+# override -- pointing host_name at it fixes PDF generation without
+# affecting what the browser sees (browser requests still hit :8080
+# directly and never consult this site-level config).
+echo "==> Fixing PDF generation (wkhtmltopdf needs an internally-resolvable host_name)"
+docker compose -p frappe -f compose.custom.yaml exec -T backend \
+  bench --site "$SITE_NAME" set-config host_name http://frontend:8080
+
 MIGRATE_MARKER="$APP_ROOT/.build/last_migrated_apps_state"
 
 echo "==> Checking if site '$SITE_NAME' already exists"

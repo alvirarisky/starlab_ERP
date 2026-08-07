@@ -1,6 +1,8 @@
 # Keputusan Bisnis Terbaru — Siap Dieksekusi
 
-Kumpulan jawaban dari stakeholder (dikumpulin 2026-07-30) buat item-item yang sebelumnya masih berstatus "menunggu jawaban" di `docs/jobdesc_pira.md` Bagian 3, `docs/BRA_v2.md` Bagian 14.6, dan `docs/ringkasan-seluruh-sprint.md` Bagian 5. Semua item di bawah ini sudah ada jawaban resmi — **boleh langsung dieksekusi, gak perlu nunggu konfirmasi lagi**, kecuali disebutkan lain.
+> **📁 ARSIP HISTORIS (per 2026-08-06):** Semua item di bawah sudah dieksekusi dan terserap ke `ringkasan-seluruh-sprint.md` (lihat Bagian 3.22/3.23) dan kode terkait. Dipertahankan sebagai catatan keputusan stakeholder, bukan daftar kerjaan aktif. Lihat `docs/OVERVIEW_PROJECT.md` untuk kondisi terkini.
+
+Kumpulan jawaban dari stakeholder (dikumpulin 2026-07-30) buat item-item yang sebelumnya masih berstatus "menunggu jawaban" di `docs/BRA_v2.md` Bagian 14.6 dan `docs/ringkasan-seluruh-sprint.md` Bagian 5. Semua item di bawah ini sudah ada jawaban resmi — **boleh langsung dieksekusi, gak perlu nunggu konfirmasi lagi**, kecuali disebutkan lain.
 
 Setelah dieksekusi, jangan lupa update juga `docs/BRA_v2.md`, `docs/PRD_v8.md`/`docs/TSD_v3.md`, dan `docs/ringkasan-seluruh-sprint.md` supaya keputusan ini tercatat resmi di dokumen acuan, bukan cuma di file ini.
 

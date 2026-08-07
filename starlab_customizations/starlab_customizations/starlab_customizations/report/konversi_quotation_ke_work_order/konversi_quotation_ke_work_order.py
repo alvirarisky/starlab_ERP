@@ -24,7 +24,7 @@ def get_data(filters):
 	# menghitung "berapa % Quotation yang PUNYA Work Order terkait"
 	# (butuh JOIN + agregasi per bulan), jadi angka yang dihasilkan Number
 	# Card biasa untuk metrik ini pasti salah/menyesatkan (lihat catatan di
-	# docs/ringkasan-seluruh-sprint.md Bagian 6 & jobdesc_pira.md item 6).
+	# docs/ringkasan-seluruh-sprint.md Bagian 6).
 	conditions = ["q.docstatus < 2"]
 	values = {}
 	if filters.get("from_date"):

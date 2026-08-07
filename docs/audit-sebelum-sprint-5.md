@@ -1,5 +1,7 @@
 # Audit Project ERP SAI — Sebelum Sprint 5
 
+> **📁 ARSIP HISTORIS (per 2026-08-06):** Snapshot kondisi project SEBELUM Sprint 5 (2026-07-26). Sudah lama dilewati oleh perkembangan project — lihat `docs/ringkasan-seluruh-sprint.md` untuk kondisi Sprint 5 ke atas dan `docs/OVERVIEW_PROJECT.md` untuk kondisi terkini. Dipertahankan sebagai catatan sejarah proses kerja, bukan referensi status aktif.
+
 **Tanggal audit:** 2026-07-26
 **Lingkup:** Audit teknis menyeluruh (read-only, tidak ada perubahan kode) terhadap implementasi Frappe/ERPNext untuk PT Starlab Analitik Indonesia (SAI), sebelum melanjutkan pekerjaan ke Sprint 5.
 **Sumber pembanding:** BRA ERP SAI, TSD ERP SAI v2.0, PRD Quotation & Master Data v6.
