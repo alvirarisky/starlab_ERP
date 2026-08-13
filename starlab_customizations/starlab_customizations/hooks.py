@@ -231,8 +231,17 @@ fixtures = [
 				"Quotation", "Customer", "Client Inquiry", "Kaji Ulang Tender", "TNC Master Template",
 				"Petty Cash Entry", "Sales Invoice", "Bank Account", "Bank Transaction",
 				"Bank Reconciliation Tool", "Bank Statement Import",
+				# 2026-08-14: 5 celah izin Read yang dilaporkan tester (OVERVIEW_PROJECT.md
+				# Bagian 5 poin 5) -- role sudah punya akses ke suatu fitur, tapi fitur itu
+				# diam-diam butuh baca DocType lain yang belum diizinkan.
+				"Account", "Company", "Email Account", "Lead",
 			]],
-			["role", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi"]],
+			["role", "in", [
+				"Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi",
+				# Laboratorium ditambahkan bareng "Customer" jadi baris ke-2 poin di atas --
+				# Laboratorium sengaja tidak pernah masuk daftar role di sini sebelumnya.
+				"Laboratorium",
+			]],
 		],
 	},
 	{

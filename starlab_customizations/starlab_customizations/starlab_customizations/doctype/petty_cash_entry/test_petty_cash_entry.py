@@ -81,8 +81,13 @@ class IntegrationTestPettyCashEntry(IntegrationTestCase):
 		amounts = {row.account: (row.debit_in_account_currency, row.credit_in_account_currency) for row in je.accounts}
 		company = frappe.defaults.get_global_default("company")
 		abbr = frappe.get_cached_value("Company", company, "abbr")
-		self.assertEqual(amounts.get(f"Beban Operasional Kantor - {abbr}"), (150000, 0))
-		self.assertEqual(amounts.get(f"Kas Kecil - {abbr}"), (0, 150000))
+		# petty_cash_hooks._create_journal_entry (2026-08-03) pakai akun
+		# default ERPNext yang selalu ada di Company baru manapun ("Cash",
+		# "Office Maintenance Expenses"), bukan "Kas Kecil"/"Beban Operasional
+		# Kantor" -- nama custom yang diasumsikan tapi tidak pernah benar-benar
+		# dibuat di Chart of Accounts (lihat komentar di petty_cash_hooks.py).
+		self.assertEqual(amounts.get(f"Office Maintenance Expenses - {abbr}"), (150000, 0))
+		self.assertEqual(amounts.get(f"Cash - {abbr}"), (0, 150000))
 
 	def test_locked_fields_after_disetujui(self):
 		doc = _make_petty_cash_entry(nominal=50000)

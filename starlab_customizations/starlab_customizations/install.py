@@ -368,11 +368,61 @@ def _ensure_indonesian_language():
 	frappe.db.set_single_value("System Settings", "language", "id")
 
 
+SAI_APP_LOGO = "/assets/starlab_customizations/images/sai-logo.png"
+SAI_FAVICON = "/assets/starlab_customizations/images/sai-favicon.png"
+
+
+def _ensure_sai_branding():
+	# 2026-08-13: patches/set_sai_branding.py sets these once at patch time,
+	# but Website Settings.favicon/app_logo were found back to None on a
+	# long-lived dev site months later -- patches never re-run once logged
+	# in Patch Log, so whatever reset them (most likely erpnext/hrms own
+	# fixture sync touching the Website Settings single doc on a later
+	# `bench migrate`, same class of drift as _ensure_indonesian_language
+	# and the Workspace resets below) silently undid it for good. Re-assert
+	# every migrate instead, same idempotent pattern as the rest of this file.
+	website_settings = frappe.get_single("Website Settings")
+	changed = False
+	if website_settings.app_logo != SAI_APP_LOGO:
+		website_settings.app_logo = SAI_APP_LOGO
+		changed = True
+	if website_settings.favicon != SAI_FAVICON:
+		website_settings.favicon = SAI_FAVICON
+		changed = True
+	if changed:
+		website_settings.save(ignore_permissions=True)
+
+
+def _ensure_tnc_master_templates():
+	# 2026-08-14: patches/seed_tnc_master_template.py and _v2.py are each
+	# idempotent ("insert only if missing"), but a patch itself only ever
+	# EXECUTES once (tracked in Patch Log) -- if the record it created goes
+	# missing afterwards (observed on this long-lived dev site: both v01 and
+	# v02 gone despite Patch Log showing both patches already ran, no
+	# Deleted Document trace either; this is also one of the 7 CI test
+	# failures documented as "resolusi versi TNC Template" in
+	# docs/audit/ringkasan-seluruh-sprint.md), nothing ever re-creates it,
+	# because the patch itself won't run a second time. The consequence is
+	# silent, not an error: quotation_hooks._set_active_tnc_template just
+	# finds no matching template and leaves doc.tnc_template unset on every
+	# new Quotation from then on -- confirmed live, the merged Quotation PDF
+	# button (quotation_print.py) quietly skips the whole T&C section with
+	# no visible sign anything is wrong. Re-running each patch's own
+	# (already idempotent) execute() every migrate closes that gap, same
+	# self-healing pattern as _ensure_sai_branding above.
+	from starlab_customizations.patches import seed_tnc_master_template, seed_tnc_master_template_v2
+
+	seed_tnc_master_template.execute()
+	seed_tnc_master_template_v2.execute()
+
+
 def after_migrate():
 	_ensure_company()
 	_ensure_fiscal_year()
 	_ensure_indonesian_language()
 	_ensure_setup_complete()
+	_ensure_sai_branding()
+	_ensure_tnc_master_templates()
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
 	_ensure_hr_workspace_sidebar()

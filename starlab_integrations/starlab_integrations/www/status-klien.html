@@ -12,6 +12,7 @@
 
 	<h4 style="margin-top: 2rem;">Laporan Hasil Uji (LHU)</h4>
 	{% if lhu_list %}
+	<div class="table-responsive">
 	<table class="table table-bordered">
 		<thead>
 			<tr>
@@ -38,12 +39,14 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	</div>
 	{% else %}
 	<p>Belum ada LHU yang diterbitkan.</p>
 	{% endif %}
 
 	<h4 style="margin-top: 2rem;">Invoice</h4>
 	{% if invoice_list %}
+	<div class="table-responsive">
 	<table class="table table-bordered">
 		<thead>
 			<tr>
@@ -68,6 +71,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	</div>
 	{% else %}
 	<p>Belum ada Invoice.</p>
 	{% endif %}

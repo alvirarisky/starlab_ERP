@@ -94,6 +94,14 @@ class IntegrationTestDocumentMaster(IntegrationTestCase):
 		status_field = frappe.get_meta("Document Master").get_field("status")
 		self.assertIn("Usang", status_field.options)
 
+		# Dihitung sebagai delta (sebelum/sesudah), bukan assert count == 0
+		# -- ini shared dev DB, bukan DB kosong terisolasi per test. Record
+		# "Usang" lama (mis. hasil penandaan manual lewat Desk) sah-sah saja
+		# sudah ada dari sebelumnya; yang mau dikunci di sini murni "siklus
+		# workflow ini tidak MENAMBAH satu pun Document Master baru berstatus
+		# Usang", bukan "tabelnya harus kosong dari Usang sama sekali".
+		usang_count_before = frappe.db.count("Document Master", {"status": "Usang"})
+
 		doc = _make_document_master()
 		apply_workflow(doc, "Ajukan")
 		apply_workflow(doc, "Setujui")
@@ -101,6 +109,6 @@ class IntegrationTestDocumentMaster(IntegrationTestCase):
 		self.assertEqual(doc.status, "Aktif")
 		self.assertEqual(
 			frappe.db.count("Document Master", {"status": "Usang"}),
-			0,
+			usang_count_before,
 			"Tidak ada jalur otomatis manapun di kode saat ini yang mengubah status jadi Usang",
 		)
