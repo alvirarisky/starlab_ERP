@@ -4,7 +4,7 @@ from starlab_lab_ops.audit_log import log_system_field_change
 
 
 def get_permission_query_conditions(user=None):
-	# Client Portal (starlab_integrations/www/status-klien.py) query LHU
+	# Client Portal (starlab_integrations/www/status_klien.py) query LHU
 	# lewat frappe.get_all tanpa ignore_permissions -- role Customer butuh
 	# "read" doctype-level (lihat lhu.json permissions) supaya tidak
 	# PermissionError, TAPI tanpa filter row-level di sini, itu berarti

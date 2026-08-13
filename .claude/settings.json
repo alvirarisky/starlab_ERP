@@ -17,7 +17,8 @@
       "Read(//tmp/**)",
       "Bash(cp /tmp/bra.txt /tmp/plan.txt \"C:\\\\Users\\\\Nopir\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Kuliah-SMT6-KERJA-PRAKTIK-starlab-ERP\\\\ef039bc4-6c52-4e7d-b7ef-0fcb20df4b06\\\\scratchpad\\\\\" 2>&1 *)",
       "Bash(docker ps *)",
-      "Bash(docker rmi *)"
+      "Bash(docker rmi *)",
+      "Bash(python3 -c ' *)"
     ],
     "additionalDirectories": [
       "\\tmp"
