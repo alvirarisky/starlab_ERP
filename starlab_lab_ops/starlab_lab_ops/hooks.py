@@ -211,7 +211,16 @@ fixtures = [
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "in", ["Work Order Pengujian", "Sample", "Test Result", "LHU"]],
+			["parent", "in", [
+				"Work Order Pengujian", "Sample", "Test Result", "LHU",
+				# 2026-08-14: Test Parameter cuma punya permission "System Manager"
+				# sejak dibuat -- shortcut "Test Parameter" di Workspace LIMS diam-diam
+				# hilang dari sidebar Laboratorium/Manajer Teknis/Direksi (Frappe
+				# menyembunyikan shortcut Workspace kalau role-nya tidak punya read,
+				# tanpa pesan error apa pun -- makanya kelihatan seperti "belum
+				# dikasih akses" padahal sebenarnya memang belum pernah diizinkan).
+				"Test Parameter",
+			]],
 			["role", "in", ["Administrasi", "Manajer Teknis", "Laboratorium", "Direksi", "Marketing", "Finance", "Manajer Mutu", "Customer"]],
 		],
 	},

@@ -235,6 +235,13 @@ fixtures = [
 				# Bagian 5 poin 5) -- role sudah punya akses ke suatu fitur, tapi fitur itu
 				# diam-diam butuh baca DocType lain yang belum diizinkan.
 				"Account", "Company", "Email Account", "Lead",
+				# 2026-08-14: Item -- ref_doctype laporan "Rekap Stok Reagen dan
+				# Consumable" di Workspace LIMS. Report.roles sudah benar mendaftarkan
+				# Laboratorium/Manajer Teknis/Direksi, tapi Frappe JUGA mensyaratkan
+				# permission langsung ke ref_doctype-nya (Item) di luar Report.roles --
+				# tanpa itu laporannya ikut hilang dari sidebar sama seperti Test
+				# Parameter di atas (starlab_lab_ops/hooks.py).
+				"Item",
 			]],
 			["role", "in", [
 				"Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi",
