@@ -11,12 +11,35 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"label": "Work Order", "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order Pengujian", "width": 130},
+		{
+			"label": "Work Order",
+			"fieldname": "work_order",
+			"fieldtype": "Link",
+			"options": "Work Order Pengujian",
+			"width": 130,
+		},
 		{"label": "Matriks", "fieldname": "matriks", "fieldtype": "Data", "width": 110},
-		{"label": "Parameter", "fieldname": "parameter", "fieldtype": "Link", "options": "Test Parameter", "width": 200},
-		{"label": "PJ Analis", "fieldname": "pj_analis", "fieldtype": "Link", "options": "Employee", "width": 120},
+		{
+			"label": "Parameter",
+			"fieldname": "parameter",
+			"fieldtype": "Link",
+			"options": "Test Parameter",
+			"width": 200,
+		},
+		{
+			"label": "PJ Analis",
+			"fieldname": "pj_analis",
+			"fieldtype": "Link",
+			"options": "Employee",
+			"width": 120,
+		},
 		{"label": "Target Pengujian", "fieldname": "target_pengujian", "fieldtype": "Date", "width": 110},
-		{"label": "Tanggal Selesai Aktual", "fieldname": "tanggal_selesai_aktual", "fieldtype": "Date", "width": 130},
+		{
+			"label": "Tanggal Selesai Aktual",
+			"fieldname": "tanggal_selesai_aktual",
+			"fieldtype": "Date",
+			"width": 130,
+		},
 		{"label": "Status SLA", "fieldname": "status_sla", "fieldtype": "Data", "width": 110},
 	]
 

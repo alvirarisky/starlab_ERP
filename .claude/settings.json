@@ -18,7 +18,21 @@
       "Bash(cp /tmp/bra.txt /tmp/plan.txt \"C:\\\\Users\\\\Nopir\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Kuliah-SMT6-KERJA-PRAKTIK-starlab-ERP\\\\ef039bc4-6c52-4e7d-b7ef-0fcb20df4b06\\\\scratchpad\\\\\" 2>&1 *)",
       "Bash(docker ps *)",
       "Bash(docker rmi *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(rm -f cookies_admin3.txt)",
+      "Bash(curl -s -c cookies_admin3.txt -X POST http://localhost:8080/api/method/login -d \"usr=administrasi.test@example.com&pwd=Test@12345\" -o /dev/null)",
+      "Bash(curl -s -b cookies_admin3.txt \"http://localhost:8080/api/resource/Page/quotation-board\")",
+      "Bash(rm -f cookies_admin4.txt)",
+      "Bash(curl -s -c cookies_admin4.txt -X POST http://localhost:8080/api/method/login -d \"usr=administrasi.test@example.com&pwd=Test@12345\" -o /dev/null)",
+      "Bash(curl -s -b cookies_admin4.txt -D - -o /dev/null \"http://localhost:8080/app/quotation-board\")",
+      "Bash(curl -s -b cookies_admin4.txt -D - -o body_quotation_list.html \"http://localhost:8080/app/quotation\")",
+      "Bash(rm -f cookies_test5.txt)",
+      "Bash(curl -s -c cookies_test5.txt -X POST http://localhost:8080/api/method/login -d \"usr=administrasi.test@example.com&pwd=Test@12345\" -w \"\\\\nHTTP: %{http_code}\\\\n\")",
+      "Bash(mv \"tampilan utama.png\" \"01-papan-kanban-kosong.png\")",
+      "Bash(mv \"Html → Body.png\" \"02-dashboard-ikhtisar-saluran.png\")",
+      "Bash(mv \"Html → Body-1.png\" \"03-panel-detail-timeline.png\")",
+      "Bash(mv \"Html → Body-2.png\" \"04-papan-kanban-form-tambah-kartu.png\")",
+      "Bash(mv \"Html → Body-3.png\" \"05-tampilan-list.png\")"
     ],
     "additionalDirectories": [
       "\\tmp"

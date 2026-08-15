@@ -26,9 +26,7 @@ def get(
 	# erpnext/stock/dashboard_chart_source/warehouse_wise_stock_value/).
 	client_inquiry_total = frappe.db.count("Client Inquiry")
 	quotation_total = frappe.db.count("Quotation", {"docstatus": ["<", 2]})
-	quotation_approved = frappe.db.count(
-		"Quotation", {"docstatus": ["<", 2], "workflow_state": "Approved"}
-	)
+	quotation_approved = frappe.db.count("Quotation", {"docstatus": ["<", 2], "workflow_state": "Approved"})
 
 	return {
 		"labels": [_("Form A (Client Inquiry)"), _("Quotation Dibuat"), _("Quotation Approved")],

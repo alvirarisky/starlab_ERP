@@ -11,8 +11,20 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"label": "Test Result", "fieldname": "name", "fieldtype": "Link", "options": "Test Result", "width": 130},
-		{"label": "Parameter", "fieldname": "parameter", "fieldtype": "Link", "options": "Test Parameter", "width": 200},
+		{
+			"label": "Test Result",
+			"fieldname": "name",
+			"fieldtype": "Link",
+			"options": "Test Result",
+			"width": 130,
+		},
+		{
+			"label": "Parameter",
+			"fieldname": "parameter",
+			"fieldtype": "Link",
+			"options": "Test Parameter",
+			"width": 200,
+		},
 		{"label": "Analis", "fieldname": "analis", "fieldtype": "Link", "options": "Employee", "width": 130},
 		{"label": "Hasil Uji", "fieldname": "hasil_uji", "fieldtype": "Float", "width": 100},
 		{"label": "Satuan", "fieldname": "satuan", "fieldtype": "Data", "width": 90},

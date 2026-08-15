@@ -2,10 +2,10 @@
 	// hooks.py::app_include_js -- install.py::get_home_page cuma dipakai
 	// Frappe core untuk redirect SEKALI seusai submit form /login. Kalau
 	// session masih aktif (cookie belum di-clear) dan user buka /app atau
-	// /desk langsung (bukmark, ketik URL, tab baru) tanpa lewat form login
-	// lagi, redirect itu tidak pernah kepanggil -- Desk cuma nampilin
-	// Workspace publik default (rute kosong) apa adanya. Skrip ini menutup
-	// celah itu: tiap Desk baru selesai boot (app_ready, SETELAH
+	// /desk langsung (bukmark, ketik URL, tab baru, REFRESH) tanpa lewat
+	// form login lagi, redirect itu tidak pernah kepanggil -- Desk cuma
+	// nampilin Workspace publik default (rute kosong) apa adanya. Skrip ini
+	// menutup celah itu: tiap Desk baru selesai boot (app_ready, SETELAH
 	// frappe.Application.set_route() jalan -- lihat desk.js), kalau rute
 	// yang ke-resolve ternyata kosong (persis kondisi "masuk ke /desk
 	// generik" yang dikeluhkan), minta rute Workspace role user ke server
@@ -13,26 +13,23 @@
 	// dulu sebelum redirect -- tidak ada hook resmi Frappe untuk intercept
 	// SEBELUM set_route() pertama jalan tanpa monkey-patch core.
 	//
-	// PENTING soal deteksi "rute kosong": frappe.router.parse() menghasilkan
-	// `[""]` (array isi SATU string kosong) untuk /desk polos, BUKAN `[]`
-	// (array kosong beneran) -- lihat convert_to_standard_route() di
-	// frappe/public/js/frappe/router.js, tidak ada satu pun cabang if yang
-	// match untuk route[0] === "", jadi balik apa adanya. Cek `.length !== 0`
-	// makanya SELALU gagal mendeteksi kondisi ini (route.length konsisten 1,
-	// bukan 0) -- redirect jadi TIDAK PERNAH kepanggil sama sekali sebelum
-	// perbaikan ini, persis root cause keluhan "sering banget ke /desk dulu".
-	//
-	// 2026-08-05: frappe.get_route() juga bisa balikin `null` (bukan array
-	// sama sekali) -- kejadian nyata di app_ready SAAT LOGIN PERTAMA (login
-	// form submit -> full page load /desk/<slug>), sebelum frappe.router
-	// sempat parse route apa pun. route.length dipanggil langsung tanpa cek
-	// null sebelumnya bikin TypeError uncaught di SETIAP boot Desk (bukan
-	// cuma kasus "session lama buka /desk langsung" yang jadi target awal
-	// fix ini) -- diverifikasi lewat headless browser, stack trace persis
-	// nunjuk baris ini. Guard null di depan.
-	function is_empty_route(route) {
-		if (!route) return true;
-		return route.length === 0 || (route.length === 1 && !route[0]);
+	// 2026-08-15: deteksi "rute kosong" TIDAK BOLEH pakai frappe.get_route()
+	// -- dikonfirmasi lewat spy langsung ke frappe.set_route()/localStorage
+	// (bukan tebakan): pada fresh full page load ke route SPESIFIK apa pun
+	// (bukan cuma /desk polos -- termasuk /app/quotation, /app/customer,
+	// Page baru manapun), frappe.router.route() bisa masih nunggu fetch
+	// metadata route yang belum ke-cache di localStorage["page_info"]
+	// (selalu kosong di awal sesi baru) SAAT app_ready ditrigger (keduanya
+	// dipanggil sinkron berurutan di Application.startup(), lihat desk.js) --
+	// jadi frappe.get_route() KELIHATAN kosong sesaat meski URL yang diminta
+	// browser sudah jelas & valid, bikin skrip ini salah redirect ke
+	// Workspace role padahal user sedang menuju halaman spesifik. Baca
+	// window.location.pathname langsung sebagai gantinya -- itu SELALU
+	// tersedia instan (bagian dari objek `location` browser, tidak
+	// bergantung resolusi async apa pun milik Frappe).
+	function is_empty_route() {
+		var path = window.location.pathname.replace(/^\/(app|desk)\/?/, "");
+		return !path;
 	}
 
 	// 2026-08-04: request user "sidebar-nya gaperlu ada kalo belum masuk
@@ -65,7 +62,7 @@
 
 	$(document).on("app_ready", function () {
 		if (frappe.session.user === "Guest") return;
-		if (!is_empty_route(frappe.get_route())) return;
+		if (!is_empty_route()) return;
 
 		toggle_sidebar(false);
 

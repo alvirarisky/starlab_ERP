@@ -1,15 +1,24 @@
 import frappe
 from frappe.tests import IntegrationTestCase
-
 from starlab_customizations.starlab_customizations.tests.quotation_test_utils import make_quotation
+
 from starlab_integrations.tracking import track_order
 
 # Kata kunci yang menandakan data harga/finansial -- endpoint ini (PRD v8
 # Bagian 5.7 / TSD Bab 11) SENGAJA tidak pernah boleh mengembalikan salah
 # satu dari ini ke guest anonim.
 PRICE_RELATED_KEYWORDS = (
-	"sub_total", "dpp", "ppn", "total_invoice", "harga", "biaya_kirim",
-	"discount", "rush_fee", "grand_total", "net_total", "outstanding_amount",
+	"sub_total",
+	"dpp",
+	"ppn",
+	"total_invoice",
+	"harga",
+	"biaya_kirim",
+	"discount",
+	"rush_fee",
+	"grand_total",
+	"net_total",
+	"outstanding_amount",
 )
 
 

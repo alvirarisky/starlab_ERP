@@ -1,21 +1,21 @@
 frappe.query_reports["Rekap Stok Reagen dan Consumable"] = {
-	"filters": [
+	filters: [
 		{
-			"fieldname": "item_group",
-			"label": __("Item Group"),
-			"fieldtype": "Link",
-			"options": "Item Group",
-			"default": "",
+			fieldname: "item_group",
+			label: __("Item Group"),
+			fieldtype: "Link",
+			options: "Item Group",
+			default: "",
 		},
 		{
-			"fieldname": "warehouse",
-			"label": __("Warehouse"),
-			"fieldtype": "Link",
-			"options": "Warehouse",
-			"default": "",
+			fieldname: "warehouse",
+			label: __("Warehouse"),
+			fieldtype: "Link",
+			options: "Warehouse",
+			default: "",
 		},
 	],
-	"formatter": function (value, row, column, data, default_formatter) {
+	formatter: function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 		if (column.fieldname == "stok_saat_ini" && data.reorder_level != null) {
 			if (flt(data.stok_saat_ini) < flt(data.reorder_level)) {

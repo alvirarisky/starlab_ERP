@@ -1,0 +1,206 @@
+/* Warna brand SAI (cyan) -- sama seperti public/css/starlab_branding.css,
+   dipakai lagi di sini biar Papan Quotation & Papan Client Inquiry kerasa
+   konsisten sama bagian lain sistem (kop surat, halaman /tracking, dst),
+   bukan warna generik bawaan Frappe. */
+:root {
+	--crm-kanban-brand: #11a8e0;
+	--crm-kanban-brand-dark: #0d89b7;
+}
+
+.crm-kanban-board {
+	position: relative;
+	display: flex;
+	gap: 1rem;
+	padding: 1rem 1.5rem;
+	overflow-x: auto;
+	align-items: flex-start;
+	min-height: 120px;
+}
+
+.crm-kanban-board.crm-kanban-board-loading {
+	min-height: 200px;
+}
+
+.crm-kanban-board-spinner {
+	position: absolute;
+	top: 1.5rem;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 2;
+}
+
+.crm-kanban-board-spinner span {
+	display: block;
+	width: 22px;
+	height: 22px;
+	border: 3px solid #d6eefb;
+	border-top-color: var(--crm-kanban-brand);
+	border-radius: 50%;
+	animation: crm-kanban-spin 0.7s linear infinite;
+}
+
+@keyframes crm-kanban-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.crm-kanban-column {
+	flex: 0 0 280px;
+	background: var(--subtle-fg, #f8f8f8);
+	border-radius: 8px;
+	padding: 0.5rem;
+	min-height: 200px;
+	transition: outline-color 0.1s ease, opacity 0.1s ease;
+}
+
+.crm-kanban-column.drop-allowed {
+	outline: 2px dashed var(--crm-kanban-brand);
+	outline-offset: -2px;
+	background: #eaf8fd;
+}
+
+.crm-kanban-column.drop-forbidden {
+	outline: 2px dashed var(--red-300, #fc8181);
+	outline-offset: -2px;
+	opacity: 0.6;
+}
+
+.crm-kanban-column-header {
+	padding: 0.4rem 0.4rem 0.6rem;
+}
+
+.crm-kanban-column-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: 600;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: var(--text-muted, #8d99a6);
+}
+
+.crm-kanban-column-count {
+	background: var(--bg-color, #fff);
+	border-radius: 999px;
+	padding: 0.05rem 0.5rem;
+	font-size: 0.75rem;
+}
+
+.crm-kanban-column-total {
+	margin-top: 0.2rem;
+	font-size: 0.85rem;
+	font-weight: 700;
+	color: var(--crm-kanban-brand-dark);
+}
+
+.crm-kanban-empty {
+	text-align: center;
+	color: var(--text-muted, #8d99a6);
+	font-size: 0.85rem;
+	padding: 1.5rem 0.5rem;
+	border: 1px dashed var(--border-color, #d1d8dd);
+	border-radius: 6px;
+}
+
+.crm-kanban-card {
+	background: var(--bg-color, #fff);
+	border: 1px solid var(--border-color, #d1d8dd);
+	border-left: 3px solid var(--crm-kanban-brand);
+	border-radius: 8px;
+	padding: 0.75rem 0.75rem 0.75rem 0.65rem;
+	margin-bottom: 0.6rem;
+	cursor: pointer;
+	transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.crm-kanban-card:hover {
+	box-shadow: 0 2px 8px rgba(17, 168, 224, 0.15);
+	transform: translateY(-1px);
+}
+
+.crm-kanban-card.dragging {
+	opacity: 0.4;
+}
+
+.crm-kanban-card-title {
+	font-weight: 600;
+	font-size: 0.9rem;
+	margin-bottom: 0.15rem;
+}
+
+.crm-kanban-card-subtitle {
+	color: var(--text-muted, #8d99a6);
+	font-size: 0.8rem;
+	margin-bottom: 0.4rem;
+}
+
+.crm-kanban-card-amount {
+	font-weight: 700;
+	font-size: 1rem;
+	margin-bottom: 0.4rem;
+	color: var(--text-color, #1c2126);
+}
+
+.crm-kanban-card-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+	margin-bottom: 0.4rem;
+}
+
+.crm-kanban-badge {
+	display: inline-block;
+	padding: 0.1rem 0.5rem;
+	border-radius: 999px;
+	font-size: 0.72rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.crm-kanban-badge-muted { background: #ececec; color: #555; }
+.crm-kanban-badge-success { background: #e3f6e8; color: #1e7a34; }
+.crm-kanban-badge-warning { background: #fff4da; color: #8a6100; }
+.crm-kanban-badge-danger { background: #fdecea; color: #a3242f; }
+.crm-kanban-badge-rush { background: #e4f6fd; color: var(--crm-kanban-brand-dark); }
+
+.crm-kanban-card-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.4rem;
+	font-size: 0.75rem;
+	color: var(--text-muted, #8d99a6);
+}
+
+.crm-kanban-avatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: #d6eefb;
+	color: var(--crm-kanban-brand-dark);
+	font-size: 0.7rem;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+
+.crm-kanban-kaji-ulang-btn {
+	font-size: 0.72rem;
+	padding: 0.2rem 0.55rem;
+	border-color: var(--crm-kanban-brand);
+	color: var(--crm-kanban-brand-dark);
+}
+
+.crm-kanban-kaji-ulang-btn:hover {
+	background: var(--crm-kanban-brand);
+	color: #fff;
+}
+
+.crm-kanban-card-loading {
+	opacity: 0.5;
+	pointer-events: none;
+}

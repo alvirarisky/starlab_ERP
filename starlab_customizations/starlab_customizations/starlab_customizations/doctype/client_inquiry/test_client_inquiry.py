@@ -63,9 +63,7 @@ class IntegrationTestClientInquiry(IntegrationTestCase):
 
 		apply_workflow(doc, "Ajukan")
 
-		self.assertEqual(
-			frappe.db.get_value("Client Inquiry", doc.name, "status"), "Diajukan Kaji Ulang"
-		)
+		self.assertEqual(frappe.db.get_value("Client Inquiry", doc.name, "status"), "Diajukan Kaji Ulang")
 
 	def test_alamat_is_mandatory(self):
 		doc = _make_client_inquiry_doc(alamat=None)

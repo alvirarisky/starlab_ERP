@@ -91,7 +91,11 @@ def _create_journal_entry(doc):
 		je.user_remark = frappe._("Petty Cash Entry {0}: {1}").format(doc.name, doc.item)
 		je.append(
 			"accounts",
-			{"account": debit_account, "debit_in_account_currency": flt(doc.nominal), "cost_center": cost_center},
+			{
+				"account": debit_account,
+				"debit_in_account_currency": flt(doc.nominal),
+				"cost_center": cost_center,
+			},
 		)
 		je.append("accounts", {"account": credit_account, "credit_in_account_currency": flt(doc.nominal)})
 		je.insert(ignore_permissions=True)
@@ -101,9 +105,9 @@ def _create_journal_entry(doc):
 			doc.doctype,
 			doc.name,
 			{"journal_entry": (None, je.name)},
-			frappe._("Journal Entry {0} dibuat otomatis oleh sistem karena Petty Cash Entry ini Disetujui.").format(
-				je.name
-			),
+			frappe._(
+				"Journal Entry {0} dibuat otomatis oleh sistem karena Petty Cash Entry ini Disetujui."
+			).format(je.name),
 		)
 	except Exception:
 		frappe.db.rollback(save_point=savepoint)

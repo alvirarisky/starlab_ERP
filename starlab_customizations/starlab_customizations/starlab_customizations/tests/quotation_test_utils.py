@@ -9,9 +9,9 @@ def ensure_master_data():
 	if not frappe.db.exists("UOM", "Nos"):
 		frappe.get_doc({"doctype": "UOM", "uom_name": "Nos"}).insert(ignore_permissions=True)
 	if not frappe.db.exists("Item Group", "All Item Groups"):
-		frappe.get_doc(
-			{"doctype": "Item Group", "item_group_name": "All Item Groups", "is_group": 1}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "Item Group", "item_group_name": "All Item Groups", "is_group": 1}).insert(
+			ignore_permissions=True
+		)
 	if not frappe.db.exists("Price List", "Standard Selling"):
 		frappe.get_doc(
 			{

@@ -10,8 +10,18 @@ from starlab_customizations.audit_log import log_system_field_change
 # (bukan reset tiap bulan -- 075/076 sama-sama bulan Mei), jadi key seri
 # di bawah sengaja hanya menyertakan tahun, bukan tahun+bulan.
 ROMAN_MONTHS = {
-	1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI",
-	7: "VII", 8: "VIII", 9: "IX", 10: "X", 11: "XI", 12: "XII",
+	1: "I",
+	2: "II",
+	3: "III",
+	4: "IV",
+	5: "V",
+	6: "VI",
+	7: "VII",
+	8: "VIII",
+	9: "IX",
+	10: "X",
+	11: "XI",
+	12: "XII",
 }
 
 
@@ -149,16 +159,19 @@ def _reset_sla_escalation_flag(doc):
 STATES_AFTER_MT_APPROVAL = ["Menunggu Approval MM", "Menunggu Approval Direksi"]
 
 NUMERIC_CONTENT_FIELDS = [
-	"discount_percent", "biaya_kirim", "ppn_percent", "dp_percent",
-	"rush_fee_hari", "rush_fee_percent",
+	"discount_percent",
+	"biaya_kirim",
+	"ppn_percent",
+	"dp_percent",
+	"rush_fee_hari",
+	"rush_fee_percent",
 ]
 TEXT_CONTENT_FIELDS = ["termin_pembayaran", "tingkat_percepatan"]
 
 
 def _parameter_detail_signature(rows):
 	return sorted(
-		(row.parameter, flt(row.frekuensi), flt(row.qty_per_titik), flt(row.harga_satuan))
-		for row in rows
+		(row.parameter, flt(row.frekuensi), flt(row.qty_per_titik), flt(row.harga_satuan)) for row in rows
 	)
 
 
@@ -276,5 +289,7 @@ def on_update(doc, method=None):
 	_notify_role(
 		role,
 		frappe._("Quotation {0} menunggu approval Anda").format(doc.name),
-		frappe._("Quotation {0} sudah masuk ke tahap approval Anda ({1}).").format(doc.name, doc.workflow_state),
+		frappe._("Quotation {0} sudah masuk ke tahap approval Anda ({1}).").format(
+			doc.name, doc.workflow_state
+		),
 	)

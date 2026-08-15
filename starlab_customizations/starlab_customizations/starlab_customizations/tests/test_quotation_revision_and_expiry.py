@@ -73,7 +73,9 @@ class IntegrationTestQuotationExpiry(IntegrationTestCase):
 
 	def test_expiry_is_45_days_from_transaction_date(self):
 		expected = add_days(self.quotation.transaction_date, 45)
-		self.assertEqual(frappe.utils.getdate(self.quotation.tanggal_kadaluwarsa), frappe.utils.getdate(expected))
+		self.assertEqual(
+			frappe.utils.getdate(self.quotation.tanggal_kadaluwarsa), frappe.utils.getdate(expected)
+		)
 
 	def test_scheduled_job_moves_approved_quotation_to_kedaluwarsa(self):
 		frappe.db.set_value(

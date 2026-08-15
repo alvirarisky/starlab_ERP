@@ -49,7 +49,9 @@ def on_update_document_master(doc, method=None):
 
 	# TSD Bagian 10 "Approval Pending": notifikasi segera begitu dokumen masuk
 	# ke tahap approval-nya masing-masing.
-	approval_role = {"Menunggu Approval MM": "Manajer Mutu", "Menunggu Approval Direksi": "Direksi"}.get(doc.status)
+	approval_role = {"Menunggu Approval MM": "Manajer Mutu", "Menunggu Approval Direksi": "Direksi"}.get(
+		doc.status
+	)
 	if approval_role:
 		_notify_role(
 			approval_role,
@@ -98,7 +100,9 @@ def _notify_distribution(doc):
 		return
 
 	users = set(
-		frappe.get_all("Has Role", filters={"role": ["in", list(roles)], "parenttype": "User"}, pluck="parent")
+		frappe.get_all(
+			"Has Role", filters={"role": ["in", list(roles)], "parenttype": "User"}, pluck="parent"
+		)
 	)
 	users.discard("Administrator")
 	users.discard("Guest")

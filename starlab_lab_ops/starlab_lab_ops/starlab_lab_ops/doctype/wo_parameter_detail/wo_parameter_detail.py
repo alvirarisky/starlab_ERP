@@ -15,7 +15,16 @@ class WOParameterDetail(Document):
 		from frappe.types import DF
 
 		keterangan: DF.SmallText | None
-		matriks: DF.Literal["Udara Ambien", "Udara Emisi", "Air Permukaan", "Air Bersih", "Air Limbah", "Tanah", "Sedimen", "Kebisingan"]
+		matriks: DF.Literal[
+			"Udara Ambien",
+			"Udara Emisi",
+			"Air Permukaan",
+			"Air Bersih",
+			"Air Limbah",
+			"Tanah",
+			"Sedimen",
+			"Kebisingan",
+		]
 		parameter: DF.Link
 		parent: DF.Data
 		parentfield: DF.Data

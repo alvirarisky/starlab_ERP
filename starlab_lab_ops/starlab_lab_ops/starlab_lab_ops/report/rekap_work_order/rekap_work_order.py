@@ -10,13 +10,37 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"label": "Work Order", "fieldname": "work_order", "fieldtype": "Link", "options": "Work Order Pengujian", "width": 150},
-		{"label": "Customer", "fieldname": "customer", "fieldtype": "Link", "options": "Customer", "width": 180},
+		{
+			"label": "Work Order",
+			"fieldname": "work_order",
+			"fieldtype": "Link",
+			"options": "Work Order Pengujian",
+			"width": 150,
+		},
+		{
+			"label": "Customer",
+			"fieldname": "customer",
+			"fieldtype": "Link",
+			"options": "Customer",
+			"width": 180,
+		},
 		{"label": "Kegiatan", "fieldname": "kegiatan", "fieldtype": "Data", "width": 200},
 		{"label": "Tanggal WO", "fieldname": "tanggal_wo", "fieldtype": "Date", "width": 100},
 		{"label": "Status WO", "fieldname": "status", "fieldtype": "Data", "width": 100},
-		{"label": "Parameter", "fieldname": "parameter", "fieldtype": "Link", "options": "Test Parameter", "width": 200},
-		{"label": "PJ Analis", "fieldname": "pj_analis", "fieldtype": "Link", "options": "Employee", "width": 140},
+		{
+			"label": "Parameter",
+			"fieldname": "parameter",
+			"fieldtype": "Link",
+			"options": "Test Parameter",
+			"width": 200,
+		},
+		{
+			"label": "PJ Analis",
+			"fieldname": "pj_analis",
+			"fieldtype": "Link",
+			"options": "Employee",
+			"width": 140,
+		},
 		{"label": "Target Pengujian", "fieldname": "target_pengujian", "fieldtype": "Date", "width": 110},
 		{"label": "Status Pengujian", "fieldname": "status_pengujian", "fieldtype": "Data", "width": 110},
 	]

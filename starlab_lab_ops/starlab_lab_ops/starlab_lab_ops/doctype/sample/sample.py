@@ -15,7 +15,16 @@ class Sample(Document):
 		from frappe.types import DF
 
 		catatan_kondisi: DF.SmallText | None
-		matriks: DF.Literal["Udara Ambien", "Udara Emisi", "Air Permukaan", "Air Bersih", "Air Limbah", "Tanah", "Sedimen", "Kebisingan"]
+		matriks: DF.Literal[
+			"Udara Ambien",
+			"Udara Emisi",
+			"Air Permukaan",
+			"Air Bersih",
+			"Air Limbah",
+			"Tanah",
+			"Sedimen",
+			"Kebisingan",
+		]
 		retensi: DF.Literal["Tahan", "Bisa Dibuang"]
 		sample_id: DF.Data
 		status: DF.Literal["Diterima", "Sedang Diuji", "Divalidasi", "Diarsipkan", "Dimusnahkan"]

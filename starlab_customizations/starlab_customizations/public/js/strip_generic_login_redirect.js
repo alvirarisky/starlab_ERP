@@ -21,7 +21,8 @@
 	if (redirectTo === "/app" || redirectTo === "/desk") {
 		params.delete("redirect-to");
 		var newSearch = params.toString();
-		var newUrl = window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
+		var newUrl =
+			window.location.pathname + (newSearch ? "?" + newSearch : "") + window.location.hash;
 		window.history.replaceState(null, "", newUrl);
 	}
 })();

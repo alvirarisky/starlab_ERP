@@ -129,7 +129,7 @@ def check_quotation_expiry():
 				frappe._("Quotation {0} sudah kedaluwarsa").format(row.name),
 				frappe._(
 					"Quotation {0} sudah melewati tanggal kedaluwarsa dan belum direspons client."
-					" Gunakan aksi \"Aktifkan Kembali\" bila ingin memperpanjang."
+					' Gunakan aksi "Aktifkan Kembali" bila ingin memperpanjang.'
 				).format(row.name),
 			)
 		frappe.db.set_value("Quotation", row.name, "kedaluwarsa_notif_terkirim", 1)
@@ -143,7 +143,7 @@ def check_quotation_expiry():
 			},
 			frappe._(
 				"Quotation ini otomatis dipindah ke status Kedaluwarsa oleh sistem karena melewati"
-				" tanggal kedaluwarsa tanpa respons client. Gunakan aksi \"Aktifkan Kembali\" untuk"
+				' tanggal kedaluwarsa tanpa respons client. Gunakan aksi "Aktifkan Kembali" untuk'
 				" memperpanjang tanpa membuat Quotation baru."
 			),
 		)

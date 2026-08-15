@@ -15,7 +15,16 @@ class TestParameter(Document):
 		from frappe.types import DF
 
 		harga_satuan_default: DF.Currency
-		matriks: DF.Literal["Udara Ambien", "Udara Emisi", "Air Permukaan", "Air Bersih", "Air Limbah", "Tanah", "Sedimen", "Kebisingan"]
+		matriks: DF.Literal[
+			"Udara Ambien",
+			"Udara Emisi",
+			"Air Permukaan",
+			"Air Bersih",
+			"Air Limbah",
+			"Tanah",
+			"Sedimen",
+			"Kebisingan",
+		]
 		metode_uji: DF.Link | None
 		parameter_name: DF.Data
 		regulasi_acuan: DF.Data

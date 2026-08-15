@@ -92,8 +92,14 @@ FINANCE_REPORT_ACCESS = ["Accounts Receivable", "Bank Reconciliation Statement"]
 # masing-masing, beda dari Workspace milik app kita sendiri yang aman dari
 # re-sync begitu `modified` ke-bump lewat save().
 SYSTEM_MANAGER_ONLY_WORKSPACES = [
-	"Build", "Users", "Website", "Support", "Integrations",
-	"Selling", "Invoicing", "Financial Reports",
+	"Build",
+	"Users",
+	"Website",
+	"Support",
+	"Integrations",
+	"Selling",
+	"Invoicing",
+	"Financial Reports",
 	# 2026-08-03: 8 Workspace bawaan app `hrms` (github.com/frappe/hrms) --
 	# sama seperti Workspace bawaan ERPNext di atas, ini juga `roles: []`
 	# (tidak dibatasi) begitu di-install, jadi kelihatan ke SEMUA role
@@ -103,8 +109,13 @@ SYSTEM_MANAGER_ONLY_WORKSPACES = [
 	# 8 Workspace bawaan ini didisain ulang cakupannya ke System Manager
 	# saja, bukan dihapus/is_hidden, supaya tetap bisa dibuka manual kalau
 	# ada kebutuhan admin/debug yang butuh tampilan asli hrms.
-	"Expenses", "HR Setup", "Leaves", "Recruitment",
-	"Shift & Attendance", "Payroll", "Tax & Benefits",
+	"Expenses",
+	"HR Setup",
+	"Leaves",
+	"Recruitment",
+	"Shift & Attendance",
+	"Payroll",
+	"Tax & Benefits",
 	# "Performance" & "Tenure" TIDAK di sini -- 2026-08-03 dikonfirmasi gak
 	# kepake sama sekali, jadi disembunyikan total lewat is_hidden (lihat
 	# FULLY_HIDDEN_WORKSPACES di bawah), bukan cuma dibatasi ke System Manager.
@@ -112,7 +123,8 @@ SYSTEM_MANAGER_ONLY_WORKSPACES = [
 	# role "HR" ditambahkan -- role HR ini yang pertama dari 7 role bisnis
 	# yang punya akses ke DocType bermodule "Setup" (Employee), jadi baru
 	# sekarang celah modul "Setup" ini kena.
-	"Home", "ERPNext Settings",
+	"Home",
+	"ERPNext Settings",
 ]
 
 

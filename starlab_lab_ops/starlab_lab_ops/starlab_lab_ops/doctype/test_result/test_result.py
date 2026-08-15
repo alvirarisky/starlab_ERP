@@ -13,6 +13,7 @@ class TestResult(Document):
 
 	if TYPE_CHECKING:
 		from frappe.types import DF
+
 		from starlab_lab_ops.starlab_lab_ops.doctype.qc_detail.qc_detail import QCDetail
 
 		analis: DF.Link

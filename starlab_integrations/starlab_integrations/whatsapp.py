@@ -87,9 +87,7 @@ def _notify_role_via_whatsapp(role: str, message: str) -> None:
 	if not users:
 		return
 
-	mobile_numbers = frappe.get_all(
-		"Employee", filters={"user_id": ["in", users]}, pluck="cell_number"
-	)
+	mobile_numbers = frappe.get_all("Employee", filters={"user_id": ["in", users]}, pluck="cell_number")
 	for mobile_no in mobile_numbers:
 		if mobile_no:
 			send_whatsapp_message(mobile_no, message)

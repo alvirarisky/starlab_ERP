@@ -13,7 +13,10 @@ class LHU(Document):
 
 	if TYPE_CHECKING:
 		from frappe.types import DF
-		from starlab_lab_ops.starlab_lab_ops.doctype.lhu_test_result_detail.lhu_test_result_detail import LHUTestResultDetail
+
+		from starlab_lab_ops.starlab_lab_ops.doctype.lhu_test_result_detail.lhu_test_result_detail import (
+			LHUTestResultDetail,
+		)
 
 		customer: DF.Link
 		diterbitkan_oleh: DF.Link

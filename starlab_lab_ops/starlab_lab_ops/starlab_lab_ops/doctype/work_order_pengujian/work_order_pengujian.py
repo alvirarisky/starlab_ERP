@@ -13,7 +13,10 @@ class WorkOrderPengujian(Document):
 
 	if TYPE_CHECKING:
 		from frappe.types import DF
-		from starlab_lab_ops.starlab_lab_ops.doctype.wo_parameter_detail.wo_parameter_detail import WOParameterDetail
+
+		from starlab_lab_ops.starlab_lab_ops.doctype.wo_parameter_detail.wo_parameter_detail import (
+			WOParameterDetail,
+		)
 
 		catatan: DF.SmallText | None
 		customer: DF.Link

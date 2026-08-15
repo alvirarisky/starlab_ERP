@@ -117,9 +117,13 @@ class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 		doc.save(ignore_permissions=True)
 		reloaded = frappe.get_doc("Quotation", doc.name)
 
-		discounted_sub_total = reloaded.sub_total - (reloaded.sub_total * flt(reloaded.discount_percent) / 100)
+		discounted_sub_total = reloaded.sub_total - (
+			reloaded.sub_total * flt(reloaded.discount_percent) / 100
+		)
 		expected_dpp = discounted_sub_total + reloaded.rush_fee_amount
-		expected_total = expected_dpp + (expected_dpp * flt(reloaded.ppn_percent) / 100) + flt(reloaded.biaya_kirim)
+		expected_total = (
+			expected_dpp + (expected_dpp * flt(reloaded.ppn_percent) / 100) + flt(reloaded.biaya_kirim)
+		)
 
 		self.assertEqual(reloaded.dpp, expected_dpp)
 		self.assertEqual(reloaded.total_invoice, expected_total)

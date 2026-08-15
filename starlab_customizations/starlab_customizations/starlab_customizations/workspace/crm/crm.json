@@ -6,7 +6,7 @@
    "label": "Funnel Form A - Quotation - Approved"
   }
  ],
- "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Draft\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Diajukan Kaji Ulang\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Disetujui MT\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Ditolak MT\", \"col\": 4}}, {\"id\": \"number_card-5\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Draft\", \"col\": 4}}, {\"id\": \"number_card-6\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Approved\", \"col\": 4}}, {\"id\": \"number_card-7\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Rejected\", \"col\": 4}}, {\"id\": \"spacer-8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Corong Konversi</b></span>\", \"col\": 12}}, {\"id\": \"chart-10\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Funnel Form A - Quotation - Approved\", \"col\": 12}}, {\"id\": \"spacer-11\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-12\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Client Inquiry\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Kaji Ulang Tender\", \"col\": 3}}, {\"id\": \"shortcut-15\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-16\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer\", \"col\": 3}}, {\"id\": \"shortcut-17\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"TNC Master Template\", \"col\": 3}}]",
+ "content": "[{\"id\": \"header-0\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Ringkasan</b></span>\", \"col\": 12}}, {\"id\": \"number_card-1\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Draft\", \"col\": 4}}, {\"id\": \"number_card-2\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Diajukan Kaji Ulang\", \"col\": 4}}, {\"id\": \"number_card-3\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Disetujui MT\", \"col\": 4}}, {\"id\": \"number_card-4\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Client Inquiry Ditolak MT\", \"col\": 4}}, {\"id\": \"number_card-5\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Draft\", \"col\": 4}}, {\"id\": \"number_card-6\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Approved\", \"col\": 4}}, {\"id\": \"number_card-7\", \"type\": \"number_card\", \"data\": {\"number_card_name\": \"Quotation Rejected\", \"col\": 4}}, {\"id\": \"spacer-8\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-9\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Corong Konversi</b></span>\", \"col\": 12}}, {\"id\": \"chart-10\", \"type\": \"chart\", \"data\": {\"chart_name\": \"Funnel Form A - Quotation - Approved\", \"col\": 12}}, {\"id\": \"spacer-11\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"header-12\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Pintasan</b></span>\", \"col\": 12}}, {\"id\": \"shortcut-13\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Client Inquiry\", \"col\": 3}}, {\"id\": \"shortcut-14\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Kaji Ulang Tender\", \"col\": 3}}, {\"id\": \"shortcut-15\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Quotation\", \"col\": 3}}, {\"id\": \"shortcut-16\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer\", \"col\": 3}}, {\"id\": \"shortcut-17\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"TNC Master Template\", \"col\": 3}}, {\"id\": \"shortcut-18\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Papan Client Inquiry\", \"col\": 3}}, {\"id\": \"shortcut-19\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Papan Quotation\", \"col\": 3}}]",
  "creation": "2026-07-29 09:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -95,6 +95,16 @@
    "label": "TNC Master Template",
    "link_to": "TNC Master Template",
    "type": "DocType"
+  },
+  {
+   "label": "Papan Client Inquiry",
+   "link_to": "client-inquiry-board",
+   "type": "Page"
+  },
+  {
+   "label": "Papan Quotation",
+   "link_to": "quotation-board",
+   "type": "Page"
   }
  ],
  "sidebar_items": [
@@ -172,6 +182,32 @@
    "label": "TNC Master Template",
    "link_to": "TNC Master Template",
    "link_type": "DocType",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "trello",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Papan Client Inquiry",
+   "link_to": "client-inquiry-board",
+   "link_type": "Page",
+   "open_in_new_tab": 0,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "trending-up",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Papan Quotation",
+   "link_to": "quotation-board",
+   "link_type": "Page",
    "open_in_new_tab": 0,
    "show_arrow": 0,
    "type": "Link"

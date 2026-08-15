@@ -131,8 +131,14 @@ def check_sample_retensi():
 			"Sample {0}: retensi sudah jatuh tempo sejak {1}, siap diproses pemusnahan."
 		).format(sample.name, sample.tanggal_musnah)
 		_notify_role(
-			"Laboratorium", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message, role_users_cache
+			"Laboratorium",
+			frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name),
+			message,
+			role_users_cache,
 		)
 		_notify_role(
-			"Manajer Teknis", frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name), message, role_users_cache
+			"Manajer Teknis",
+			frappe._("Retensi Sample jatuh tempo: {0}").format(sample.name),
+			message,
+			role_users_cache,
 		)

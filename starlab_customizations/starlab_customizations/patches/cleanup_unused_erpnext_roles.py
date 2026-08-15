@@ -17,9 +17,21 @@ UNUSED_ROLE_PROFILES = ["Purchase", "Sales", "Accounts", "Manufacturing", "Inven
 # dipakai" tanpa terus-menerus fighting migrate). Role yang benar-benar
 # orphan (tidak direferensikan permission apa pun) tetap dihapus permanen.
 KEEP_ROLES = {
-	"Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing",
-	"Administrasi", "Laboratorium", "HR",
-	"Administrator", "Guest", "All", "System Manager", "Desk User", "Customer", "Supplier",
+	"Direksi",
+	"Manajer Teknis",
+	"Manajer Mutu",
+	"Finance",
+	"Marketing",
+	"Administrasi",
+	"Laboratorium",
+	"HR",
+	"Administrator",
+	"Guest",
+	"All",
+	"System Manager",
+	"Desk User",
+	"Customer",
+	"Supplier",
 }
 
 

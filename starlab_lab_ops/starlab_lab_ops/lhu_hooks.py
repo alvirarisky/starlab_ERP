@@ -73,7 +73,9 @@ def populate_test_result_list(doc, method=None):
 		{
 			p.name: p.regulasi_acuan
 			for p in frappe.get_all(
-				"Test Parameter", filters={"name": ["in", list(parameter_names)]}, fields=["name", "regulasi_acuan"]
+				"Test Parameter",
+				filters={"name": ["in", list(parameter_names)]},
+				fields=["name", "regulasi_acuan"],
 			)
 		}
 		if parameter_names
@@ -116,5 +118,7 @@ def on_submit(doc, method=None):
 			"LHU",
 			doc.amended_from,
 			{"status": (old_amended_status, "Superseded")},
-			frappe._("Status otomatis diubah ke Superseded oleh sistem karena digantikan oleh {0}.").format(doc.name),
+			frappe._("Status otomatis diubah ke Superseded oleh sistem karena digantikan oleh {0}.").format(
+				doc.name
+			),
 		)

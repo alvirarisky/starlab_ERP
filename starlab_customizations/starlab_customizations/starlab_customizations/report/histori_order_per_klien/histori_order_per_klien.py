@@ -10,7 +10,13 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"label": "Customer", "fieldname": "customer", "fieldtype": "Link", "options": "Customer", "width": 220},
+		{
+			"label": "Customer",
+			"fieldname": "customer",
+			"fieldtype": "Link",
+			"options": "Customer",
+			"width": 220,
+		},
 		{"label": "Total Quotation", "fieldname": "total_quotation", "fieldtype": "Int", "width": 130},
 		{"label": "Total Work Order", "fieldname": "total_wo", "fieldtype": "Int", "width": 130},
 		{"label": "Total LHU Terbit", "fieldname": "total_lhu", "fieldtype": "Int", "width": 130},

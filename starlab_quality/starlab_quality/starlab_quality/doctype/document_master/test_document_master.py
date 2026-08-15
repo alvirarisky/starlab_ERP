@@ -2,8 +2,8 @@
 # See license.txt
 
 import frappe
-from frappe.tests import IntegrationTestCase
 from frappe.model.workflow import apply_workflow
+from frappe.tests import IntegrationTestCase
 from frappe.utils import nowdate
 
 # On IntegrationTestCase, the doctype test records and all

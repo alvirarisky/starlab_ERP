@@ -78,7 +78,10 @@ class IntegrationTestPettyCashEntry(IntegrationTestCase):
 
 		je = frappe.get_doc("Journal Entry", doc.journal_entry)
 		self.assertEqual(je.docstatus, 1)
-		amounts = {row.account: (row.debit_in_account_currency, row.credit_in_account_currency) for row in je.accounts}
+		amounts = {
+			row.account: (row.debit_in_account_currency, row.credit_in_account_currency)
+			for row in je.accounts
+		}
 		company = frappe.defaults.get_global_default("company")
 		abbr = frappe.get_cached_value("Company", company, "abbr")
 		# petty_cash_hooks._create_journal_entry (2026-08-03) pakai akun

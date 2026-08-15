@@ -5,80 +5,45 @@ app_description = "Customizations modul ERP SAI"
 app_email = "banyugong3@gmail.com"
 app_license = "mit"
 
-# Apps
-# ------------------
-
 # starlab_lab_ops is required because Client Inquiry Parameter Detail.parameter
 # is a Link field with options="Test Parameter" (owned by starlab_lab_ops).
 required_apps = ["starlab_lab_ops"]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "starlab_customizations",
-# 		"logo": "/assets/starlab_customizations/logo.png",
-# 		"title": "Starlab Customizations",
-# 		"route": "/starlab_customizations",
-# 		"has_permission": "starlab_customizations.api.permission.has_app_permission"
-# 	}
-# ]
-
 # Includes in <head>
 # ------------------
 
-# include js, css files in header of desk.html
-# app_include_css = "/assets/starlab_customizations/css/starlab_customizations.css"
-#
+# Styling Papan Quotation & Papan Client Inquiry (page/quotation_board,
+# page/client_inquiry_board) -- dimuat di semua halaman Desk lewat
+# app_include_css (bukan cuma di 2 Page itu, karena Frappe tidak punya hook
+# "load CSS ini cuma di Page X"), tapi semua class di file ini diberi prefix
+# crm-kanban- jadi aman/tidak menimpa style Desk manapun di luar 2 Page itu.
+app_include_css = "/assets/starlab_customizations/css/crm_kanban.css"
+
 # Lihat komentar di public/js/redirect_to_role_workspace.js -- install.py's
 # get_home_page cuma nyala sekali seusai submit form /login; kalau session
 # masih aktif dan Desk dibuka langsung tanpa lewat login lagi, redirect itu
 # tidak pernah kepanggil. Skrip ini menutup celah itu di app_ready.
 app_include_js = "/assets/starlab_customizations/js/redirect_to_role_workspace.js"
 
-# include js, css files in header of web template
-#
 # Aksen tombol brand SAI -- static CSS biasa, BUKAN lewat Website Theme
 # custom_scss (lihat public/css/starlab_branding.css untuk kenapa; ringkas:
 # Website Theme custom di versi Frappe ini kena bug kompilasi @import .css
 # yang bikin ~25 asset 500 di setiap halaman website).
 web_include_css = "/assets/starlab_customizations/css/starlab_branding.css"
-#
+
 # Lihat komentar di public/js/strip_generic_login_redirect.js -- perlu di
 # SEMUA halaman website (bukan cuma /login) karena web_include_js dimuat
 # lewat base template templates/web.html yang sama; script-nya sendiri
 # early-return kalau bukan /login jadi aman/no-op di halaman lain.
 web_include_js = "/assets/starlab_customizations/js/strip_generic_login_redirect.js"
 
-# include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "starlab_customizations/public/scss/website"
-
-# include js, css files in header of web form
-# webform_include_js = {"doctype": "public/js/doctype.js"}
-# webform_include_css = {"doctype": "public/css/doctype.css"}
-
-# include js in page
-# page_js = {"page" : "public/js/file.js"}
-
-# include js in doctype views
 doctype_js = {
 	"Quotation": "public/js/quotation.js",
 	"LHU": "public/js/lhu.js",
 }
-# doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-# doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
-# doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
-
-# Svg Icons
-# ------------------
-# include app icons in desk
-# app_include_icons = "starlab_customizations/public/icons.svg"
 
 # Home Pages
 # ----------
-
-# application home page (will override Website Settings)
-# home_page = "login"
 
 # Landing page per role begitu login -- tanpa ini, semua user (apa pun
 # role-nya) mendarat di /desk generik, harus tahu dulu nama Workspace-nya
@@ -97,77 +62,7 @@ doctype_js = {
 # eksplisit.
 get_website_user_home_page = "starlab_customizations.install.get_home_page"
 
-# Generators
-# ----------
-
-# automatically create page for each record of this doctype
-# website_generators = ["Web Page"]
-
-# automatically load and sync documents of this doctype from downstream apps
-# importable_doctypes = [doctype_1]
-
-# Jinja
-# ----------
-
-# add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "starlab_customizations.utils.jinja_methods",
-# 	"filters": "starlab_customizations.utils.jinja_filters"
-# }
-
-# Installation
-# ------------
-
-# before_install = "starlab_customizations.install.before_install"
-# after_install = "starlab_customizations.install.after_install"
-
 after_migrate = "starlab_customizations.install.after_migrate"
-
-# Uninstallation
-# ------------
-
-# before_uninstall = "starlab_customizations.uninstall.before_uninstall"
-# after_uninstall = "starlab_customizations.uninstall.after_uninstall"
-
-# Integration Setup
-# ------------------
-# To set up dependencies/integrations with other apps
-# Name of the app being installed is passed as an argument
-
-# before_app_install = "starlab_customizations.utils.before_app_install"
-# after_app_install = "starlab_customizations.utils.after_app_install"
-
-# Integration Cleanup
-# -------------------
-# To clean up dependencies/integrations with other apps
-# Name of the app being uninstalled is passed as an argument
-
-# before_app_uninstall = "starlab_customizations.utils.before_app_uninstall"
-# after_app_uninstall = "starlab_customizations.utils.after_app_uninstall"
-
-# Build
-# ------------------
-# To hook into the build process
-
-# after_build = "starlab_customizations.build.after_build"
-
-# Desk Notifications
-# ------------------
-# See frappe.core.notifications.get_notification_config
-
-# notification_config = "starlab_customizations.notifications.get_notification_config"
-
-# Permissions
-# -----------
-# Permissions evaluated in scripted ways
-
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
 
 # Document Events
 # ---------------
@@ -205,50 +100,115 @@ fixtures = [
 	{
 		"dt": "Role",
 		"filters": [
-			["name", "in", ["Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi", "Laboratorium", "HR"]]
+			[
+				"name",
+				"in",
+				[
+					"Direksi",
+					"Manajer Teknis",
+					"Manajer Mutu",
+					"Finance",
+					"Marketing",
+					"Administrasi",
+					"Laboratorium",
+					"HR",
+				],
+			]
 		],
 	},
 	{
 		"dt": "Workflow State",
 		"filters": [
-			["name", "in", [
-				"Draft", "Menunggu Approval MT", "Menunggu Approval MM",
-				"Menunggu Approval Direksi", "Approved", "Rejected", "Kedaluwarsa", "Cancelled",
-				"Diajukan Kaji Ulang", "Disetujui MT", "Ditolak MT", "Menunggu Approval", "Disetujui",
-			]]
+			[
+				"name",
+				"in",
+				[
+					"Draft",
+					"Menunggu Approval MT",
+					"Menunggu Approval MM",
+					"Menunggu Approval Direksi",
+					"Approved",
+					"Rejected",
+					"Kedaluwarsa",
+					"Cancelled",
+					"Diajukan Kaji Ulang",
+					"Disetujui MT",
+					"Ditolak MT",
+					"Menunggu Approval",
+					"Disetujui",
+				],
+			]
 		],
 	},
 	{
 		"dt": "Workflow Action Master",
 		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
 	},
-	{"dt": "Workflow", "filters": [["document_type", "in", ["Quotation", "Client Inquiry", "Petty Cash Entry"]]]},
-	{"dt": "Custom Field", "filters": [["dt", "in", ["Quotation", "Customer", "Print Settings", "Sales Invoice"]]]},
+	{
+		"dt": "Workflow",
+		"filters": [["document_type", "in", ["Quotation", "Client Inquiry", "Petty Cash Entry"]]],
+	},
+	{
+		"dt": "Custom Field",
+		"filters": [["dt", "in", ["Quotation", "Customer", "Print Settings", "Sales Invoice"]]],
+	},
 	{
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "in", [
-				"Quotation", "Customer", "Client Inquiry", "Kaji Ulang Tender", "TNC Master Template",
-				"Petty Cash Entry", "Sales Invoice", "Bank Account", "Bank Transaction",
-				"Bank Reconciliation Tool", "Bank Statement Import",
-				# 2026-08-14: 5 celah izin Read yang dilaporkan tester (OVERVIEW_PROJECT.md
-				# Bagian 5 poin 5) -- role sudah punya akses ke suatu fitur, tapi fitur itu
-				# diam-diam butuh baca DocType lain yang belum diizinkan.
-				"Account", "Company", "Email Account", "Lead",
-				# 2026-08-14: Item -- ref_doctype laporan "Rekap Stok Reagen dan
-				# Consumable" di Workspace LIMS. Report.roles sudah benar mendaftarkan
-				# Laboratorium/Manajer Teknis/Direksi, tapi Frappe JUGA mensyaratkan
-				# permission langsung ke ref_doctype-nya (Item) di luar Report.roles --
-				# tanpa itu laporannya ikut hilang dari sidebar sama seperti Test
-				# Parameter di atas (starlab_lab_ops/hooks.py).
-				"Item",
-			]],
-			["role", "in", [
-				"Direksi", "Manajer Teknis", "Manajer Mutu", "Finance", "Marketing", "Administrasi",
-				# Laboratorium ditambahkan bareng "Customer" jadi baris ke-2 poin di atas --
-				# Laboratorium sengaja tidak pernah masuk daftar role di sini sebelumnya.
-				"Laboratorium",
-			]],
+			[
+				"parent",
+				"in",
+				[
+					"Quotation",
+					"Customer",
+					"Client Inquiry",
+					"Kaji Ulang Tender",
+					"TNC Master Template",
+					"Petty Cash Entry",
+					"Sales Invoice",
+					"Bank Account",
+					"Bank Transaction",
+					"Bank Reconciliation Tool",
+					"Bank Statement Import",
+					# 2026-08-14: 5 celah izin Read yang dilaporkan tester (OVERVIEW_PROJECT.md
+					# Bagian 5 poin 5) -- role sudah punya akses ke suatu fitur, tapi fitur itu
+					# diam-diam butuh baca DocType lain yang belum diizinkan.
+					"Account",
+					"Company",
+					"Email Account",
+					"Lead",
+					# 2026-08-14: Item -- ref_doctype laporan "Rekap Stok Reagen dan
+					# Consumable" di Workspace LIMS. Report.roles sudah benar mendaftarkan
+					# Laboratorium/Manajer Teknis/Direksi, tapi Frappe JUGA mensyaratkan
+					# permission langsung ke ref_doctype-nya (Item) di luar Report.roles --
+					# tanpa itu laporannya ikut hilang dari sidebar sama seperti Test
+					# Parameter di atas (starlab_lab_ops/hooks.py).
+					"Item",
+					# 2026-08-15: ditemukan lewat Papan Quotation -- Manajer Teknis/Manajer
+					# Mutu/Direksi/Administrasi (4 role approver Quotation) semuanya tidak
+					# punya read ke Account, padahal apply_workflow() -> doc.save() ->
+					# validasi inti ERPNext (get_party_account_currency) diam-diam butuh
+					# baca Account default Customer buat resolve currency, di SETIAP
+					# transisi approval -- bukan cuma lewat papan baru ini, tombol Workflow
+					# standar di Desk kena masalah yang sama. "Account" sendiri sudah ada
+					# di daftar parent di atas (baris utk Finance) -- 4 role ini nyusul.
+				],
+			],
+			[
+				"role",
+				"in",
+				[
+					"Direksi",
+					"Manajer Teknis",
+					"Manajer Mutu",
+					"Finance",
+					"Marketing",
+					"Administrasi",
+					# Laboratorium ditambahkan bareng "Customer" jadi baris ke-2 poin di atas --
+					# Laboratorium sengaja tidak pernah masuk daftar role di sini sebelumnya.
+					"Laboratorium",
+				],
+			],
 		],
 	},
 	{
@@ -299,45 +259,89 @@ fixtures = [
 		# Payroll Entry submit/cancel biasa) -- bukan Frappe Workflow custom.
 		"dt": "Custom DocPerm",
 		"filters": [
-			["parent", "in", [
-				"Employee", "Attendance",
-				"Leave Application", "Leave Type", "Leave Allocation",
-				"Payroll Entry", "Salary Slip", "Salary Structure", "Salary Structure Assignment", "Salary Component",
-				"Training Event", "Training Program", "Training Result", "Training Feedback",
-				"Appraisal", "Appraisal Template", "Goal",
-			]],
+			[
+				"parent",
+				"in",
+				[
+					"Employee",
+					"Attendance",
+					"Leave Application",
+					"Leave Type",
+					"Leave Allocation",
+					"Payroll Entry",
+					"Salary Slip",
+					"Salary Structure",
+					"Salary Structure Assignment",
+					"Salary Component",
+					"Training Event",
+					"Training Program",
+					"Training Result",
+					"Training Feedback",
+					"Appraisal",
+					"Appraisal Template",
+					"Goal",
+				],
+			],
 			["role", "=", "HR"],
 		],
 	},
 	{
 		"dt": "Number Card",
 		"filters": [
-			["name", "in", [
-				"Quotation Draft", "Quotation Approved", "Quotation Rejected",
-				"Quotation Menunggu Approval Direksi", "Petty Cash Menunggu Approval",
-				"Petty Cash Disetujui Bulan Ini", "Invoice Overdue", "Invoice Unpaid", "Invoice Due 7 Hari",
-				"Client Inquiry Draft", "Client Inquiry Diajukan Kaji Ulang",
-				"Client Inquiry Disetujui MT", "Client Inquiry Ditolak MT",
-			]]
+			[
+				"name",
+				"in",
+				[
+					"Quotation Draft",
+					"Quotation Approved",
+					"Quotation Rejected",
+					"Quotation Menunggu Approval Direksi",
+					"Petty Cash Menunggu Approval",
+					"Petty Cash Disetujui Bulan Ini",
+					"Invoice Overdue",
+					"Invoice Unpaid",
+					"Invoice Due 7 Hari",
+					"Client Inquiry Draft",
+					"Client Inquiry Diajukan Kaji Ulang",
+					"Client Inquiry Disetujui MT",
+					"Client Inquiry Ditolak MT",
+				],
+			]
 		],
 	},
 	{
 		"dt": "Dashboard",
 		"filters": [
-			["name", "in", [
-				"Dashboard Direksi", "Dashboard Marketing", "Dashboard Administrasi", "Dashboard Finance",
-				"Dashboard Laboratorium", "Dashboard Manajer Teknis", "Dashboard Manajer Mutu",
-			]]
+			[
+				"name",
+				"in",
+				[
+					"Dashboard Direksi",
+					"Dashboard Marketing",
+					"Dashboard Administrasi",
+					"Dashboard Finance",
+					"Dashboard Laboratorium",
+					"Dashboard Manajer Teknis",
+					"Dashboard Manajer Mutu",
+				],
+			]
 		],
 	},
 	{
 		"dt": "Dashboard Chart",
 		"filters": [
-			["name", "in", [
-				"Tren Quotation Dibuat", "Tren Invoice Dibuat", "Tren Sample Diterima",
-				"Tren Test Result Dibuat", "Tren Dokumen Direvisi",
-				"Funnel Form A - Quotation - Approved",
-			]]
+			[
+				"name",
+				"in",
+				[
+					"Tren Quotation Dibuat",
+					"Tren Invoice Dibuat",
+					"Tren Sample Diterima",
+					"Tren Test Result Dibuat",
+					"Tren Dokumen Direvisi",
+					"Funnel Form A - Quotation - Approved",
+				],
+			]
 		],
 	},
 ]
@@ -365,93 +369,3 @@ scheduler_events = {
 		"starlab_customizations.tasks.check_invoice_overdue",
 	],
 }
-
-# Testing
-# -------
-
-# before_tests = "starlab_customizations.install.before_tests"
-
-# Extend DocType Class
-# ------------------------------
-#
-# Specify custom mixins to extend the standard doctype controller.
-# extend_doctype_class = {
-# 	"Task": "starlab_customizations.custom.task.CustomTaskMixin"
-# }
-
-# Overriding Methods
-# ------------------------------
-#
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "starlab_customizations.event.get_events"
-# }
-#
-# each overriding function accepts a `data` argument;
-# generated from the base implementation of the doctype dashboard,
-# along with any modifications made in other Frappe apps
-# override_doctype_dashboards = {
-# 	"Task": "starlab_customizations.task.get_dashboard_data"
-# }
-
-# exempt linked doctypes from being automatically cancelled
-#
-# auto_cancel_exempted_doctypes = ["Auto Repeat"]
-
-# Ignore links to specified DocTypes when deleting documents
-# -----------------------------------------------------------
-
-# ignore_links_on_delete = ["Communication", "ToDo"]
-
-# Request Events
-# ----------------
-# before_request = ["starlab_customizations.utils.before_request"]
-# after_request = ["starlab_customizations.utils.after_request"]
-
-# Job Events
-# ----------
-# before_job = ["starlab_customizations.utils.before_job"]
-# after_job = ["starlab_customizations.utils.after_job"]
-
-# User Data Protection
-# --------------------
-
-# user_data_fields = [
-# 	{
-# 		"doctype": "{doctype_1}",
-# 		"filter_by": "{filter_by}",
-# 		"redact_fields": ["{field_1}", "{field_2}"],
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_2}",
-# 		"filter_by": "{filter_by}",
-# 		"partial": 1,
-# 	},
-# 	{
-# 		"doctype": "{doctype_3}",
-# 		"strict": False,
-# 	},
-# 	{
-# 		"doctype": "{doctype_4}"
-# 	}
-# ]
-
-# Authentication and authorization
-# --------------------------------
-
-# auth_hooks = [
-# 	"starlab_customizations.auth.validate"
-# ]
-
-# Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
-
-# default_log_clearing_doctypes = {
-# 	"Logging DocType Name": 30  # days to retain logs
-# }
-
-# Translation
-# ------------
-# List of apps whose translatable strings should be excluded from this app's translations.
-# ignore_translatable_strings_from = []
-

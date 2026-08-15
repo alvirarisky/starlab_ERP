@@ -387,9 +387,17 @@ Semua contoh di bawah pakai `bench --site <NAMA_SITE> console < nama_file.py` (p
 3. Jalankan scheduled job manual untuk tes cepat tanpa nunggu jadwal harian:
    ```python
    from starlab_customizations.tasks import check_invoice_due, check_invoice_overdue
-   from starlab_lab_ops.tasks import check_sample_deadline_mendekat, check_sample_deadline_terlewat, check_sample_retensi
-   check_invoice_due(); check_invoice_overdue()
-   check_sample_deadline_mendekat(); check_sample_deadline_terlewat(); check_sample_retensi()
+   from starlab_lab_ops.tasks import (
+   	check_sample_deadline_mendekat,
+   	check_sample_deadline_terlewat,
+   	check_sample_retensi,
+   )
+
+   check_invoice_due()
+   check_invoice_overdue()
+   check_sample_deadline_mendekat()
+   check_sample_deadline_terlewat()
+   check_sample_retensi()
    ```
 
 ### 7.8 WhatsApp Settings & Client Portal
@@ -583,8 +591,10 @@ Saat ditulis, total 37 test lolos (27 + 2 + 4 + 4). Lihat Bagian 7.18 untuk angk
 Kalau belum ada akun buat coba-coba: 7 akun test per role sudah di-seed otomatis saat `after_install` (kalau `developer_mode` aktif) lewat `starlab_integrations/seed_test_users.py` — semua pakai password `Test@12345`, contoh `direksi.test@example.com`, `marketing.test@example.com`, dst (lihat daftar lengkap `TEST_USERS` di file itu). Kalau site sudah lama ke-install sebelum patch ini ada, akun-akun ini tidak otomatis muncul (hook `after_install` cuma jalan sekali saat fresh install) — jalankan manual lewat `bench --site <NAMA_SITE> console`:
 ```python
 import frappe
+
 frappe.conf.developer_mode = 1
 from starlab_integrations.seed_test_users import after_install
+
 after_install()
 ```
 

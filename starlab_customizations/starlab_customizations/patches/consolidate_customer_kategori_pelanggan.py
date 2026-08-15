@@ -6,8 +6,11 @@ import frappe
 # jenis_industri dihapus dari custom_field.json (lihat fixtures/custom_field.json)
 # setelah patch ini jalan.
 VALID_KATEGORI = {
-	"Perusahaan", "Individu-Perorangan", "Institusi Pemerintah",
-	"Universitas-Sekolah", "Lain-lain",
+	"Perusahaan",
+	"Individu-Perorangan",
+	"Institusi Pemerintah",
+	"Universitas-Sekolah",
+	"Lain-lain",
 }
 
 

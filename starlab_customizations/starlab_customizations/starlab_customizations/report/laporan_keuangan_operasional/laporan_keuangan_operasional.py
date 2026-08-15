@@ -47,19 +47,21 @@ def get_data(filters):
 			as_dict=1,
 		)
 		for pc in petty_cash:
-			rows.append({
-				"tanggal": pc.tanggal,
-				"kategori": "Petty Cash",
-				"referensi": pc.name,
-				"keterangan": pc.item,
-				"nominal": pc.nominal,
-				"status": pc.status,
-				# Petty Cash Entry adalah catatan pengajuan/approval, bukan
-				# mutasi buku besar itu sendiri -- saldo hanya dihitung dari
-				# Journal Entry yang benar-benar membukukan ke akun Kas
-				# Kecil (lihat _attach_saldo_kas_kecil).
-				"saldo": None,
-			})
+			rows.append(
+				{
+					"tanggal": pc.tanggal,
+					"kategori": "Petty Cash",
+					"referensi": pc.name,
+					"keterangan": pc.item,
+					"nominal": pc.nominal,
+					"status": pc.status,
+					# Petty Cash Entry adalah catatan pengajuan/approval, bukan
+					# mutasi buku besar itu sendiri -- saldo hanya dihitung dari
+					# Journal Entry yang benar-benar membukukan ke akun Kas
+					# Kecil (lihat _attach_saldo_kas_kecil).
+					"saldo": None,
+				}
+			)
 
 	if not kategori or kategori == "Entri Jurnal":
 		conditions = ["docstatus = 1"]
@@ -88,15 +90,17 @@ def get_data(filters):
 			as_dict=1,
 		)
 		for je in journal_entries:
-			rows.append({
-				"tanggal": je.posting_date,
-				"kategori": "Entri Jurnal",
-				"referensi": je.name,
-				"keterangan": je.user_remark,
-				"nominal": je.total_debit,
-				"status": "Tersubmit",
-				"saldo": None,
-			})
+			rows.append(
+				{
+					"tanggal": je.posting_date,
+					"kategori": "Entri Jurnal",
+					"referensi": je.name,
+					"keterangan": je.user_remark,
+					"nominal": je.total_debit,
+					"status": "Tersubmit",
+					"saldo": None,
+				}
+			)
 
 	_attach_saldo_kas_kecil(rows)
 	rows.sort(key=lambda r: r["tanggal"], reverse=True)

@@ -59,7 +59,9 @@ def on_update_work_order(doc, method=None):
 			doc.doctype,
 			doc.name,
 			{"status": (old_status, "Completed")},
-			frappe._("Status otomatis diubah ke Completed oleh sistem karena seluruh parameter pengujian sudah Done."),
+			frappe._(
+				"Status otomatis diubah ke Completed oleh sistem karena seluruh parameter pengujian sudah Done."
+			),
 		)
 
 
@@ -87,7 +89,9 @@ def validate_sample(doc, method=None):
 			"Work Order Pengujian",
 			doc.work_order,
 			{"status": (wo_status, "In Progress")},
-			frappe._("Status otomatis diubah ke In Progress oleh sistem karena Sample {0} diterima.").format(doc.name),
+			frappe._("Status otomatis diubah ke In Progress oleh sistem karena Sample {0} diterima.").format(
+				doc.name
+			),
 		)
 
 
@@ -95,7 +99,12 @@ def validate_test_result(doc, method=None):
 	# TSD SS6.5: reject (Diajukan Validasi -> Ditolak) wajib mengisi
 	# catatan_validasi.
 	before = doc.get_doc_before_save()
-	if before and before.status == "Diajukan Validasi" and doc.status == "Ditolak" and not doc.catatan_validasi:
+	if (
+		before
+		and before.status == "Diajukan Validasi"
+		and doc.status == "Ditolak"
+		and not doc.catatan_validasi
+	):
 		frappe.throw(frappe._("Catatan Validasi wajib diisi saat menolak Test Result"))
 
 	# TSD SS5 Non-Functional (Data Integrity): hasil_uji & qc_detail tidak
@@ -114,7 +123,14 @@ def _qc_rows_changed(doc, before):
 	if len(before_rows) != len(after_rows):
 		return True
 
-	fields = ("qc_type", "nilai_slope", "nilai_intersep", "nilai_r2", "nilai_rpd_persen", "nilai_trueness_persen")
+	fields = (
+		"qc_type",
+		"nilai_slope",
+		"nilai_intersep",
+		"nilai_r2",
+		"nilai_rpd_persen",
+		"nilai_trueness_persen",
+	)
 	for row_before, row_after in zip(before_rows, after_rows):
 		if any(row_before.get(f) != row_after.get(f) for f in fields):
 			return True
@@ -158,5 +174,7 @@ def on_update_test_result(doc, method=None):
 				"Sample",
 				doc.sample,
 				{"status": (sample_status, "Divalidasi")},
-				frappe._("Status otomatis diubah ke Divalidasi oleh sistem karena seluruh Test Result sudah Divalidasi."),
+				frappe._(
+					"Status otomatis diubah ke Divalidasi oleh sistem karena seluruh Test Result sudah Divalidasi."
+				),
 			)
