@@ -17,8 +17,25 @@ TEST_PARAM = "TEST-PARAMETER-STATUS-KLIEN"
 
 def _ensure_customer(name):
 	if not frappe.db.exists("Customer", name):
-		customer_group = frappe.db.get_value("Customer Group", {}, "name") or "All Customer Groups"
-		territory = frappe.db.get_value("Territory", {}, "name") or "All Territories"
+		# On a bare CI site (bench new-site without the Setup Wizard),
+		# neither of the ERPNext defaults below exists yet -- falling back
+		# to their literal names without creating them pointed customer_group
+		# / territory at Customer Group / Territory records that don't
+		# actually exist, so Customer.insert() failed link validation.
+		# is_group=0 (leaf) -- Customer.customer_group/territory reject a
+		# group/folder node ("Cannot select a Group type Customer Group").
+		customer_group = frappe.db.get_value("Customer Group", {"is_group": 0}, "name")
+		if not customer_group:
+			customer_group = "Test Customer Group"
+			frappe.get_doc(
+				{"doctype": "Customer Group", "customer_group_name": customer_group, "is_group": 0}
+			).insert(ignore_permissions=True)
+		territory = frappe.db.get_value("Territory", {"is_group": 0}, "name")
+		if not territory:
+			territory = "Test Territory"
+			frappe.get_doc({"doctype": "Territory", "territory_name": territory, "is_group": 0}).insert(
+				ignore_permissions=True
+			)
 		frappe.get_doc(
 			{
 				"doctype": "Customer",
@@ -28,6 +45,68 @@ def _ensure_customer(name):
 			}
 		).insert(ignore_permissions=True)
 	return name
+
+
+def _ensure_employee():
+	# Work Order Pengujian.penerimaan_sampel / wo_parameter_detail.pj_analis
+	# (Link -> Employee) need a real Employee. Employee.insert() itself needs
+	# a Company (+ "Warehouse Type: Transit" for Company.on_update's default
+	# warehouses, + a Fiscal Year covering today for dated transactions, +
+	# Gender) -- none of which exist on a bare CI site (bench new-site never
+	# runs the Setup Wizard). Created here, once, idempotently; on the
+	# long-lived dev site this whole chain no-ops since an Employee already
+	# exists.
+	employee = frappe.db.get_value("Employee", {}, "name")
+	if employee:
+		return employee
+
+	company = frappe.db.get_value("Company", {}, "name")
+	if not company:
+		if not frappe.db.exists("Warehouse Type", "Transit"):
+			frappe.get_doc({"doctype": "Warehouse Type", "name": "Transit"}).insert(ignore_permissions=True)
+		company_doc = frappe.get_doc(
+			{
+				"doctype": "Company",
+				"company_name": "Test Company CI",
+				"abbr": "TCCI",
+				"default_currency": "IDR",
+				"country": "Indonesia",
+			}
+		)
+		company_doc.insert(ignore_permissions=True)
+		frappe.defaults.set_global_default("company", company_doc.name)
+		company = company_doc.name
+
+	if not frappe.db.exists(
+		"Fiscal Year", {"year_start_date": ["<=", nowdate()], "year_end_date": [">=", nowdate()]}
+	):
+		frappe.get_doc(
+			{
+				"doctype": "Fiscal Year",
+				"year": "CI 2020-2030",
+				"year_start_date": "2020-01-01",
+				"year_end_date": "2030-12-31",
+			}
+		).insert(ignore_permissions=True)
+
+	gender = frappe.db.get_value("Gender", {}, "name")
+	if not gender:
+		gender = "Other"
+		frappe.get_doc({"doctype": "Gender", "gender": gender}).insert(ignore_permissions=True)
+
+	employee_doc = frappe.get_doc(
+		{
+			"doctype": "Employee",
+			"first_name": "Test Employee CI",
+			"gender": gender,
+			"date_of_birth": "1990-01-01",
+			"date_of_joining": nowdate(),
+			"status": "Active",
+			"company": company,
+		}
+	)
+	employee_doc.insert(ignore_permissions=True)
+	return employee_doc.name
 
 
 def _ensure_portal_user(email, customer_name):
@@ -64,7 +143,7 @@ def _make_lhu(customer_name):
 			}
 		).insert(ignore_permissions=True)
 
-	employee = frappe.db.get_value("Employee", {}, "name")
+	employee = _ensure_employee()
 
 	wo = frappe.get_doc(
 		{

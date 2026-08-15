@@ -4,6 +4,7 @@ from frappe.utils import add_days, getdate, nowdate
 
 from starlab_customizations.starlab_customizations.tests.quotation_test_utils import (
 	TEST_ITEM_CODE,
+	ensure_customer,
 	ensure_master_data,
 )
 
@@ -14,7 +15,7 @@ class IntegrationTestSalesInvoiceDueDate(IntegrationTestCase):
 
 	def _make_invoice(self, posting_date=None):
 		ensure_master_data()
-		customer = frappe.db.get_value("Customer", {}, "name")
+		customer = ensure_customer()
 		company = frappe.defaults.get_global_default("company")
 		income_account = frappe.db.get_value(
 			"Account", {"company": company, "is_group": 0, "root_type": "Income"}, "name"

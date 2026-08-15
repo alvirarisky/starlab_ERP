@@ -167,6 +167,13 @@ jobs:
             --install-app starlab_lab_ops \
             --install-app starlab_customizations \
             --install-app starlab_integrations
+          # bench new-site does NOT run each app's post_model_sync patches
+          # (seed_tnc_master_template, seed_kanban_boards, etc.) -- those
+          # only run on an explicit migrate. docker/start.sh already does
+          # this for local dev; CI needs the same or several tests fail
+          # here looking for seed data (e.g. TNC Master Template) that
+          # exists on every real site but was silently never created here.
+          bench --site test_site migrate
           bench --site test_site set-config allow_tests true
 
       # Runs all 4 custom apps' test suites (previously only starlab_lab_ops

@@ -5,7 +5,10 @@ import frappe
 from frappe.tests import IntegrationTestCase
 from frappe.utils import nowdate
 
-from starlab_customizations.starlab_customizations.tests.quotation_test_utils import make_client_inquiry
+from starlab_customizations.starlab_customizations.tests.quotation_test_utils import (
+	ensure_customer,
+	make_client_inquiry,
+)
 
 # On IntegrationTestCase, the doctype test records and all
 # link-field test record dependencies are recursively loaded
@@ -59,6 +62,14 @@ class IntegrationTestKajiUlangTender(IntegrationTestCase):
 	Integration tests for KajiUlangTender.
 	Use this class for testing interactions between multiple components.
 	"""
+
+	def setUp(self):
+		# frappe.db.get_value("Customer", {}, "name") below assumes *some*
+		# Customer already exists (true on the long-lived dev site) -- on a
+		# bare CI site it's None otherwise, silently steering these tests
+		# into the "no customer linked" code path instead of the one they
+		# actually mean to exercise.
+		ensure_customer()
 
 	def test_layak_approves_client_inquiry(self):
 		customer = frappe.db.get_value("Customer", {}, "name")

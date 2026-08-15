@@ -7,6 +7,7 @@ from frappe.tests import IntegrationTestCase
 
 from starlab_customizations.starlab_customizations.tests.quotation_test_utils import (
 	TEST_PARAMETER_NAME,
+	ensure_employee,
 	ensure_master_data,
 )
 
@@ -40,7 +41,7 @@ def _make_client_inquiry_doc(**overrides):
 		"matriks": "Air Bersih",
 		"parameter_diminta": [{"parameter": TEST_PARAMETER_NAME}],
 		"channel_asal": "WA",
-		"dicatat_oleh": frappe.db.get_value("Employee", {}, "name"),
+		"dicatat_oleh": ensure_employee(),
 	}
 	values.update(overrides)
 	return frappe.get_doc(values)
