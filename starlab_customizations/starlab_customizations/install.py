@@ -252,6 +252,47 @@ def _ensure_hr_workspace_sidebar():
 		sidebar.save(ignore_permissions=True)
 
 
+# 2026-08-18: Workspace Sidebar (lihat komentar _ensure_hr_workspace_sidebar
+# di atas) untuk Administrasi/Direksi/Marketing sudah lama ada duluan (dibuat
+# manual lewat UI sebelum Workspace "CRM Starlab" ini ada), jadi otomatis
+# TIDAK ikut kebentuk ulang begitu CRM Starlab baru ditambahkan -- 3 role
+# yang punya akses ke CRM Starlab (lihat roles di
+# workspace/crm_starlab/crm_starlab.json) jadi tidak punya jalan klik
+# langsung ke sana dari sidebar mereka sendiri, cuma bisa lewat ketik URL
+# manual. Ditambahkan idempoten di sini, bukan di file Workspace itu sendiri,
+# karena field `shortcuts` (yang biasanya dipakai) tidak mendukung
+# link_type/type "Workspace" sama sekali (cuma DocType/Report/Page/
+# Dashboard/URL) -- satu-satunya jalur yang mendukung link ke Workspace lain
+# adalah Workspace Sidebar Item ini.
+CRM_STARLAB_SIDEBAR_TARGETS = ["Administrasi", "Direksi", "Marketing"]
+
+
+def _ensure_crm_starlab_shortcuts():
+	if not frappe.db.exists("Workspace", "CRM Starlab"):
+		return
+
+	for workspace_name in CRM_STARLAB_SIDEBAR_TARGETS:
+		if not frappe.db.exists("Workspace Sidebar", workspace_name):
+			continue
+
+		sidebar = frappe.get_doc("Workspace Sidebar", workspace_name)
+		if any(item.link_to == "CRM Starlab" for item in sidebar.items):
+			continue
+
+		max_idx = max([item.idx for item in sidebar.items], default=0)
+		sidebar.append(
+			"items",
+			{
+				"label": "CRM Starlab",
+				"link_to": "CRM Starlab",
+				"link_type": "Workspace",
+				"type": "Link",
+				"idx": max_idx + 1,
+			},
+		)
+		sidebar.save(ignore_permissions=True)
+
+
 COMPANY = "Starlab Analitik Indonesia"
 COMPANY_ABBR = "SAI"
 
@@ -438,6 +479,7 @@ def after_migrate():
 	_restrict_admin_workspaces_to_system_manager()
 	_rehide_unused_workspaces()
 	_ensure_hr_workspace_sidebar()
+	_ensure_crm_starlab_shortcuts()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):
