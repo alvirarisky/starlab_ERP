@@ -490,6 +490,61 @@ def _restructure_selling_workspace():
 	restructure_selling_and_org_menu.execute()
 
 
+# 2026-08-25: "LIMS" Workspace Sidebar (lihat komentar besar di
+# _ensure_hr_workspace_sidebar di atas soal DocType terpisah ini) sudah lama
+# ada duluan dengan 2 baris duplikat ("Work Order Pengujian" & "Sample" polos,
+# selain versi "-- Kanban"-nya). Perbaikan lims.json (shortcuts/content/
+# sidebar_items) hanya mengubah field JSON Workspace itu sendiri -- field
+# `sidebar_items` TIDAK dipakai render (lihat komentar sama), dan Workspace
+# Sidebar yang SUDAH ADA sebelumnya tidak pernah otomatis di-rebuild ulang
+# dari Workspace.shortcuts oleh migrate (create_workspace_sidebar_for_workspaces
+# cuma bikin baru untuk yang belum punya sama sekali). Sempat di-patch manual
+# lewat console saat verifikasi, TAPI itu tidak durable -- site lain/site yang
+# di-migrate dari awal tetap kena baris duplikat ini selamanya kalau tidak
+# dibersihkan di sini juga.
+LIMS_SIDEBAR_DUPLICATE_LABELS = ("Work Order Pengujian", "Sample")
+
+
+def _dedupe_lims_workspace_sidebar():
+	if not frappe.db.exists("Workspace Sidebar", "LIMS"):
+		return
+
+	sidebar = frappe.get_doc("Workspace Sidebar", "LIMS")
+	kept_items = [
+		item
+		for item in sidebar.items
+		if not (item.label in LIMS_SIDEBAR_DUPLICATE_LABELS and "Kanban" not in item.label)
+	]
+	if len(kept_items) == len(sidebar.items):
+		return
+
+	sidebar.items = kept_items
+	sidebar.save(ignore_permissions=True)
+
+
+def _ensure_rekap_kepatuhan_report_is_script_report():
+	# 2026-08-25: Report ("module doc", disinkronkan mirip DocType/Page, BUKAN
+	# lewat mekanisme fixtures) punya cache/hash internal yang membuat `bench
+	# migrate` biasa (bahkan `bench reload-doc` CLI eksplisit) TIDAK menyerap
+	# perubahan report_type/query dari file .json ini kalau site sudah pernah
+	# punya versi lama record-nya (Query Report) tersimpan di DB sebelum fix
+	# ini ada -- cuma frappe.reload_doc(..., force=True) yang terbukti
+	# menembusnya (dicoba manual saat verifikasi bug KeyError b'document_level').
+	# Tanpa fungsi ini, site mana pun yang sudah pernah migrate SEBELUM commit
+	# fix ini (termasuk site pengembangan tim lain) akan tetap kena
+	# KeyError lama itu selamanya walau file .py/.json sumbernya sudah benar.
+	if not frappe.db.exists("Report", "Rekap Kepatuhan Dokumen Mutu"):
+		return
+
+	report_type, query = frappe.db.get_value(
+		"Report", "Rekap Kepatuhan Dokumen Mutu", ["report_type", "query"]
+	)
+	if report_type == "Script Report" and not query:
+		return
+
+	frappe.reload_doc("starlab_quality", "report", "rekap_kepatuhan_dokumen_mutu", force=True)
+
+
 def after_migrate():
 	_ensure_company()
 	_ensure_fiscal_year()
@@ -502,6 +557,8 @@ def after_migrate():
 	_ensure_hr_workspace_sidebar()
 	_ensure_crm_starlab_shortcuts()
 	_restructure_selling_workspace()
+	_dedupe_lims_workspace_sidebar()
+	_ensure_rekap_kepatuhan_report_is_script_report()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):
