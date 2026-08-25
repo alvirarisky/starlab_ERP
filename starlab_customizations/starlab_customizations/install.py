@@ -545,6 +545,56 @@ def _ensure_rekap_kepatuhan_report_is_script_report():
 	frappe.reload_doc("starlab_quality", "report", "rekap_kepatuhan_dokumen_mutu", force=True)
 
 
+# 2026-08-25: sama persis kelas masalahnya dengan LIMS_SIDEBAR_DUPLICATE_LABELS
+# di atas -- _restructure_selling() (patches/restructure_selling_and_org_menu.py)
+# cuma memutasi Workspace.links (grid "Reports & Masters" di halaman Selling),
+# TAPI Workspace "Selling" juga punya Workspace Sidebar sendiri (menu kiri yang
+# tampil di SETIAP halaman dalam Workspace itu, bukan cuma landing page) yang
+# tidak pernah ikut disentuh -- dikonfirmasi langsung ke data live, POS/POS
+# Profile/POS Invoice/dst, Loyalty Program, Price List, Coupon Code, Blanket
+# Order, Pricing Rule semua masih nongol di sidebar walau sudah hilang/hidden
+# di links. User (lewat tester) melaporkan ini sebagai "belum fix" karena
+# sidebar adalah navigasi yang paling kelihatan/persisten, bukan cuma isi
+# landing page workspace.
+SELLING_SIDEBAR_REMOVE_LABELS = (
+	"POS",
+	"POS Profile",
+	"POS Invoice",
+	"POS Opening Entry",
+	"POS Closing Entry",
+	"POS Invoice Merge Log",
+	"POS Settings",
+	"Loyalty Program",
+	"Loyalty Point Entry",
+	"Price List",
+	"Coupon Code",
+	"Blanket Order",
+	"Pricing Rule",
+)
+SELLING_SIDEBAR_RELABEL = {"Item": "Parameter", "Item Group": "Matriks"}
+
+
+def _prune_selling_workspace_sidebar():
+	if not frappe.db.exists("Workspace Sidebar", "Selling"):
+		return
+
+	sidebar = frappe.get_doc("Workspace Sidebar", "Selling")
+	kept_items = [item for item in sidebar.items if item.label not in SELLING_SIDEBAR_REMOVE_LABELS]
+	changed = len(kept_items) != len(sidebar.items)
+
+	for item in kept_items:
+		new_label = SELLING_SIDEBAR_RELABEL.get(item.label)
+		if new_label and item.label != new_label:
+			item.label = new_label
+			changed = True
+
+	if not changed:
+		return
+
+	sidebar.items = kept_items
+	sidebar.save(ignore_permissions=True)
+
+
 def after_migrate():
 	_ensure_company()
 	_ensure_fiscal_year()
@@ -559,6 +609,7 @@ def after_migrate():
 	_restructure_selling_workspace()
 	_dedupe_lims_workspace_sidebar()
 	_ensure_rekap_kepatuhan_report_is_script_report()
+	_prune_selling_workspace_sidebar()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):
