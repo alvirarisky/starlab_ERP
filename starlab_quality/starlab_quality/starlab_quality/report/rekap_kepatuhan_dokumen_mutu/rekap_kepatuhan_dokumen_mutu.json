@@ -18,10 +18,9 @@
  "name": "Rekap Kepatuhan Dokumen Mutu",
  "owner": "Administrator",
  "prepared_report": 0,
- "query": "\nSELECT\n\tm.document_no as \"No Dokumen:Data:120\",\n\tm.document_name as \"Nama Dokumen:Data:200\",\n\tm.document_level as \"Level::180\",\n\tm.status as \"Status Dokumen::100\",\n\td.divisi as \"Divisi::110\",\n\td.tanggal_distribusi as \"Tanggal Distribusi:Date:120\",\n\td.acknowledged as \"Sudah Dibaca:Check:90\"\nFROM `tabDocument Master` m\nINNER JOIN `tabDocument Distribution` d ON d.parent = m.name\nWHERE\n\t(%(document_level)s = '' OR m.document_level = %(document_level)s)\n\tAND (%(status)s = '' OR m.status = %(status)s)\n\tAND (%(divisi)s = '' OR d.divisi = %(divisi)s)\nORDER BY m.document_no, d.divisi\nLIMIT 5000\n",
  "ref_doctype": "Document Master",
  "report_name": "Rekap Kepatuhan Dokumen Mutu",
- "report_type": "Query Report",
+ "report_type": "Script Report",
  "roles": [
   {
    "role": "System Manager"

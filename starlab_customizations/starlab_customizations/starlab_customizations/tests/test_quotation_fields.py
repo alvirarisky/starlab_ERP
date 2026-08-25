@@ -84,9 +84,10 @@ class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 	quotation_hooks._calculate_price_summary."""
 
 	def setUp(self):
-		# harga_satuan di-fetch otomatis dari Test Parameter.harga_satuan_default
-		# (lihat quotation_test_utils.ensure_master_data) -- tidak diisi manual
-		# di sini karena fetch_from akan menimpanya saat insert/save.
+		# harga_satuan sengaja tidak diisi manual di sini -- dengan fetch_if_empty
+		# (lihat quotation_parameter_detail.json), kosong berarti field ini akan
+		# di-fetch otomatis dari Test Parameter.harga_satuan_default (lihat
+		# quotation_test_utils.ensure_master_data).
 		self.parameter_detail = [{"parameter": TEST_PARAMETER_NAME, "frekuensi": 1, "qty_per_titik": 1}]
 
 	def test_rush_fee_amount_added_to_total_when_tier_set(self):
@@ -127,6 +128,54 @@ class IntegrationTestQuotationRushFeeInTotal(IntegrationTestCase):
 
 		self.assertEqual(reloaded.dpp, expected_dpp)
 		self.assertEqual(reloaded.total_invoice, expected_total)
+
+
+class IntegrationTestQuotationHargaSatuanOverride(IntegrationTestCase):
+	"""Open question #2 (jawaban Starlab): harga per parameter boleh auto-fill
+	dari Test Parameter.harga_satuan_default, TAPI harus tetap bisa diganti
+	manual kalau ada yang perlu disesuaikan. Sebelum fetch_if_empty=1
+	ditambahkan ke quotation_parameter_detail.json, harga_satuan yang sudah
+	diisi manual selalu ketiban balik ke harga_satuan_default setiap
+	insert/save (fetch_from Frappe core menimpa field tanpa fetch_if_empty
+	setiap kali, bukan cuma sekali pas parameter pertama dipilih) -- dites
+	langsung ke database sebelum fix ini, terkonfirmasi bug nyata."""
+
+	def test_empty_harga_satuan_still_auto_fetches_default(self):
+		doc = make_quotation(
+			parameter_detail=[{"parameter": TEST_PARAMETER_NAME, "frekuensi": 1, "qty_per_titik": 1}]
+		)
+		default_price = frappe.db.get_value("Test Parameter", TEST_PARAMETER_NAME, "harga_satuan_default")
+		self.assertEqual(doc.parameter_detail[0].harga_satuan, default_price)
+
+	def test_manual_override_survives_insert(self):
+		doc = make_quotation(
+			parameter_detail=[
+				{
+					"parameter": TEST_PARAMETER_NAME,
+					"frekuensi": 1,
+					"qty_per_titik": 1,
+					"harga_satuan": 99999,
+				}
+			]
+		)
+		self.assertEqual(doc.parameter_detail[0].harga_satuan, 99999)
+
+	def test_manual_override_survives_subsequent_save(self):
+		doc = make_quotation(
+			parameter_detail=[
+				{
+					"parameter": TEST_PARAMETER_NAME,
+					"frekuensi": 1,
+					"qty_per_titik": 1,
+					"harga_satuan": 99999,
+				}
+			]
+		)
+		doc = frappe.get_doc("Quotation", doc.name)
+		doc.save(ignore_permissions=True)
+
+		reloaded = frappe.get_doc("Quotation", doc.name)
+		self.assertEqual(reloaded.parameter_detail[0].harga_satuan, 99999)
 
 
 class IntegrationTestTncMasterTemplateV2(IntegrationTestCase):

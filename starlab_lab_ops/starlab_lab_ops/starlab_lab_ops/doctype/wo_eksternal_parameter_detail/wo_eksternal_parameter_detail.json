@@ -1,0 +1,95 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-08-25 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter",
+  "matriks",
+  "sample",
+  "hasil_uji",
+  "satuan",
+  "status_hasil",
+  "test_result",
+  "catatan"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Parameter Uji",
+   "options": "Test Parameter",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "parameter.matriks",
+   "fieldname": "matriks",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Matriks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sample",
+   "options": "Sample",
+   "description": "Wajib diisi sebelum WO Eksternal diajukan approval (lihat condition transisi Ajukan) -- tidak reqd di level field supaya draft otomatis (dibuat sistem saat parameter ditandai Subkon) bisa langsung tersimpan sebelum sample dipilih manual."
+  },
+  {
+   "fieldname": "hasil_uji",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Hasil Uji"
+  },
+  {
+   "fetch_from": "parameter.satuan",
+   "fieldname": "satuan",
+   "fieldtype": "Data",
+   "label": "Satuan",
+   "read_only": 1
+  },
+  {
+   "default": "Menunggu",
+   "fieldname": "status_hasil",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status Hasil",
+   "options": "Menunggu\nDiterima",
+   "reqd": 1
+  },
+  {
+   "fieldname": "test_result",
+   "fieldtype": "Link",
+   "label": "Test Result",
+   "options": "Test Result",
+   "read_only": 1,
+   "description": "Diisi otomatis oleh sistem begitu hasil ditandai Diterima pada WO Eksternal yang sudah Approved -- lihat wo_eksternal_hooks.on_update_wo_eksternal."
+  },
+  {
+   "fieldname": "catatan",
+   "fieldtype": "Small Text",
+   "label": "Catatan"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-25 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Starlab Lab Ops",
+ "name": "WO Eksternal Parameter Detail",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

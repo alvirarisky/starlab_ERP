@@ -93,6 +93,18 @@ def _notify_role_via_whatsapp(role: str, message: str) -> None:
 			send_whatsapp_message(mobile_no, message)
 
 
+def _notify_customer_via_whatsapp(customer: str, message: str) -> None:
+	"""Sama seperti _notify_role_via_whatsapp di atas tapi untuk satu
+	Customer spesifik -- nomor diambil dari Customer.mobile_no (bawaan
+	ERPNext, fetch_from customer_primary_contact.mobile_no), bukan custom
+	field baru. Dipanggil langsung (bukan lewat HTTP) oleh kode server-side
+	trusted lain (starlab_lab_ops.whatsapp_notify), sama seperti
+	_notify_role_via_whatsapp."""
+	mobile_no = frappe.db.get_value("Customer", customer, "mobile_no")
+	if mobile_no:
+		send_whatsapp_message(mobile_no, message)
+
+
 @frappe.whitelist()
 def notify_role_via_whatsapp(role: str, message: str) -> None:
 	"""Endpoint HTTP untuk trigger broadcast WhatsApp manual ke seluruh

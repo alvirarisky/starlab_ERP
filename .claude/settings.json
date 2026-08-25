@@ -32,7 +32,8 @@
       "Bash(mv \"Html → Body.png\" \"02-dashboard-ikhtisar-saluran.png\")",
       "Bash(mv \"Html → Body-1.png\" \"03-panel-detail-timeline.png\")",
       "Bash(mv \"Html → Body-2.png\" \"04-papan-kanban-form-tambah-kartu.png\")",
-      "Bash(mv \"Html → Body-3.png\" \"05-tampilan-list.png\")"
+      "Bash(mv \"Html → Body-3.png\" \"05-tampilan-list.png\")",
+      "Bash(node -e ' *)"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -106,6 +106,19 @@ def on_submit(doc, method=None):
 	doc.db_set("status", "Issued")
 	log_system_field_change(doc.doctype, doc.name, {"status": (old_status, "Issued")})
 
+	# Open question #3 (jawaban Starlab): notifikasi WhatsApp ke customer +
+	# staff (Marketing/Administrasi/Manajer Teknis/Direksi) begitu laporan
+	# (LHU) terbit.
+	from starlab_lab_ops.whatsapp_notify import notify_staff_and_customer
+
+	notify_staff_and_customer(
+		doc.customer,
+		frappe._("LHU {0} sudah terbit (Work Order {1}).").format(doc.name, doc.work_order),
+		frappe._("Laporan Hasil Uji Anda ({0}) sudah terbit. Lihat/unduh di {1}/status-klien").format(
+			doc.name, frappe.utils.get_url()
+		),
+	)
+
 	# LHU lama yang di-amend baru resmi "Superseded" begitu LHU pengganti
 	# ini benar-benar terbit (submit), bukan langsung saat Cancel/Amend --
 	# supaya tidak ada jeda di mana LHU lama sudah "usang" padahal LHU

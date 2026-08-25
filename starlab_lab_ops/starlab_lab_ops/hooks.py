@@ -40,10 +40,18 @@ has_permission = {
 doc_events = {
 	"Work Order Pengujian": {
 		"validate": "starlab_lab_ops.wo_hooks.validate_work_order",
-		"on_update": "starlab_lab_ops.wo_hooks.on_update_work_order",
+		"on_update": [
+			"starlab_lab_ops.wo_hooks.on_update_work_order",
+			"starlab_lab_ops.wo_hooks.handle_subkon_flagging",
+		],
+	},
+	"WO Eksternal": {
+		"validate": "starlab_lab_ops.wo_eksternal_hooks.validate_wo_eksternal",
+		"on_update": "starlab_lab_ops.wo_eksternal_hooks.on_update_wo_eksternal",
 	},
 	"Sample": {
 		"validate": "starlab_lab_ops.wo_hooks.validate_sample",
+		"on_update": "starlab_lab_ops.wo_hooks.on_update_sample",
 	},
 	"Test Result": {
 		"validate": "starlab_lab_ops.wo_hooks.validate_test_result",
@@ -107,7 +115,9 @@ fixtures = [
 	},
 	{
 		"dt": "Workflow",
-		"filters": [["document_type", "in", ["Work Order Pengujian", "Sample", "Test Result"]]],
+		"filters": [
+			["document_type", "in", ["Work Order Pengujian", "Sample", "Test Result", "WO Eksternal"]]
+		],
 	},
 	{"dt": "Custom Field", "filters": [["dt", "=", "Work Order Pengujian"]]},
 	{
@@ -121,6 +131,7 @@ fixtures = [
 					"Sample",
 					"Test Result",
 					"LHU",
+					"WO Eksternal",
 					# 2026-08-14: Test Parameter cuma punya permission "System Manager"
 					# sejak dibuat -- shortcut "Test Parameter" di Workspace LIMS diam-diam
 					# hilang dari sidebar Laboratorium/Manajer Teknis/Direksi (Frappe

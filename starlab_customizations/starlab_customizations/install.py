@@ -469,6 +469,27 @@ def _ensure_tnc_master_templates():
 	seed_tnc_master_template_v2.execute()
 
 
+def _restructure_selling_workspace():
+	# 2026-08-24: same drift class as _ensure_tnc_master_templates above -- "Selling"
+	# and "ERPNext Settings" are standard ERPNext Workspaces, reset by erpnext's own
+	# module sync on `bench migrate` (same reasoning as
+	# SYSTEM_MANAGER_ONLY_WORKSPACES/_restrict_admin_workspaces_to_system_manager
+	# above, which is why "Selling" is already in that list -- restricting who can
+	# see the Workspace icon doesn't stop erpnext's sync from resetting the
+	# Workspace's own content/links every migrate). patches/
+	# restructure_selling_and_org_menu.py already applied the menu cleanup once
+	# ([post_model_sync], patches.txt) -- but a patch never re-runs, so a later
+	# erpnext sync can silently undo it on a long-lived site (confirmed missing on
+	# this project's own dev site). Re-run the patch's own (now idempotent, see
+	# _selling_already_restructured guard in that file) execute() every migrate
+	# instead of re-implementing the Workspace-editing logic a second time here --
+	# same "call the existing patch's function" pattern as
+	# _ensure_tnc_master_templates.
+	from starlab_customizations.patches import restructure_selling_and_org_menu
+
+	restructure_selling_and_org_menu.execute()
+
+
 def after_migrate():
 	_ensure_company()
 	_ensure_fiscal_year()
@@ -480,6 +501,7 @@ def after_migrate():
 	_rehide_unused_workspaces()
 	_ensure_hr_workspace_sidebar()
 	_ensure_crm_starlab_shortcuts()
+	_restructure_selling_workspace()
 
 	for report_name in FINANCE_REPORT_ACCESS:
 		if not frappe.db.exists("Report", report_name):

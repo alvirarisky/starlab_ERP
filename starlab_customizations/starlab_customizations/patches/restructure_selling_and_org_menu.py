@@ -32,10 +32,36 @@ def execute():
 	_swap_branch_for_employee_list()
 
 
+def _selling_already_restructured(selling):
+	content = json.loads(selling.content or "[]")
+	if any(b.get("data", {}).get("card_name") == "Point of Sale" for b in content):
+		return False
+
+	links_by_label = {link.label: link for link in selling.links}
+	if any(
+		label in links_by_label for label in ("Point of Sale", "Price List", "Coupon Code", "Blanket Order")
+	):
+		return False
+	pricing_rule = links_by_label.get("Pricing Rule")
+	if pricing_rule and not pricing_rule.hidden:
+		return False
+	if "Item" in links_by_label or "Item Group" in links_by_label:
+		return False
+
+	return True
+
+
 def _restructure_selling():
 	if not frappe.db.exists("Workspace", "Selling"):
 		return
 	selling = frappe.get_doc("Workspace", "Selling")
+
+	# 2026-08-24: this Workspace is standard ERPNext, reset by erpnext's own module
+	# sync on `bench migrate` -- called again every migrate (see install.py's
+	# _restructure_selling_workspace) on a long-lived site that's already in the
+	# target state, so this guard skips the write instead of re-saving every time.
+	if _selling_already_restructured(selling):
+		return
 
 	# --- content (layout grid "Reports & Masters") -- buang blok card "Point of Sale" ---
 	content = json.loads(selling.content or "[]")

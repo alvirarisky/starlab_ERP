@@ -13,6 +13,7 @@
   "pj_analis",
   "target_pengujian",
   "status_pengujian",
+  "wo_eksternal",
   "keterangan"
  ],
  "fields": [
@@ -62,6 +63,14 @@
    "label": "Status Pengujian",
    "options": "Pending\nIn Progress\nDone\nSubkon",
    "reqd": 1
+  },
+  {
+   "fieldname": "wo_eksternal",
+   "fieldtype": "Link",
+   "label": "WO Eksternal",
+   "options": "WO Eksternal",
+   "read_only": 1,
+   "description": "Diisi otomatis oleh sistem begitu baris ini ditandai Subkon -- lihat wo_hooks.handle_subkon_flagging."
   },
   {
    "fieldname": "keterangan",

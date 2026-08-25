@@ -57,6 +57,7 @@
   },
   {
    "fetch_from": "parameter.harga_satuan_default",
+   "fetch_if_empty": 1,
    "fieldname": "harga_satuan",
    "fieldtype": "Currency",
    "in_list_view": 1,

@@ -65,6 +65,32 @@ def on_update_work_order(doc, method=None):
 		)
 
 
+def handle_subkon_flagging(doc, method=None):
+	# Open question #1 (jawaban Starlab): begitu satu/lebih baris
+	# wo_parameter_detail ditandai Subkon, sistem otomatis bikin draft WO
+	# Eksternal supaya Administrasi tinggal melengkapi vendor/biaya/tanggal
+	# lalu mengajukan approval MT->MM->Direksi -- bukan lagi murni penanda
+	# manual di luar sistem (lihat description lama status_pengujian).
+	before = doc.get_doc_before_save()
+	if not before:
+		return
+
+	before_status_by_idx = {row.idx: row.status_pengujian for row in before.wo_parameter_detail}
+	newly_flagged = [
+		row
+		for row in doc.wo_parameter_detail
+		if row.status_pengujian == "Subkon"
+		and not row.wo_eksternal
+		and before_status_by_idx.get(row.idx) != "Subkon"
+	]
+	if not newly_flagged:
+		return
+
+	from starlab_lab_ops.wo_eksternal_hooks import create_draft_wo_eksternal
+
+	create_draft_wo_eksternal(doc, newly_flagged)
+
+
 def validate_sample(doc, method=None):
 	before = doc.get_doc_before_save()
 	previous_status = before.status if before else None
@@ -93,6 +119,32 @@ def validate_sample(doc, method=None):
 				doc.name
 			),
 		)
+
+
+def on_update_sample(doc, method=None):
+	# Open question #3 (jawaban Starlab): notifikasi WhatsApp ke customer +
+	# staff (Marketing/Administrasi/Manajer Teknis/Direksi) begitu sample
+	# diterima. Dipisah dari validate_sample (di atas) ke on_update, sama
+	# seperti pola notifikasi lain di app ini (on_update_work_order,
+	# on_update_test_result) -- notifikasi baru dikirim SETELAH tersimpan,
+	# bukan di validate() yang bisa jadi belum tentu benar-benar tersimpan.
+	before = doc.get_doc_before_save()
+	previous_status = before.status if before else None
+	if previous_status == "Diterima" or doc.status != "Diterima" or not doc.work_order:
+		return
+
+	customer = frappe.db.get_value("Work Order Pengujian", doc.work_order, "customer")
+
+	from starlab_lab_ops.whatsapp_notify import notify_staff_and_customer
+
+	notify_staff_and_customer(
+		customer,
+		frappe._("Sample {0} sudah diterima (Work Order {1}).").format(doc.name, doc.work_order),
+		frappe._(
+			"Sample Anda ({0}) sudah kami terima dan mulai diproses. Cek status pengujian"
+			" di {1}/status-klien"
+		).format(doc.name, frappe.utils.get_url()),
+	)
 
 
 def validate_test_result(doc, method=None):

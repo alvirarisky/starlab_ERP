@@ -142,7 +142,7 @@ fixtures = [
 	},
 	{
 		"dt": "Workflow Action Master",
-		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan"]]],
+		"filters": [["name", "in", ["Ajukan", "Setujui", "Tolak", "Revisi", "Batalkan", "Aktifkan Kembali"]]],
 	},
 	{
 		"dt": "Workflow",
